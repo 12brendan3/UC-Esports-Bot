@@ -1,0 +1,45 @@
+{
+  "name": "uc-esports-bot",
+  "version": "0.1.0",
+  "description": "A bot for the University of Cincinnati Esports Discord server.",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index",
+    "pretest": "eslint --ignore-path .gitignore ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/12brendan3/UC-Esports-Bot.git"
+  },
+  "keywords": [
+    "discord",
+    "js",
+    "discord.js",
+    "bot"
+  ],
+  "author": "Brendan Root, Baru Yogesh",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/12brendan3/UC-Esports-Bot/issues"
+  },
+  "homepage": "https://github.com/12brendan3/UC-Esports-Bot#readme",
+  "dependencies": {
+    "@discordjs/opus": "^0.3.2",
+    "bufferutil": "^4.0.1",
+    "discord.js": "^12.2.0",
+    "erlpack": "github:discordapp/erlpack",
+    "libsodium-wrappers": "^0.7.6",
+    "utf-8-validate": "^5.0.2",
+    "zlib-sync": "^0.1.7"
+  },
+  "devDependencies": {
+    "@shopify/eslint-plugin": "^37.0.1",
+    "eslint": "^7.5.0"
+  },
+  "eslintConfig": {
+    "extends": [
+      "plugin:@shopify/esnext",
+      "plugin:@shopify/node"
+    ]
+  }
+}

@@ -32,5 +32,6 @@ function stopBot() {
 function restartBot() {
   stopBot();
   settings.clearAll();
+  modules.clearAll();
   startBot();
 }

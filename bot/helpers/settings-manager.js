@@ -15,7 +15,7 @@ function loadAll() {
   loadSettings();
 }
 
-// Private Functions
+// Private functions
 function loadAuth() {
   if (fs.existsSync('./storage') && fs.existsSync('./storage/auth.json')) {
     try {

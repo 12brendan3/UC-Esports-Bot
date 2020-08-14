@@ -1,10 +1,30 @@
+const settings = require('../helpers/settings-manager');
+const modules = require('../helpers/module-manager');
+
 // Exports
 module.exports = {handle};
 
 // Exported function
 function handle(client, msg) {
   console.log(`${msg.channel.name} <${msg.author.username}> ${msg.content}`);
-  if (msg.content.startsWith('bc!ping')) {
-    msg.reply('pong!');
+  if (msg.content.startsWith(settings.getSettings().prefix)) {
+    handleCommand(client, msg);
+  }
+}
+
+// Private function
+function handleCommand(client, msg) {
+  let command = msg.content.substr(settings.getSettings().prefix.length);
+
+  if (msg.content.includes(' ')) {
+    command = command.split(' ')[0];
+  }
+
+  const commands = modules.getCommands();
+
+  if (commands[command]) {
+    commands[command].handle(client, msg);
+  } else {
+    msg.reply('unknown command.');
   }
 }

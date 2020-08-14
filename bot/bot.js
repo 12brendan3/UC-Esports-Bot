@@ -1,43 +1,36 @@
-const fs = require('fs');
-const path = require('path');
-
 const Discord = require('discord.js');
 
-const client = new Discord.Client();
+let client;
 
-const eventImports = {};
+const modules = require('./helpers/module-manager');
+const settings = require('./helpers/settings-manager');
 
-// Temp import bot auth
-const auth = require('../storage/auth.json');
+// Exports
+module.exports = {startBot, stopBot, restartBot};
 
 // Exported functions
-module.exports = {startBot, stopBot};
-
 function startBot() {
-  registerEvents();
+  client = new Discord.Client();
 
-  client.login(auth.token);
+  modules.registerAll(client);
+
+  settings.loadAll();
+
+  const botToken = settings.getAuth().botToken;
+
+  if (botToken && botToken !== 'replace me') {
+    client.login(botToken);
+  } else {
+    console.info('No bot token found, please edit the "settings.json" file in the storage folder.\nYou can then type "restart" and then press enter.\nTo exit, type "exit" and then press enter.');
+  }
 }
 
 function stopBot() {
   client.destroy();
 }
 
-
-// Private functions
-function registerEvents() {
-  const events = fs.readdirSync('./bot/events');
-  console.log(events);
-
-  for (let i = 0; i < events.length; i++) {
-    const eventName = path.basename(events[i], '.js');
-
-    eventImports[eventName] = require(`./events/${events[i]}`);
-
-    client.on(eventName, (eventData, eventData2) => {
-      eventImports[eventName].handle(client, eventData, eventData2);
-    });
-
-    console.info(`Loaded event: ${eventName}`);
-  }
+function restartBot() {
+  stopBot();
+  settings.clearAll();
+  startBot();
 }

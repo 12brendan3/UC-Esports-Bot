@@ -9,10 +9,13 @@ const input = readline.createInterface({
   output: process.stdout,
 });
 
-// Allow user input
-input.on('line', (line) => {
-  handleUserInput(line);
-});
+const help =
+'\n---- Here are all the commands ----\n' +
+'help; This command.\n' +
+'reload <item>; Reloads the specified item.  Items: settings, auth, commands, all\n' +
+'reload command <command name>; Reloads a single bot command.\n' +
+'restart; Restarts the entire bot.\n' +
+'exit; Exits gracefully.';
 
 // Do something with user input
 function handleUserInput(line) {
@@ -33,14 +36,21 @@ function handleUserInput(line) {
     case 'reload':
       reloadSomething(split);
       break;
+    case 'help':
+      console.info(help);
+      break;
     default:
-      console.info('Invalid command.');
+      console.info('Invalid command. Try "help" for help.');
       break;
   }
 }
 
 // Start everything
 function startUp() {
+  input.on('line', (line) => {
+    handleUserInput(line);
+  });
+
   bot.startBot();
 }
 
@@ -66,6 +76,11 @@ function reloadSomething(split) {
         break;
       case 'command':
         botModules.reloadCommand(split[2]);
+        break;
+      case 'all':
+        botStorage.loadSettings();
+        botStorage.loadAuth();
+        botModules.reloadCommands();
         break;
       default:
         console.info('Invalid reload option.');

@@ -2,12 +2,13 @@ const fs = require('fs');
 
 const authTemplate = {botToken: 'replace me'};
 const settingsTemplate = {prefix: 'bc!'};
+const version = 'v1.0.0';
 
 let auth = {};
 let settings = {};
 
 // Exports
-module.exports = {loadAll, loadAuth, loadSettings, getAuth, getSettings, clearAll};
+module.exports = {loadAll, loadAuth, loadSettings, getAuth, getSettings, clearAll, version};
 
 // Exported functions
 function loadAll() {

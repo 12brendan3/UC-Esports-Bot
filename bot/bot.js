@@ -4,6 +4,7 @@ let client;
 
 const modules = require('./helpers/module-manager');
 const settings = require('./helpers/settings-manager');
+const database = require('./helpers/database-manager');
 
 // Exports
 module.exports = {startBot, stopBot, restartBot};
@@ -11,6 +12,8 @@ module.exports = {startBot, stopBot, restartBot};
 // Exported functions
 function startBot() {
   client = new Discord.Client();
+
+  database.syncTables();
 
   modules.registerAll(client);
 

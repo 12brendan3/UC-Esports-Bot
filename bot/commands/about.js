@@ -22,6 +22,8 @@ function handle(client, msg) {
   embed.addField('__Previous Contributors__', '• [Jordan Wentland](https://github.com/jordanwentland)');
   embed.addField('__Links__', '• [GitHub Repo](https://github.com/12brendan3/UC-Esports-Bot)');
 
+  embed.setFooter(settings.version);
+
   msg.channel.send(embed);
 }
 

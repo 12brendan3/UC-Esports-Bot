@@ -1,16 +1,16 @@
 // Imports
-const modules = require('../helpers/module-manager');
+const modules = require(`../helpers/module-manager`);
 
 // Exports
 module.exports = {handle, getHelp};
 
 // Help command text
 const help =
-'This command :)';
+`This command :)`;
 
 // Exported functions
 function handle(client, msg) {
-  let helpMessage = '';
+  let helpMessage = ``;
   const commands = modules.getCommands();
 
   for (const key of Object.keys(commands)) {

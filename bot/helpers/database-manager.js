@@ -1,13 +1,13 @@
-const Sequelize = require('sequelize');
+const Sequelize = require(`sequelize`);
 
-const sequelize = new Sequelize('database', 'user', 'password', {
-  host: 'localhost',
-  dialect: 'sqlite',
+const sequelize = new Sequelize(`database`, `user`, `password`, {
+  host: `localhost`,
+  dialect: `sqlite`,
   logging: false,
-  storage: './storage/database.sqlite',
+  storage: `./storage/database.sqlite`,
 });
 
-const Users = sequelize.define('users', {
+const Users = sequelize.define(`users`, {
   id: {
     type: Sequelize.STRING,
     unique: true,
@@ -29,7 +29,7 @@ const Users = sequelize.define('users', {
   },
 });
 
-const Roles = sequelize.define('roles', {
+const Roles = sequelize.define(`roles`, {
   id: {
     type: Sequelize.STRING,
     unique: true,
@@ -54,7 +54,7 @@ const Roles = sequelize.define('roles', {
   },
 });
 
-const XP = sequelize.define('XP', {
+const XP = sequelize.define(`XP`, {
   id: {
     type: Sequelize.STRING,
     unique: true,
@@ -71,7 +71,7 @@ const XP = sequelize.define('XP', {
   },
 });
 
-const Starboard = sequelize.define('Starboard', {
+const Starboard = sequelize.define(`Starboard`, {
   messageId: {
     type: Sequelize.STRING,
     unique: true,
@@ -90,6 +90,6 @@ module.exports = {
     Roles.sync();
     XP.sync();
     Starboard.sync();
-    console.info('Database tables synced.');
+    console.info(`Database tables synced.`);
   },
 };

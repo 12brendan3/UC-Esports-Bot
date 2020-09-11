@@ -12,7 +12,7 @@ function handle(client, oldPresence, newPresence) {
 function checkStreaming(presence) {
   let streaming = false;
   for (let i = 0; i < presence.activities.length > 0; i++) {
-    if (presence.activities[i].type === 'LISTENING') {
+    if (presence.activities[i].type === `LISTENING`) {
       streaming = true;
       break;
     }

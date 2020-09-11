@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+const fs = require(`fs`);
+const path = require(`path`);
 
 let eventImports = {};
 let commandImports = {};
@@ -18,10 +18,10 @@ function getCommands() {
 }
 
 function reloadCommands() {
-  const commands = fs.readdirSync('./bot/commands');
+  const commands = fs.readdirSync(`./bot/commands`);
 
   for (let i = 0; i < commands.length; i++) {
-    const commandName = path.basename(commands[i], '.js');
+    const commandName = path.basename(commands[i], `.js`);
 
     delete require.cache[require.resolve(`../commands/${commands[i]}`)];
     delete commandImports[commandName];
@@ -36,14 +36,14 @@ function clearAll() {
   eventImports = {};
   commandImports = {};
 
-  const commands = fs.readdirSync('./bot/commands');
+  const commands = fs.readdirSync(`./bot/commands`);
   for (let i = 0; i < commands.length; i++) {
     delete require.cache[require.resolve(`../commands/${commands[i]}`)];
   }
 }
 
 function reloadCommand(command) {
-  const commands = fs.readdirSync('./bot/commands');
+  const commands = fs.readdirSync(`./bot/commands`);
 
   if (commands.includes(`${command}.js`)) {
     delete require.cache[require.resolve(`../commands/${command}.js`)];
@@ -59,10 +59,10 @@ function reloadCommand(command) {
 
 // Private functions
 function registerEvents(client) {
-  const events = fs.readdirSync('./bot/events');
+  const events = fs.readdirSync(`./bot/events`);
 
   for (let i = 0; i < events.length; i++) {
-    const eventName = path.basename(events[i], '.js');
+    const eventName = path.basename(events[i], `.js`);
 
     eventImports[eventName] = require(`../events/${events[i]}`);
 
@@ -79,10 +79,10 @@ function registerEvent(client, eventName) {
 }
 
 function loadCommands() {
-  const commands = fs.readdirSync('./bot/commands');
+  const commands = fs.readdirSync(`./bot/commands`);
 
   for (let i = 0; i < commands.length; i++) {
-    const commandName = path.basename(commands[i], '.js');
+    const commandName = path.basename(commands[i], `.js`);
 
     commandImports[commandName] = require(`../commands/${commands[i]}`);
 

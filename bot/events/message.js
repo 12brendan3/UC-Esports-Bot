@@ -1,5 +1,5 @@
-const settings = require('../helpers/settings-manager');
-const modules = require('../helpers/module-manager');
+const settings = require(`../helpers/settings-manager`);
+const modules = require(`../helpers/module-manager`);
 
 // Exports
 module.exports = {handle};
@@ -17,8 +17,8 @@ function handleCommand(client, msg) {
 
   let command = msg.content.substr(settings.getSettings().prefix.length);
 
-  if (msg.content.includes(' ')) {
-    command = command.split(' ')[0];
+  if (msg.content.includes(` `)) {
+    command = command.split(` `)[0];
   }
 
   const commands = modules.getCommands();
@@ -26,6 +26,6 @@ function handleCommand(client, msg) {
   if (commands[command]) {
     commands[command].handle(client, msg);
   } else {
-    msg.reply('unknown command.');
+    msg.reply(`unknown command.`);
   }
 }

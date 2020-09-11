@@ -1,10 +1,10 @@
-const Discord = require('discord.js');
+const Discord = require(`discord.js`);
 
 let client;
 
-const modules = require('./helpers/module-manager');
-const settings = require('./helpers/settings-manager');
-const database = require('./helpers/database-manager');
+const modules = require(`./helpers/module-manager`);
+const settings = require(`./helpers/settings-manager`);
+const database = require(`./helpers/database-manager`);
 
 // Exports
 module.exports = {startBot, stopBot, restartBot};
@@ -21,10 +21,10 @@ function startBot() {
 
   const botToken = settings.getAuth().botToken;
 
-  if (botToken && botToken !== 'replace me') {
+  if (botToken && botToken !== `replace me`) {
     client.login(botToken);
   } else {
-    console.info('No bot token found, please edit the "settings.json" file in the storage folder.\nYou can then type "restart" and then press enter.\nTo exit, type "exit" and then press enter.');
+    console.info(`No bot token found, please edit the "settings.json" file in the storage folder.\nYou can then type "restart" and then press enter.\nTo exit, type "exit" and then press enter.`);
   }
 }
 

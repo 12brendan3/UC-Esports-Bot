@@ -2,11 +2,11 @@
 module.exports = {handle, getHelp};
 
 const help =
-'Replies with "pong!"';
+`Replies with "pong!"`;
 
 // Exported functions
 function handle(client, msg) {
-  msg.reply('pong!');
+  msg.reply(`pong!`);
 }
 
 function getHelp() {

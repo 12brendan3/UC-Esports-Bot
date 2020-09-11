@@ -1,12 +1,11 @@
-const settings = require('../helpers/settings-manager');
-const modules = require('../helpers/module-manager');
+const settings = require(`../helpers/settings-manager`);
+const modules = require(`../helpers/module-manager`);
 
 // Exports
 module.exports = {handle};
 
 // Exported function
 function handle(client, msg) {
-  console.log(`${msg.channel.name} <${msg.author.username}> ${msg.content}`);
   if (msg.content.startsWith(settings.getSettings().prefix)) {
     handleCommand(client, msg);
   }
@@ -14,10 +13,12 @@ function handle(client, msg) {
 
 // Private function
 function handleCommand(client, msg) {
+  console.info(`#${msg.channel.name} <${msg.author.username}> ${msg.content}`);
+
   let command = msg.content.substr(settings.getSettings().prefix.length);
 
-  if (msg.content.includes(' ')) {
-    command = command.split(' ')[0];
+  if (msg.content.includes(` `)) {
+    command = command.split(` `)[0];
   }
 
   const commands = modules.getCommands();
@@ -25,6 +26,6 @@ function handleCommand(client, msg) {
   if (commands[command]) {
     commands[command].handle(client, msg);
   } else {
-    msg.reply('unknown command.');
+    msg.reply(`unknown command.`);
   }
 }

@@ -3,8 +3,6 @@ module.exports = {handle};
 
 // Exported function
 function handle(client, oldPresence, newPresence) {
-  console.log(`\n\nGot a presence update for the user: ${newPresence.user.username}`);
-
   if (newPresence) {
     checkStreaming(newPresence);
   }
@@ -20,7 +18,7 @@ function checkStreaming(presence) {
     }
   }
 
-  if (streaming === true) {
+  if (streaming) {
     // Give streaming role here
   } else {
     // Remove streaming role here

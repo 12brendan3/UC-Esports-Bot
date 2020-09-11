@@ -1,3 +1,5 @@
+const weather = require(`../helpers/weather-manager`);
+
 // Exports
 module.exports = {handle};
 
@@ -12,4 +14,6 @@ function handle(client) {
 
     console.info(`Fetched all members from "${guild.name}."`);
   });
+
+  weather.startStatusLoop(client);
 }

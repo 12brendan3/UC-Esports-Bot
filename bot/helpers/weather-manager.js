@@ -7,33 +7,31 @@ let lastCheck = 0;
 let currentData = {temp: {value: `....`}, weather_code: {value: `unknown`}};
 
 // Exports
-module.exports = {startStatusLoop, getWeather};
+module.exports = {setBotStatus, getWeather};
 
 // Exported functions
-function startStatusLoop(client) {
-  setBotStatus(client);
+function getWeather() {
+  return currentData;
+}
+
+async function setBotStatus(client) {
+  await getWeatherData();
+  const status = `for ${settings.getSettings().prefix}help | ${getEmoji(currentData.weather_code.value)} ${Math.round(currentData.temp.value)}°F`;
+  client.user.setPresence({activity: {name: status, type: `WATCHING`}});
+
   setTimeout(() => {
     setBotStatus(client);
   }, 300000);
 }
 
-function getWeather() {
-  return currentData;
-}
-
 // Private functions
-async function setBotStatus(client) {
-  await getWeatherData();
-  const status = `for ${settings.getSettings().prefix}help | ${getEmoji(currentData.weather_code.value)} ${Math.round(currentData.temp.value)}°F`;
-  client.user.setPresence({activity: {name: status, type: `WATCHING`}});
-}
-
 async function getWeatherData() {
   const currentTime = new Date().getTime();
 
   if (currentTime > lastCheck + 300000) {
     lastCheck = currentTime;
 
+    // lat/lon is somewhere on UC's campus towards the middle
     const params = {
       lat: `39.131813`,
       lon: `-84.5159845`,

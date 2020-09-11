@@ -15,5 +15,5 @@ function handle(client) {
     console.info(`Fetched all members from "${guild.name}."`);
   });
 
-  weather.startStatusLoop(client);
+  weather.setBotStatus(client);
 }

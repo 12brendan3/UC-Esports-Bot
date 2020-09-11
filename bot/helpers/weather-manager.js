@@ -37,8 +37,8 @@ async function getWeatherData() {
 
     // lat/lon is somewhere on UC's campus towards the middle
     const params = {
-      lat: `39.131813`,
-      lon: `-84.5159845`,
+      lat: `39.1329`,
+      lon: `-84.5150`,
       // eslint-disable-next-line babel/camelcase
       unit_system: `us`,
       fields: `temp,weather_code`,

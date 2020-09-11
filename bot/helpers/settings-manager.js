@@ -1,6 +1,6 @@
 const fs = require(`fs`);
 
-const authTemplate = {botToken: `replace me`};
+const authTemplate = {botToken: `replace me`, weatherToken: `replace me`};
 const settingsTemplate = {prefix: `bc!`};
 const version = `v1.0.0`;
 

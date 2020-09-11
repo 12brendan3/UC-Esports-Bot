@@ -15,13 +15,17 @@ function getWeather() {
 }
 
 async function setBotStatus(client) {
-  await getWeatherData();
-  const status = `for ${settings.getSettings().prefix}help | ${getEmoji(currentData.weather_code.value)} ${Math.round(currentData.temp.value)}°F`;
-  client.user.setPresence({activity: {name: status, type: `WATCHING`}});
+  if (settings.getAuth().weatherToken || settings.getAuth().weatherToken === 'replace me') {
+    await getWeatherData();
+    const status = `for ${settings.getSettings().prefix}help | ${getEmoji(currentData.weather_code.value)} ${Math.round(currentData.temp.value)}°F`;
+    client.user.setPresence({activity: {name: status, type: `WATCHING`}});
 
-  setTimeout(() => {
-    setBotStatus(client);
-  }, 300000);
+    setTimeout(() => {
+      setBotStatus(client);
+    }, 300000);
+  } else {
+    console.error('No weather token found, please set one in the auth file.');
+  }
 }
 
 // Private functions

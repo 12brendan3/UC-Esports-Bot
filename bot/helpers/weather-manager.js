@@ -22,7 +22,7 @@ async function setBotStatus(client) {
 
     setTimeout(() => {
       setBotStatus(client);
-    }, 300000);
+    }, 600000);
   } else {
     console.error('No weather token found, please set one in the auth file.');
   }
@@ -32,7 +32,7 @@ async function setBotStatus(client) {
 async function getWeatherData() {
   const currentTime = new Date().getTime();
 
-  if (currentTime > lastCheck + 300000) {
+  if (currentTime >= lastCheck + 600000) {
     lastCheck = currentTime;
 
     // lat/lon is somewhere on UC's campus towards the middle

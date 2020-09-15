@@ -29,31 +29,6 @@ const Users = sequelize.define(`users`, {
   },
 });
 
-const Roles = sequelize.define(`roles`, {
-  roleID: {
-    type: Sequelize.STRING,
-    unique: true,
-    allowNull: false,
-    primaryKey: true,
-  },
-  name: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  emoji: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  category: {
-    type: Sequelize.CHAR,
-    allowNull: false,
-  },
-  desc: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-});
-
 const XP = sequelize.define(`XP`, {
   userID: {
     type: Sequelize.STRING,
@@ -72,12 +47,6 @@ const XP = sequelize.define(`XP`, {
 });
 
 const Starboard = sequelize.define(`Starboard`, {
-  key: {
-    type: Sequelize.INTEGER,
-    unique: true,
-    allowNull: false,
-    primaryKey: true,
-  },
   guildID: {
     type: Sequelize.STRING,
     allowNull: false,
@@ -92,7 +61,7 @@ const Starboard = sequelize.define(`Starboard`, {
   },
 });
 
-const Guild = sequelize.define(`Guild`, {
+const Guilds = sequelize.define(`Guilds`, {
   guildID: {
     type: Sequelize.STRING,
     unique: true,
@@ -104,6 +73,10 @@ const Guild = sequelize.define(`Guild`, {
     allowNull: true,
   },
   welcomeMessage: {
+    type: Sequelize.STRING,
+    allowNull: true,
+  },
+  welcomeChannelID: {
     type: Sequelize.STRING,
     allowNull: true,
   },
@@ -129,18 +102,80 @@ const Guild = sequelize.define(`Guild`, {
   },
 });
 
-module.exports = {
-  Users,
-  Roles,
-  XP,
-  Starboard,
-  Guild,
-  syncTables: () => {
-    Users.sync();
-    Roles.sync();
-    XP.sync();
-    Starboard.sync();
-    Guild.sync();
-    console.info(`Database tables synced.`);
-  },
-};
+// Make object containing tables
+const tables = {Users, XP, Starboard, Guilds};
+
+// Exports
+module.exports = {syncTables, createEntry, getEntry, getOrCreateEntry, updateEntry, updateOrCreateEntry, removeEntry};
+
+// Exported Functions
+function syncTables() {
+  Users.sync();
+  XP.sync();
+  Starboard.sync();
+  Guilds.sync();
+  console.info(`Database tables synced.`);
+}
+
+async function createEntry(table, newData) {
+  try {
+    const newEntry = await tables[table].create(newData);
+    return newEntry;
+  } catch (err) {
+    return false;
+  }
+}
+
+async function getEntry(table, filter) {
+  try {
+    const existingEntry = await tables[table].findOne({where: filter});
+    return existingEntry;
+  } catch (err) {
+    return false;
+  }
+}
+
+async function getOrCreateEntry(table, filter) {
+  try {
+    const existingEntry = await tables[table].findOne({where: filter});
+    return existingEntry;
+  } catch {
+    const newEntry = await createEntry(table, filter);
+    return newEntry;
+  }
+}
+
+async function updateEntry(table, filter, newData) {
+  try {
+    const existingEntry = await tables[table].update(newData, {where: filter});
+    return existingEntry;
+  } catch (err) {
+    return false;
+  }
+}
+
+async function updateOrCreateEntry(table, filter, newData) {
+  try {
+    const existingEntry = await tables[table].update(newData, {where: filter});
+
+    if (existingEntry[0] === 0) {
+      console.log(existingEntry);
+      throw Error('No entries updated.');
+    }
+
+    return existingEntry;
+  } catch (err) {
+    console.error(err);
+    const newEntry = createEntry(table, {...filter, ...newData});
+    return newEntry;
+  }
+}
+
+async function removeEntry(table, filter) {
+  try {
+    await tables[table].destroy({where: filter});
+    return true;
+  } catch (err) {
+    return false;
+  }
+}

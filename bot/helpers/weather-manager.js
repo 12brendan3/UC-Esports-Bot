@@ -4,7 +4,7 @@ const settings = require(`./settings-manager`);
 let lastCheck = 0;
 
 // eslint-disable-next-line babel/camelcase
-let currentData = {temp: {value: `....`}, weather_code: {value: `unknown`}};
+let currentData = {temp: {value: `...`}, weather_code: {value: `unknown`}};
 
 // Exports
 module.exports = {setBotStatus, getWeather};
@@ -24,7 +24,7 @@ async function setBotStatus(client) {
       setBotStatus(client);
     }, 600000);
   } else {
-    console.error('No weather token found, please set one in the auth file.');
+    console.error('No weather token found, please edit the "settings.json" file in the storage folder.\nYou can then type "restart" and then press enter.\nTo exit, type "exit" and then press enter.');
   }
 }
 

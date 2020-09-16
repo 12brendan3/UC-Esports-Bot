@@ -159,7 +159,8 @@ async function getEntry(table, filter) {
   try {
     const existingEntry = await tables[table].findOne({where: filter});
     return existingEntry;
-  } catch {
+  } catch (err) {
+    console.error(err);
     return false;
   }
 }
@@ -189,7 +190,6 @@ async function updateOrCreateEntry(table, filter, newData) {
     const existingEntry = await tables[table].update(newData, {where: filter});
 
     if (existingEntry[0] === 0) {
-      console.log(existingEntry);
       throw Error('No entries updated.');
     }
 

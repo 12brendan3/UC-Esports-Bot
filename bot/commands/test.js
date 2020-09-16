@@ -1,6 +1,8 @@
 // Imports
 const database = require('../helpers/database-manager');
 
+const Discord = require(`discord.js`);
+
 // Vars
 const options = `Currently the only options are: "welcome-message" and "welcome-channel"`;
 
@@ -39,6 +41,9 @@ function testSettings(msg, setting) {
     case 'welcome-channel':
       testWelcomeChannel(msg);
       break;
+    case 'logs-channel':
+      testLogsChannel(msg);
+      break;
     default:
       msg.reply(`Invalid option.\n${options}`);
       break;
@@ -48,7 +53,7 @@ function testSettings(msg, setting) {
 async function testWelcomeMessage(msg) {
   const guildSettings = await database.getEntry(`Guilds`, {guildID: msg.guild.id});
 
-  if (guildSettings) {
+  if (guildSettings && guildSettings.welcomeMessage) {
     const welcomeMessage = guildSettings.welcomeMessage.replace(`!!newuser!!`, `${msg.member}`);
     msg.channel.send(welcomeMessage);
   } else {
@@ -59,13 +64,34 @@ async function testWelcomeMessage(msg) {
 async function testWelcomeChannel(msg) {
   const guildSettings = await database.getEntry(`Guilds`, {guildID: msg.guild.id});
 
-  if (guildSettings.welcomeMessage && guildSettings.welcomeChannelID) {
+  if (guildSettings && guildSettings.welcomeMessage && guildSettings.welcomeChannelID) {
     const welcomeMessage = guildSettings.welcomeMessage.replace(`!!newuser!!`, `${msg.member}`);
     const welcomeChannel = msg.guild.channels.cache.get(guildSettings.welcomeChannelID);
     welcomeChannel.send(welcomeMessage);
-  } else if (guildSettings.welcomeChannelID) {
+  } else if (guildSettings && guildSettings.welcomeChannelID) {
     msg.reply(`there is no welcome message set up for this guild!`);
   } else {
     msg.reply(`there is no welcome channel set up for this guild!`);
+  }
+}
+
+async function testLogsChannel(msg) {
+  const guildSettings = await database.getEntry(`Guilds`, {guildID: msg.guild.id});
+
+  if (guildSettings && guildSettings.logsChannelID) {
+    const logsChannel = msg.guild.channels.cache.get(guildSettings.logsChannelID);
+    const embed = new Discord.MessageEmbed();
+
+    embed.setColor(`#00FF1A`);
+    embed.setAuthor(msg.member.displayName, msg.author.displayAvatarURL());
+    embed.setDescription(`Message was sent by ${msg.author} in ${msg.channel} to test the logs channel.`);
+    embed.addField(`Message Content`, `${msg.content}`);
+    embed.addField(`Message Link`, `[Jump to Message](${msg.url})`);
+    embed.setTimestamp();
+    embed.setFooter(`${msg.author.tag}`);
+
+    logsChannel.send(embed);
+  } else {
+    msg.reply(`there is no logs channel set up for this guild!`);
   }
 }

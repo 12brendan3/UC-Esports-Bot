@@ -5,7 +5,7 @@ const resolvers = require(`../helpers/resolvers`);
 const permissions = require("../helpers/permissions");
 
 // Vars
-const options = `Currently the only options are: "welcome-message" and "welcome-channel"`;
+const options = `Valid settings are: \`welcome-message\` \`welcome-channel\` \`admin-add\` \`admin-remove\` \`admin-list\` \`logs-channel\``;
 let activeChanges = [];
 
 // Exports
@@ -31,7 +31,7 @@ async function handle(client, msg) {
       if (option.length > 1) {
         changeSettings(msg, option[1]);
       } else {
-        msg.reply(`please provide a setting to change.\n${options}`);
+        msg.reply(`please provide a setting to change with your command.\n${options}`);
         activeChanges = activeChanges.filter((val) => val !== msg.guild.id);
       }
     } else {
@@ -62,9 +62,12 @@ function changeSettings(msg, setting) {
     case 'admin-list':
       listAdmins(msg);
       break;
+    case 'logs-channel':
+      changeLogsChannel(msg);
+      break;
     default:
       activeChanges = activeChanges.filter((val) => val !== msg.guild.id);
-      msg.reply(`invalid option.\n${options}`);
+      msg.reply(`that's not a valid setting.\n${options}`);
       break;
   }
 }
@@ -88,21 +91,33 @@ async function changeWelcomeMessage(msg) {
 }
 
 async function changeWelcomeChannel(msg) {
-  msg.reply(`please provide the name or ID of the new welcome message channel.`);
+  msg.reply(`please provide the name/ID of the new welcome message channel or mention it.\nIf you'd like to disable the welcome message, just send \`disable\`.`);
 
   try {
     const collected = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
 
-    const newWelcomeChannelID = resolvers.resolveChannelID(msg.guild, collected.first().content);
+    if (collected.first().content === 'disable') {
+      const result = await database.updateEntry(`Guilds`, {guildID: msg.guild.id}, {welcomeChannelID: null});
 
-    if (newWelcomeChannelID) {
-      const result = await database.updateOrCreateEntry(`Guilds`, {guildID: msg.guild.id}, {welcomeChannelID: newWelcomeChannelID});
-
-      console.log(result);
-
-      msg.reply(`welcome message channel has been updated!\nUse the "test welcome-channel" command to try it.`);
+      if (result) {
+        msg.reply(`the welcome message has been disabled.\nUse the "test welcome-channel" command to try it.`);
+      } else {
+        msg.reply(`there was an error disabling the welcome message.  Tell the bot developers if the issue persists.`);
+      }
     } else {
-      msg.reply(`no channel found, please try again.`);
+      const newWelcomeChannelID = resolvers.resolveChannelID(msg.guild, collected.first().content);
+
+      if (newWelcomeChannelID) {
+        const result = await database.updateOrCreateEntry(`Guilds`, {guildID: msg.guild.id}, {welcomeChannelID: newWelcomeChannelID});
+
+        if (result) {
+          msg.reply(`welcome message channel has been updated!\nUse the "test welcome-channel" command to try it.`);
+        } else {
+          msg.reply(`there was an error updating the welcome message channel.  Tell the bot developers if the issue persists.`);
+        }
+      } else {
+        msg.reply(`no channel found, please try again.`);
+      }
     }
   } catch (err) {
     console.error(err);
@@ -117,8 +132,6 @@ async function addAdmin(msg) {
 
   try {
     const collected = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
-
-    console.log(collected.first().content);
 
     const newUserID = resolvers.resolveUserID(msg.guild, collected.first().content);
 
@@ -207,6 +220,43 @@ async function sendAdminList(msg) {
 
 async function listAdmins(msg) {
   await sendAdminList(msg);
+
+  activeChanges = activeChanges.filter((val) => val !== msg.guild.id);
+}
+
+async function changeLogsChannel(msg) {
+  msg.reply(`please provide the name/ID of the new logs channel or mention it.\nIf you'd like to disable logs, just send \`disable\`.`);
+
+  try {
+    const collected = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
+
+    if (collected.first().content === 'disable') {
+      const result = await database.updateEntry(`Guilds`, {guildID: msg.guild.id}, {logsChannelID: null});
+
+      if (result) {
+        msg.reply(`the logs have been disabled.\nUse the "test logs-channel" command to try it.`);
+      } else {
+        msg.reply(`there was an error disabling logs.  Tell the bot developers if the issue persists.`);
+      }
+    } else {
+      const newLogChannelID = resolvers.resolveChannelID(msg.guild, collected.first().content);
+
+      if (newLogChannelID) {
+        const result = await database.updateOrCreateEntry(`Guilds`, {guildID: msg.guild.id}, {logsChannelID: newLogChannelID});
+
+        if (result) {
+          msg.reply(`logs channel has been updated!\nUse the "test logs-channel" command to try it.`);
+        } else {
+          msg.reply(`there was an error updating the logs channel.  Tell the bot developers if the issue persists.`);
+        }
+      } else {
+        msg.reply(`no channel found, please try again.`);
+      }
+    }
+  } catch (err) {
+    console.error(err);
+    msg.reply(`command timed out, please try again.`);
+  }
 
   activeChanges = activeChanges.filter((val) => val !== msg.guild.id);
 }

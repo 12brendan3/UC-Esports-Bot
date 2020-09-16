@@ -47,6 +47,7 @@ async function getWeatherData() {
 
     try {
       const newData = await axios.get(`https://api.climacell.co/v3/weather/realtime`, {params});
+      // Eventually check if moon is out using "sunrise"/"sunset" data and set the emoji using the "moon_phase" data - just add them to "fields" above
       currentData = newData.data;
     } catch (err) {
       console.error(`There was an error fetching the weather data....`);
@@ -93,6 +94,22 @@ function getEmoji(value) {
       return `🌤️`;
     case `clear`:
       return `☀️`;
+    case `new`:
+      return `🌑`;
+    case `waxing_crescent`:
+      return `🌒`;
+    case `first_quarter`:
+      return `🌓`;
+    case `waxing_gibbous`:
+      return `🌔`;
+    case `full`:
+      return `🌕`;
+    case `waning_gibbous`:
+      return `🌖`;
+    case `last_quarter`:
+      return `🌗`;
+    case `waning_crescent`:
+      return `🌘`;
     default:
       return `❔`;
   }

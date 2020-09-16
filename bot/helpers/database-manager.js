@@ -7,12 +7,17 @@ const sequelize = new Sequelize(`database`, `user`, `password`, {
   storage: `./storage/database.sqlite`,
 });
 
-const Users = sequelize.define(`users`, {
+const Bearcats = sequelize.define(`Bearcats`, {
   userID: {
     type: Sequelize.STRING,
     unique: true,
     allowNull: false,
     primaryKey: true,
+  },
+  email: {
+    type: Sequelize.STRING,
+    unique: true,
+    allowNull: false,
   },
   firstName: {
     type: Sequelize.STRING,
@@ -30,6 +35,12 @@ const Users = sequelize.define(`users`, {
 });
 
 const XP = sequelize.define(`XP`, {
+  ID: {
+    type: Sequelize.UUIDV4,
+    unique: true,
+    primaryKey: true,
+    allowNull: false,
+  },
   userID: {
     type: Sequelize.STRING,
     unique: true,
@@ -102,18 +113,35 @@ const Guilds = sequelize.define(`Guilds`, {
   },
 });
 
+const ServerAdmins = sequelize.define(`ServerAdmins`, {
+  ID: {
+    type: Sequelize.UUIDV4,
+    unique: true,
+    primaryKey: true,
+  },
+  guildID: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  userID: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+});
+
 // Make object containing tables
-const tables = {Users, XP, Starboard, Guilds};
+const tables = {Bearcats, XP, Starboard, Guilds, ServerAdmins};
 
 // Exports
-module.exports = {syncTables, createEntry, getEntry, getOrCreateEntry, updateEntry, updateOrCreateEntry, removeEntry};
+module.exports = {syncTables, createEntry, getEntry, getOrCreateEntry, updateEntry, updateOrCreateEntry, removeEntry, getAllEntries};
 
 // Exported Functions
 function syncTables() {
-  Users.sync();
+  Bearcats.sync();
   XP.sync();
   Starboard.sync();
   Guilds.sync();
+  ServerAdmins.sync();
   console.info(`Database tables synced.`);
 }
 
@@ -122,6 +150,7 @@ async function createEntry(table, newData) {
     const newEntry = await tables[table].create(newData);
     return newEntry;
   } catch (err) {
+    console.error(err);
     return false;
   }
 }
@@ -130,7 +159,7 @@ async function getEntry(table, filter) {
   try {
     const existingEntry = await tables[table].findOne({where: filter});
     return existingEntry;
-  } catch (err) {
+  } catch {
     return false;
   }
 }
@@ -150,6 +179,7 @@ async function updateEntry(table, filter, newData) {
     const existingEntry = await tables[table].update(newData, {where: filter});
     return existingEntry;
   } catch (err) {
+    console.error(err);
     return false;
   }
 }
@@ -164,8 +194,7 @@ async function updateOrCreateEntry(table, filter, newData) {
     }
 
     return existingEntry;
-  } catch (err) {
-    console.error(err);
+  } catch {
     const newEntry = createEntry(table, {...filter, ...newData});
     return newEntry;
   }
@@ -176,6 +205,17 @@ async function removeEntry(table, filter) {
     await tables[table].destroy({where: filter});
     return true;
   } catch (err) {
+    console.error(err);
+    return false;
+  }
+}
+
+async function getAllEntries(table, filter) {
+  try {
+    const foundEntries = await tables[table].findAll({where: filter});
+    return foundEntries;
+  } catch (err) {
+    console.error(err);
     return false;
   }
 }

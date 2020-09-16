@@ -36,8 +36,6 @@ async function removeAdmin(guildID, userID) {
   if (adminCheck) {
     const result = await database.removeEntry(`ServerAdmins`, {guildID, userID});
 
-    console.log(result);
-
     if (result) {
       return true;
     } else {

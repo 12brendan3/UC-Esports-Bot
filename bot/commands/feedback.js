@@ -6,7 +6,7 @@ module.exports = {handle, getHelp};
 
 // Help command text
 const help =
-`Allows anyone to provide feedback directly to bot developers.  Use this command for improvements, bugs, etc.`;
+`Allows anyone to provide feedback directly to the bot developers.  Use this command for improvements, bugs, etc.`;
 
 // Exported functions
 async function handle(client, msg) {

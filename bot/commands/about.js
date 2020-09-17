@@ -14,7 +14,7 @@ function handle(client, msg) {
   const embed = new Discord.MessageEmbed();
 
   embed.setTimestamp();
-  embed.setColor(`#FF0000`);
+  embed.setColor(`#FF7700`);
   embed.setAuthor(client.user.username, client.user.displayAvatarURL());
 
   embed.addField(`__About__`, `The UC Esports bot is written in JS using the Discord.js library.\nSuggestions for the bot can be provided via the "${settings.getSettings().prefix}feedback" commmand.`);

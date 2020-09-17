@@ -2,11 +2,11 @@
 module.exports = {handle, getHelp};
 
 const help =
-`Replies with "pong!"`;
+`Replies with "pong!" ...and the bot's actual ping.`;
 
 // Exported functions
 function handle(client, msg) {
-  msg.reply(`pong!`);
+  msg.reply(`pong! (${client.ws.ping} ms)`);
 }
 
 function getHelp() {

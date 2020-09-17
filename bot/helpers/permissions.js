@@ -21,7 +21,7 @@ async function addAdmin(guildID, userID) {
   const adminCheck = await database.getEntry(`ServerAdmins`, {guildID, userID});
 
   if (adminCheck) {
-    return 'duplicate';
+    return `duplicate`;
   } else {
     const result = await database.createEntry(`ServerAdmins`, {guildID, userID});
 
@@ -45,7 +45,7 @@ async function removeAdmin(guildID, userID) {
       return false;
     }
   } else {
-    return 'notadmin';
+    return `notadmin`;
   }
 }
 

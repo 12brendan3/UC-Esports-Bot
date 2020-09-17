@@ -20,13 +20,13 @@ async function handle(client, msg) {
   if (msg.channel.type === `dm`) {
     msg.reply(`this command has to be used in a server.`);
   } else {
-    const admin = msg.guild.ownerID === msg.author.id ? 'true' : await permissions.checkAdmin(msg.guild);
+    const admin = msg.guild.ownerID === msg.author.id ? `true` : await permissions.checkAdmin(msg.guild);
 
     if (admin && activeChanges.includes(msg.guild.id)) {
       msg.reply(`only one change can be made at a time.`);
     } else if (admin) {
       activeChanges.push(msg.guild.id);
-      const option = msg.content.split(' ');
+      const option = msg.content.split(` `);
 
       if (option.length > 1) {
         changeSettings(msg, option[1]);
@@ -47,22 +47,22 @@ function getHelp() {
 // Private functions
 function changeSettings(msg, setting) {
   switch (setting) {
-    case 'welcome-message':
+    case `welcome-message`:
       changeWelcomeMessage(msg);
       break;
-    case 'welcome-channel':
+    case `welcome-channel`:
       changeWelcomeChannel(msg);
       break;
-    case 'admin-add':
+    case `admin-add`:
       addAdmin(msg);
       break;
-    case 'admin-remove':
+    case `admin-remove`:
       removeAdmin(msg);
       break;
-    case 'admin-list':
+    case `admin-list`:
       listAdmins(msg);
       break;
-    case 'logs-channel':
+    case `logs-channel`:
       changeLogsChannel(msg);
       break;
     default:
@@ -100,7 +100,7 @@ async function changeWelcomeChannel(msg) {
   try {
     const collected = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
 
-    if (collected.first().content === 'disable') {
+    if (collected.first().content === `disable`) {
       const result = await database.updateEntry(`Guilds`, {guildID: msg.guild.id}, {welcomeChannelID: null});
 
       if (result) {
@@ -142,7 +142,7 @@ async function addAdmin(msg) {
     if (newUserID) {
       const success = await permissions.addAdmin(msg.guild.id, newUserID);
 
-      if (success && success === 'duplicate') {
+      if (success && success === `duplicate`) {
         msg.reply(`that user is already an admin!`);
       } else if (success) {
         if (msg.guild.ownerID === newUserID && msg.author.id === msg.guild.ownerID) {
@@ -177,7 +177,7 @@ async function removeAdmin(msg) {
 
       if (removeUserID) {
         const adminCheck = await permissions.removeAdmin(msg.guild.id, removeUserID);
-        if (adminCheck && adminCheck === 'notadmin') {
+        if (adminCheck && adminCheck === `notadmin`) {
           msg.reply(`that user isn't an admin!`);
         } else if (adminCheck) {
           if (msg.author.id === removeUserID) {
@@ -234,7 +234,7 @@ async function changeLogsChannel(msg) {
   try {
     const collected = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
 
-    if (collected.first().content === 'disable') {
+    if (collected.first().content === `disable`) {
       const result = await database.updateEntry(`Guilds`, {guildID: msg.guild.id}, {logsChannelID: null});
 
       if (result) {

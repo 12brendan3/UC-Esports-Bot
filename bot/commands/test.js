@@ -1,5 +1,5 @@
 // Imports
-const database = require('../helpers/database-manager');
+const database = require(`../helpers/database-manager`);
 
 const Discord = require(`discord.js`);
 
@@ -18,7 +18,7 @@ function handle(client, msg) {
   if (msg.channel.type === `dm`) {
     msg.reply(`This command has to be used in a server.`);
   } else {
-    const option = msg.content.split(' ');
+    const option = msg.content.split(` `);
 
     if (option.length > 1) {
       testSettings(msg, option[1]);
@@ -35,13 +35,13 @@ function getHelp() {
 // Private functions
 function testSettings(msg, setting) {
   switch (setting) {
-    case 'welcome-message':
+    case `welcome-message`:
       testWelcomeMessage(msg);
       break;
-    case 'welcome-channel':
+    case `welcome-channel`:
       testWelcomeChannel(msg);
       break;
-    case 'logs-channel':
+    case `logs-channel`:
       testLogsChannel(msg);
       break;
     default:

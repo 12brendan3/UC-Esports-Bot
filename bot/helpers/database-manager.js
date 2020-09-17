@@ -35,12 +35,6 @@ const Bearcats = sequelize.define(`Bearcats`, {
 });
 
 const XP = sequelize.define(`XP`, {
-  ID: {
-    type: Sequelize.UUIDV4,
-    unique: true,
-    primaryKey: true,
-    allowNull: false,
-  },
   userID: {
     type: Sequelize.STRING,
     unique: true,
@@ -52,7 +46,7 @@ const XP = sequelize.define(`XP`, {
     allowNull: false,
   },
   lastXP: {
-    type: Sequelize.DATE,
+    type: Sequelize.STRING,
     allowNull: false,
   },
 });
@@ -217,7 +211,7 @@ async function updateOrCreateEntry(table, filter, newData) {
     const existingEntry = await tables[table].update(newData, {where: filter});
 
     if (existingEntry[0] === 0) {
-      throw Error('No entries updated.');
+      throw Error(`No entries updated.`);
     }
 
     return existingEntry;
@@ -237,9 +231,9 @@ async function removeEntry(table, filter) {
   }
 }
 
-async function getAllEntries(table, filter) {
+async function getAllEntries(table, filter, limits) {
   try {
-    const foundEntries = await tables[table].findAll({where: filter});
+    const foundEntries = await tables[table].findAll({where: filter, ...limits});
     return foundEntries;
   } catch (err) {
     console.error(err);

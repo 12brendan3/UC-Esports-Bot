@@ -19,7 +19,7 @@ function handle(client, msg) {
 }
 
 async function removeFeedback(msg) {
-  msg.reply('What is the ID of the entry to remove?');
+  msg.reply(`What is the ID of the entry to remove?`);
 
   try {
     const removeID = await collectors.oneMessageFromUser(msg.channel, msg.author.id);

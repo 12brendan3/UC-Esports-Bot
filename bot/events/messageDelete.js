@@ -1,6 +1,6 @@
 const Discord = require(`discord.js`);
 
-const database = require('../helpers/database-manager');
+const database = require(`../helpers/database-manager`);
 
 // Exports
 module.exports = {handle};

@@ -15,7 +15,7 @@ function getWeather() {
 }
 
 async function setBotStatus(client) {
-  if (settings.getAuth().weatherToken || settings.getAuth().weatherToken === 'replace me') {
+  if (settings.getAuth().weatherToken || settings.getAuth().weatherToken === `replace me`) {
     await getWeatherData();
     const status = `for ${settings.getSettings().prefix}help | ${getEmoji(currentData.weather_code.value)} ${Math.round(currentData.temp.value)}°F`;
     client.user.setPresence({activity: {name: status, type: `WATCHING`}});
@@ -24,7 +24,7 @@ async function setBotStatus(client) {
       setBotStatus(client);
     }, 600000);
   } else {
-    console.error('No weather token found, please edit the "settings.json" file in the storage folder.\nYou can then type "restart" and then press enter.\nTo exit, type "exit" and then press enter.');
+    console.error(`No weather token found, please edit the "settings.json" file in the storage folder.\nYou can then type "restart" and then press enter.\nTo exit, type "exit" and then press enter.`);
   }
 }
 

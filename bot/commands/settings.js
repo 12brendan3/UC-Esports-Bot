@@ -80,9 +80,13 @@ async function changeWelcomeMessage(msg) {
 
     const newMessage = collected.first().content;
 
-    await database.updateOrCreateEntry(`Guilds`, {guildID: msg.guild.id}, {welcomeMessage: newMessage});
+    const result = await database.updateOrCreateEntry(`Guilds`, {guildID: msg.guild.id}, {welcomeMessage: newMessage});
 
-    msg.reply(`join message has been updated!\nUse the "test welcome-message" command to try it.`);
+    if (result) {
+      msg.reply(`join message has been updated!\nUse the "test welcome-message" command to try it.`);
+    } else {
+      msg.reply(`there was an error saving the new welcome message.  Tell the bot developers if the issue persists.`);
+    }
   } catch {
     msg.reply(`command timed out, please try again.`);
   }
@@ -205,7 +209,7 @@ async function sendAdminList(msg) {
   } else if (admins) {
     let adminList = ``;
 
-    for (let i = 0; admins.length > i; i++) {
+    for (let i = 0; i < admins.length; i++) {
       const adminMember = msg.guild.members.cache.get(admins[i].userID);
       adminList += `${adminMember ? adminMember.user.tag : admins[i]}\n`;
     }

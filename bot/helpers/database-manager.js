@@ -84,7 +84,7 @@ const Guilds = sequelize.define(`Guilds`, {
     allowNull: true,
   },
   welcomeMessage: {
-    type: Sequelize.STRING,
+    type: Sequelize.TEXT,
     allowNull: true,
   },
   welcomeChannelID: {
@@ -129,8 +129,34 @@ const ServerAdmins = sequelize.define(`ServerAdmins`, {
   },
 });
 
+const Feedback = sequelize.define(`Feedback`, {
+  ID: {
+    type: Sequelize.UUIDV4,
+    defaultValue: Sequelize.UUIDV4,
+    unique: true,
+    primaryKey: true,
+    allowNull: false,
+  },
+  userID: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  messageURL: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  message: {
+    type: Sequelize.TEXT,
+    allowNull: false,
+  },
+  time: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+});
+
 // Make object containing tables
-const tables = {Bearcats, XP, Starboard, Guilds, ServerAdmins};
+const tables = {Bearcats, XP, Starboard, Guilds, ServerAdmins, Feedback};
 
 // Exports
 module.exports = {syncTables, createEntry, getEntry, getOrCreateEntry, updateEntry, updateOrCreateEntry, removeEntry, getAllEntries};
@@ -142,6 +168,7 @@ function syncTables() {
   Starboard.sync();
   Guilds.sync();
   ServerAdmins.sync();
+  Feedback.sync();
   console.info(`Database tables synced.`);
 }
 

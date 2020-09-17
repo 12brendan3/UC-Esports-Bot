@@ -2,7 +2,10 @@
 const database = require(`../helpers/database-manager`);
 
 // Exports
-module.exports = {checkAdmin, addAdmin, removeAdmin, getAdmins};
+module.exports = {checkAdmin, addAdmin, removeAdmin, getAdmins, checkDev};
+
+// Devs are temporarily hard-coded
+const devs = [`145730448105013248`, `151079705917915136`];
 
 // Exported Function
 async function checkAdmin(guildID, userID) {
@@ -53,6 +56,14 @@ async function getAdmins(guildID) {
     return `noadmins`;
   } else if (admins) {
     return admins;
+  } else {
+    return false;
+  }
+}
+
+function checkDev(userID) {
+  if (devs.includes(userID)) {
+    return true;
   } else {
     return false;
   }

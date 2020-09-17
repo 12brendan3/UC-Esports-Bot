@@ -14,7 +14,9 @@ function handle(client, msg) {
   const commands = modules.getCommands();
 
   for (const key of Object.keys(commands)) {
-    helpMessage += `${key}; ${commands[key].getHelp()}\n`;
+    if (commands[key].getHelp()) {
+      helpMessage += `${key}; ${commands[key].getHelp()}\n`;
+    }
   }
 
   msg.channel.send(helpMessage);

@@ -4,13 +4,13 @@ const database = require(`../helpers/database-manager`);
 // Exports
 module.exports = {checkAdmin, addAdmin, removeAdmin, getAdmins, checkDev};
 
-// Devs are temporarily hard-coded
+// Devs are hard-coded
 const devs = [`145730448105013248`, `151079705917915136`];
 
 // Exported Function
 async function checkAdmin(guildID, userID) {
   const adminCheck = await database.getEntry(`ServerAdmins`, {guildID, userID});
-  if (adminCheck) {
+  if (adminCheck || devs.includes(userID)) {
     return true;
   } else {
     return false;

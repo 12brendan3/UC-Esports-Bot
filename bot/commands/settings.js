@@ -20,7 +20,7 @@ async function handle(client, msg) {
   if (msg.channel.type === `dm`) {
     msg.reply(`this command has to be used in a server.`);
   } else {
-    const admin = msg.guild.ownerID === msg.author.id ? `true` : await permissions.checkAdmin(msg.guild);
+    const admin = msg.guild.ownerID === msg.author.id ? true : await permissions.checkAdmin(msg.guild.id, msg.author.id);
 
     if (admin && activeChanges.includes(msg.guild.id)) {
       msg.reply(`only one change can be made at a time.`);

@@ -52,6 +52,12 @@ const XP = sequelize.define(`XP`, {
 });
 
 const Starboard = sequelize.define(`Starboard`, {
+  ID: {
+    type: Sequelize.UUIDV4,
+    defaultValue: Sequelize.UUIDV4,
+    unique: true,
+    primaryKey: true,
+  },
   guildID: {
     type: Sequelize.STRING,
     allowNull: false,
@@ -60,7 +66,11 @@ const Starboard = sequelize.define(`Starboard`, {
     type: Sequelize.STRING,
     allowNull: false,
   },
-  messageID: {
+  originalMessageID: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  starboardMessageID: {
     type: Sequelize.STRING,
     allowNull: false,
   },
@@ -110,6 +120,7 @@ const Guilds = sequelize.define(`Guilds`, {
 const ServerAdmins = sequelize.define(`ServerAdmins`, {
   ID: {
     type: Sequelize.UUIDV4,
+    defaultValue: Sequelize.UUIDV4,
     unique: true,
     primaryKey: true,
   },

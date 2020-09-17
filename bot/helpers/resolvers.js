@@ -35,14 +35,12 @@ function resolveChannelID(guild, channelObject) {
 function resolveUserID(guild, userObject) {
   let userID = userObject;
   if (regexUserMention.test(userObject)) {
-    console.log('Mentioned');
     if (userObject.startsWith(`<@!`)) {
       userID = userObject.substr(3).slice(0, -1);
     } else {
       userID = userObject.substr(2).slice(0, -1);
     }
   } else if (regexUserTag.test(userObject)) {
-    console.log('Tag');
     const foundMember = guild.members.cache.find((member) => member.user.tag === userObject);
     if (foundMember) {
       userID = foundMember.id;
@@ -50,14 +48,12 @@ function resolveUserID(guild, userObject) {
       userID = false;
     }
   } else if (regexObjectID.test(userObject)) {
-    console.log('ID');
     const foundMember = guild.members.cache.get(userObject);
 
     if (!foundMember) {
       userID = false;
     }
   } else {
-    console.log('Name/Nickname');
     const foundMember = guild.members.cache.find((member) => member.displayName === userObject);
 
     if (foundMember) {

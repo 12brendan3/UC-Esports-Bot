@@ -272,7 +272,7 @@ async function changeLogsChannel(msg) {
 }
 
 async function changeStarboardChannel(msg) {
-  msg.reply(`please provide the name/ID of the new starboard channel or mention it.`);
+  msg.reply(`please provide the name/ID of the new starboard channel or mention it.\nIf you'd like to disable the starboard, just send \`disable\`.`);
 
   try {
     const collected = await collectors.oneMessageFromUser(msg.channel, msg.author.id);

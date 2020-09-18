@@ -111,6 +111,10 @@ const Guilds = sequelize.define(`Guilds`, {
     type: Sequelize.STRING,
     allowNull: true,
   },
+  starboardThreshold: {
+    type: Sequelize.INTEGER,
+    allowNull: true,
+  },
   twitterChannelID: {
     type: Sequelize.STRING,
     allowNull: true,

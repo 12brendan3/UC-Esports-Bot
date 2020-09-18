@@ -11,7 +11,7 @@ module.exports = {startBot, stopBot, restartBot};
 
 // Exported functions
 function startBot() {
-  client = new Discord.Client();
+  client = new Discord.Client({partials: ['MESSAGE', 'REACTION']});
 
   database.syncTables();
 

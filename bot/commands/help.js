@@ -1,5 +1,8 @@
 // Imports
+const Discord = require(`discord.js`);
+
 const modules = require(`../helpers/module-manager`);
+const settings = require(`../helpers/settings-manager`);
 
 // Exports
 module.exports = {handle, getHelp};
@@ -10,16 +13,21 @@ const help =
 
 // Exported functions
 function handle(client, msg) {
-  let helpMessage = ``;
   const commands = modules.getCommands();
+  const embed = new Discord.MessageEmbed();
+  const prefix = settings.getSettings().prefix;
+
+  embed.setColor(`#FF00CC`);
+  embed.setAuthor(client.user.username, client.user.displayAvatarURL());
+  embed.setFooter(settings.version);
 
   for (const key of Object.keys(commands)) {
     if (commands[key].getHelp()) {
-      helpMessage += `${key}; ${commands[key].getHelp()}\n`;
+      embed.addField(`__${prefix}${key}__`, commands[key].getHelp());
     }
   }
 
-  msg.channel.send(helpMessage);
+  msg.channel.send(embed);
 }
 
 function getHelp() {

@@ -5,7 +5,7 @@ const resolvers = require(`../helpers/resolvers`);
 const permissions = require("../helpers/permissions");
 
 // Vars
-const options = `Valid settings are: \`welcome-message\` \`welcome-channel\` \`admin-add\` \`admin-remove\` \`admin-list\` \`logs-channel\``;
+const options = `Valid settings are: \`welcome-message\` \`welcome-channel\` \`admin-add\` \`admin-remove\` \`admin-list\` \`logs-channel\` \`starboard-channel\` \`starboard-threshold\``;
 let activeChanges = [];
 
 // Exports
@@ -20,7 +20,7 @@ async function handle(client, msg) {
   if (msg.channel.type === `dm`) {
     msg.reply(`this command has to be used in a server.`);
   } else {
-    const admin = msg.guild.ownerID === msg.author.id ? `true` : await permissions.checkAdmin(msg.guild);
+    const admin = msg.guild.ownerID === msg.author.id ? true : await permissions.checkAdmin(msg.guild.id, msg.author.id);
 
     if (admin && activeChanges.includes(msg.guild.id)) {
       msg.reply(`only one change can be made at a time.`);
@@ -65,6 +65,12 @@ function changeSettings(msg, setting) {
     case `logs-channel`:
       changeLogsChannel(msg);
       break;
+    case `starboard-channel`:
+      changeStarboardChannel(msg);
+      break;
+    case `starboard-threshold`:
+      changeStarboardThreshold(msg);
+      break;
     default:
       activeChanges = activeChanges.filter((val) => val !== msg.guild.id);
       msg.reply(`that's not a valid setting.\n${options}`);
@@ -85,7 +91,7 @@ async function changeWelcomeMessage(msg) {
     if (result) {
       msg.reply(`join message has been updated!\nUse the "test welcome-message" command to try it.`);
     } else {
-      msg.reply(`there was an error saving the new welcome message.  Tell the bot developers if the issue persists.`);
+      msg.reply(`there was an error saving the new welcome message.\nTell the bot developers if the issue persists.`);
     }
   } catch {
     msg.reply(`command timed out, please try again.`);
@@ -106,7 +112,7 @@ async function changeWelcomeChannel(msg) {
       if (result) {
         msg.reply(`the welcome message has been disabled.\nUse the "test welcome-channel" command to try it.`);
       } else {
-        msg.reply(`there was an error disabling the welcome message.  Tell the bot developers if the issue persists.`);
+        msg.reply(`there was an error disabling the welcome message.\nTell the bot developers if the issue persists.`);
       }
     } else {
       const newWelcomeChannelID = resolvers.resolveChannelID(msg.guild, collected.first().content);
@@ -117,7 +123,7 @@ async function changeWelcomeChannel(msg) {
         if (result) {
           msg.reply(`welcome message channel has been updated!\nUse the "test welcome-channel" command to try it.`);
         } else {
-          msg.reply(`there was an error updating the welcome message channel.  Tell the bot developers if the issue persists.`);
+          msg.reply(`there was an error updating the welcome message channel.\nTell the bot developers if the issue persists.`);
         }
       } else {
         msg.reply(`no channel found, please try again.`);
@@ -153,7 +159,7 @@ async function addAdmin(msg) {
           msg.reply(`admin has been added!\nUse the "settings admin-list" command to see the current admins.`);
         }
       } else {
-        msg.reply(`there was an error adding the new admin.  Tell the bot developers if the issue persists.`);
+        msg.reply(`there was an error adding the new admin.\nTell the bot developers if the issue persists.`);
       }
     } else {
       msg.reply(`no user found, please try again.`);
@@ -186,7 +192,7 @@ async function removeAdmin(msg) {
             msg.reply(`admin has been removed!\nUse the "settings admin-list" command to see the current admins.`);
           }
         } else {
-          msg.reply(`there was an error removing the admin.  Tell the bot developers if the issue persists.`);
+          msg.reply(`there was an error removing the admin.\nTell the bot developers if the issue persists.`);
         }
       } else {
         msg.reply(`no user found, please try again.`);
@@ -217,7 +223,7 @@ async function sendAdminList(msg) {
     msg.reply(`here are the admins:\n\`\`\`${adminList}\`\`\`\nNote: The server owner is always an admin.`);
     return true;
   } else {
-    msg.reply(`there was an error getting the admins.  Tell the bot developers if the issue persists.`);
+    msg.reply(`there was an error getting the admins.\nTell the bot developers if the issue persists.`);
     return false;
   }
 }
@@ -240,7 +246,7 @@ async function changeLogsChannel(msg) {
       if (result) {
         msg.reply(`the logs have been disabled.\nUse the "test logs-channel" command to try it.`);
       } else {
-        msg.reply(`there was an error disabling logs.  Tell the bot developers if the issue persists.`);
+        msg.reply(`there was an error disabling logs.\nTell the bot developers if the issue persists.`);
       }
     } else {
       const newLogChannelID = resolvers.resolveChannelID(msg.guild, collected.first().content);
@@ -251,10 +257,87 @@ async function changeLogsChannel(msg) {
         if (result) {
           msg.reply(`logs channel has been updated!\nUse the "test logs-channel" command to try it.`);
         } else {
-          msg.reply(`there was an error updating the logs channel.  Tell the bot developers if the issue persists.`);
+          msg.reply(`there was an error updating the logs channel.\nTell the bot developers if the issue persists.`);
         }
       } else {
         msg.reply(`no channel found, please try again.`);
+      }
+    }
+  } catch (err) {
+    console.error(err);
+    msg.reply(`command timed out, please try again.`);
+  }
+
+  activeChanges = activeChanges.filter((val) => val !== msg.guild.id);
+}
+
+async function changeStarboardChannel(msg) {
+  msg.reply(`please provide the name/ID of the new starboard channel or mention it.\nIf you'd like to disable the starboard, just send \`disable\`.`);
+
+  try {
+    const collected = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
+
+    const newStarboardChannelID = resolvers.resolveChannelID(msg.guild, collected.first().content);
+
+    if (collected.first().content === `disable`) {
+      const result = await database.updateEntry(`Guilds`, {guildID: msg.guild.id}, {starboardChannelID: null});
+
+      if (result) {
+        msg.reply(`the starboard has been disabled.`);
+      } else {
+        msg.reply(`there was an error disabling the starboard.`);
+      }
+    } else if (newStarboardChannelID) {
+      let threshold = 5;
+      const currentSettings = await database.getEntry(`Guilds`, {guildID: msg.guild.id});
+
+      if (currentSettings && currentSettings.starboardThreshold) {
+        threshold = currentSettings.starboardThreshold;
+      }
+
+      const result = await database.updateOrCreateEntry(`Guilds`, {guildID: msg.guild.id}, {starboardChannelID: newStarboardChannelID, starboardThreshold: threshold});
+
+      if (result) {
+        msg.reply(`starboard channel has been updated!\nThe default starboard threshold is 5 reactions.  Use the "settings starboard-threshold" command to change it.`);
+      } else {
+        msg.reply(`there was an error updating the starboard channel.\nTell the bot developers if the issue persists.`);
+      }
+    } else {
+      msg.reply(`no channel found, please try again.`);
+    }
+  } catch (err) {
+    console.error(err);
+    msg.reply(`command timed out, please try again.`);
+  }
+
+  activeChanges = activeChanges.filter((val) => val !== msg.guild.id);
+}
+
+async function changeStarboardThreshold(msg) {
+  msg.reply(`please provide the new number of reactions needed.\nIf you'd like to disable the starboard, just send \`disable\`.`);
+
+  try {
+    const collected = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
+
+    const newNum = parseInt(collected.first().content, 10);
+
+    if (collected.first().content === `disable`) {
+      const result = await database.updateEntry(`Guilds`, {guildID: msg.guild.id}, {starboardChannelID: null});
+
+      if (result) {
+        msg.reply(`the starboard has been disabled.`);
+      } else {
+        msg.reply(`there was an error disabling the starboard.`);
+      }
+    } else if (isNaN(newNum) && (newNum < 1 && newNum > 1000)) {
+      msg.reply(`that's an invalid number, please try again.`);
+    } else {
+      const result = await database.updateOrCreateEntry(`Guilds`, {guildID: msg.guild.id}, {starboardThreshold: newNum});
+
+      if (result) {
+        msg.reply(`starboard threshold has been updated!\nMake sure you have a starboard channel set!  Use the "settings starboard-channel" command to change it.`);
+      } else {
+        msg.reply(`there was an error updating the starboard channel.\nTell the bot developers if the issue persists.`);
       }
     }
   } catch (err) {

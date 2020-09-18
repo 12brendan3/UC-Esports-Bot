@@ -20,7 +20,7 @@ async function logMessageEdit(msgOld, msgNew) {
     const logsChannel = msgNew.guild.channels.cache.get(guildSettings.logsChannelID);
     const embed = new Discord.MessageEmbed();
 
-    embed.setColor(`#FF0000`);
+    embed.setColor(`#00DDFF`);
     embed.setAuthor(msgNew.member.displayName, msgNew.author.displayAvatarURL());
     embed.setDescription(`Message sent by ${msgNew.author} in ${msgNew.channel} was edited.`);
     if (msgOld.content) {

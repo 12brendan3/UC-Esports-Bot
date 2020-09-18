@@ -34,15 +34,15 @@ function handleCommand(client, msg) {
 }
 
 async function awardXP(msg) {
-  const result = await database.getEntry(`XP`);
+  const result = await database.getEntry(`XP`, {userID: msg.author.id});
 
   const time = Date.now();
 
-  if ((result && result.lastXP + 60000 <= time) || !result) {
+  if ((result && parseInt(result.lastXP, 10) + 60000 <= time) || !result) {
     let newXP = rollXP();
 
     if (result && result.XP) {
-      newXP += result.XP;
+      newXP = parseInt(result.XP, 10) + newXP;
     }
 
     database.updateOrCreateEntry(`XP`, {userID: msg.author.id}, {XP: newXP, lastXP: time});

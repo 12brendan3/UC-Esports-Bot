@@ -20,7 +20,7 @@ async function handle(client, reaction, user) {
 
   const guildSettings = await database.getEntry(`Guilds`, {guildID: reaction.message.guild.id});
 
-  if (!guildSettings || !guildSettings.starboardChannelID || !reaction.message.guild.channels.cache.get(guildSettings.starboardChannelID) || !guildSettings.starboardThreshold) {
+  if (!guildSettings || !guildSettings.starboardChannelID || reaction.message.channel.id === guildSettings.starboardChannelID || !reaction.message.guild.channels.cache.get(guildSettings.starboardChannelID) || !guildSettings.starboardThreshold) {
     return;
   }
 

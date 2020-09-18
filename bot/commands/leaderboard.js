@@ -38,7 +38,7 @@ async function getUserList(client) {
   for (let i = 0; i < top10.length; i++) {
     const user = client.users.cache.get(top10[i].userID);
     if (user) {
-      list += `${i + 1}.${i < 9 ? ` ` : ``} ${user ? user.tag : top10[i].userID} - ${top10[i].XP}xp\n`;
+      list += `${i + 1}.${i < 9 ? ` ` : ``} ${user ? user.tag : top10[i].userID} - XP: ${top10[i].XP}\n`;
     } else {
       invalid.push(top10[i].userID);
     }

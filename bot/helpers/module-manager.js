@@ -73,7 +73,23 @@ function registerEvents(client) {
 }
 
 function registerEvent(client, eventName) {
-  client.on(eventName, (eventData, eventData2) => {
+  client.on(eventName, async (eventData, eventData2) => {
+    if (eventData && eventData.partial) {
+      try {
+        await eventData.fetch();
+      } catch (error) {
+        return;
+      }
+    }
+
+    if (eventData2 && eventData2.partial) {
+      try {
+        await eventData2.fetch();
+      } catch (error) {
+        return;
+      }
+    }
+
     eventImports[eventName].handle(client, eventData, eventData2);
   });
 }

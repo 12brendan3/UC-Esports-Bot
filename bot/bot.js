@@ -10,10 +10,10 @@ const database = require(`./helpers/database-manager`);
 module.exports = {startBot, stopBot, restartBot};
 
 // Exported functions
-function startBot() {
+async function startBot() {
   client = new Discord.Client({partials: ['MESSAGE', 'REACTION']});
 
-  database.syncTables();
+  await database.syncTables();
 
   modules.registerAll(client);
 

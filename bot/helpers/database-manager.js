@@ -171,13 +171,15 @@ const tables = {Bearcats, XP, Starboard, Guilds, ServerAdmins, Feedback};
 module.exports = {syncTables, createEntry, getEntry, getOrCreateEntry, updateEntry, updateOrCreateEntry, removeEntry, getAllEntries};
 
 // Exported Functions
-function syncTables() {
-  Bearcats.sync();
-  XP.sync();
-  Starboard.sync();
-  Guilds.sync();
-  ServerAdmins.sync();
-  Feedback.sync();
+async function syncTables() {
+  await Promise.all([
+    Bearcats.sync(),
+    XP.sync(),
+    Starboard.sync(),
+    Guilds.sync(),
+    ServerAdmins.sync(),
+    Feedback.sync(),
+  ]);
   console.info(`Database tables synced.`);
 }
 

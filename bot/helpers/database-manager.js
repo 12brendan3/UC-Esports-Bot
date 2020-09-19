@@ -17,19 +17,19 @@ const Bearcats = sequelize.define(`Bearcats`, {
   email: {
     type: Sequelize.STRING,
     unique: true,
-    allowNull: false,
+    allowNull: true,
   },
   firstName: {
     type: Sequelize.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   lastName: {
     type: Sequelize.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   MNumber: {
     type: Sequelize.STRING,
-    allowNull: false,
+    allowNull: true,
     unique: true,
   },
 });

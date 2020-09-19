@@ -30,7 +30,7 @@ async function setBotStatus(client) {
 
 // Private functions
 async function getWeatherData() {
-  const currentTime = new Date().getTime();
+  const currentTime = Date.now();
 
   if (currentTime >= lastCheck + 600000) {
     lastCheck = currentTime;
@@ -41,13 +41,20 @@ async function getWeatherData() {
       lon: `-84.5150`,
       // eslint-disable-next-line babel/camelcase
       unit_system: `us`,
-      fields: `temp,weather_code`,
+      fields: `temp,weather_code,sunrise,sunset,moon_phase`,
       apikey: settings.getAuth().weatherToken,
     };
 
     try {
       const newData = await axios.get(`https://api.climacell.co/v3/weather/realtime`, {params});
-      // Eventually check if moon is out using "sunrise"/"sunset" data and set the emoji using the "moon_phase" data - just add them to "fields" above
+
+      const sunrise = new Date(newData.data.sunrise.value).getTime();
+      const sunset = new Date(newData.data.sunset.value).getTime();
+
+      if (sunrise > currentTime || sunset < currentTime) {
+        newData.data.weather_code.value = newData.moon_phase.value;
+      }
+
       currentData = newData.data;
     } catch (err) {
       console.error(`There was an error fetching the weather data....`);

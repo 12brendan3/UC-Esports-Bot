@@ -38,11 +38,11 @@ async function awardXP(msg) {
 
   const time = Date.now();
 
-  if ((result && parseInt(result.lastXP, 10) + 60000 <= time) || !result) {
+  if ((result && result.lastXP + 60000 <= time) || !result) {
     let newXP = rollXP();
 
     if (result && result.XP) {
-      newXP = parseInt(result.XP, 10) + newXP;
+      newXP = result.XP + newXP;
     }
 
     database.updateOrCreateEntry(`XP`, {userID: msg.author.id}, {XP: newXP, lastXP: time});

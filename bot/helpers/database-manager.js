@@ -46,7 +46,7 @@ const XP = sequelize.define(`XP`, {
     allowNull: false,
   },
   lastXP: {
-    type: Sequelize.STRING,
+    type: Sequelize.INTEGER,
     allowNull: false,
   },
 });
@@ -159,7 +159,7 @@ const Feedback = sequelize.define(`Feedback`, {
     allowNull: false,
   },
   time: {
-    type: Sequelize.STRING,
+    type: Sequelize.INTEGER,
     allowNull: false,
   },
 });

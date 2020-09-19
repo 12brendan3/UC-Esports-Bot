@@ -5,7 +5,7 @@ const resolvers = require(`../helpers/resolvers`);
 const permissions = require("../helpers/permissions");
 
 // Vars
-const options = `Valid settings are: \`welcome-message\` \`welcome-channel\` \`admin-add\` \`admin-remove\` \`admin-list\` \`logs-channel\` \`starboard-channel\` \`starboard-threshold\` \`streaming-role\``;
+const options = `Valid settings are: \`welcome-message\` \`welcome-channel\` \`admin-add\` \`admin-remove\` \`admin-list\` \`logs-channel\` \`starboard-channel\` \`starboard-threshold\` \`streaming-role\` \`role-reaction-channel\``;
 let activeChanges = [];
 
 // Exports
@@ -73,6 +73,12 @@ function changeSettings(msg, setting) {
       break;
     case `streaming-role`:
       changeStreamingRole(msg);
+      break;
+    case `role-reaction-channel`:
+      changeRoleChannel(msg);
+      break;
+    case `add-role-reaction`:
+      addRoleReaction(msg);
       break;
     default:
       activeChanges = activeChanges.filter((val) => val !== msg.guild.id);
@@ -380,6 +386,77 @@ async function changeStreamingRole(msg) {
     }
   } catch (err) {
     console.error(err);
+    msg.reply(`command timed out, please try again.`);
+  }
+
+  activeChanges = activeChanges.filter((val) => val !== msg.guild.id);
+}
+
+async function changeRoleChannel(msg) {
+  msg.reply(`please provide the name/ID of the new role reaction channel or mention it.\nIf you'd like to disable the role reaction channel, just send \`disable\`.`);
+
+  try {
+    const collected = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
+
+    if (collected.first().content === `disable`) {
+      const result = await database.updateOrCreateEntry(`Guilds`, {guildID: msg.guild.id}, {welcomeChannelID: null});
+
+      if (result) {
+        msg.reply(`the role reaction channel has been disabled.`);
+      } else {
+        msg.reply(`there was an error disabling the role reaction channel.\nTell the bot developers if the issue persists.`);
+      }
+    } else {
+      const newWelcomeChannelID = resolvers.resolveChannelID(msg.guild, collected.first().content);
+
+      if (newWelcomeChannelID) {
+        const result = await database.updateOrCreateEntry(`Guilds`, {guildID: msg.guild.id}, {welcomeChannelID: newWelcomeChannelID});
+
+        if (result) {
+          msg.reply(`role reaction channel has been updated!`);
+        } else {
+          msg.reply(`there was an error updating the role reaction channel.\nTell the bot developers if the issue persists.`);
+        }
+      } else {
+        msg.reply(`no channel found, please try again.`);
+      }
+    }
+  } catch (err) {
+    console.error(err);
+    msg.reply(`command timed out, please try again.`);
+  }
+
+  activeChanges = activeChanges.filter((val) => val !== msg.guild.id);
+}
+
+async function addRoleReaction(msg) {
+  msg.reply(`please provide the name/ID of the role that you want to add`);
+
+  try {
+    const collectedRole = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
+
+    const role = resolvers.resolveRoleID(msg.guild, collectedRole.first().content);
+    if (role) {
+      const emojiMsg = await msg.reply(`React to this message with the emoji that you want to use for the role`);
+      const collectedReaction = await collectors.oneReactionFromUser(emojiMsg, msg.author.id);
+
+      if (collectedReaction) {
+
+        msg.reply(`Please provide a category name for this role reaction`);
+
+        const category = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
+        const roleCategory = await database.getEntry(`RoleCategories`, {categoryName: category.first().content, guildID: msg.guild.id});
+
+        if (roleCategory) {
+          const matchingRole = await database.getEntry(`Roles`, {emojiID: collectedReaction.emoji.identifier, roleCategory: roleCategory.ID});
+
+          if (!(matchingRole)) {
+            msg.reply(`this could be added`);
+          }
+        }
+      }
+    }
+  } catch (err) {
     msg.reply(`command timed out, please try again.`);
   }
 

@@ -5,7 +5,7 @@ const resolvers = require(`../helpers/resolvers`);
 const permissions = require("../helpers/permissions");
 
 // Vars
-const options = `Valid settings are: \`welcome-message\` \`welcome-channel\` \`admin-add\` \`admin-remove\` \`admin-list\` \`logs-channel\` \`starboard-channel\` \`starboard-threshold\``;
+const options = `Valid settings are: \`welcome-message\` \`welcome-channel\` \`admin-add\` \`admin-remove\` \`admin-list\` \`logs-channel\` \`starboard-channel\` \`starboard-threshold\` \`streaming-role\``;
 let activeChanges = [];
 
 // Exports
@@ -70,6 +70,9 @@ function changeSettings(msg, setting) {
       break;
     case `starboard-threshold`:
       changeStarboardThreshold(msg);
+      break;
+    case `streaming-role`:
+      changeStreamingRole(msg);
       break;
     default:
       activeChanges = activeChanges.filter((val) => val !== msg.guild.id);
@@ -339,6 +342,41 @@ async function changeStarboardThreshold(msg) {
       } else {
         msg.reply(`there was an error updating the starboard channel.\nTell the bot developers if the issue persists.`);
       }
+    }
+  } catch (err) {
+    console.error(err);
+    msg.reply(`command timed out, please try again.`);
+  }
+
+  activeChanges = activeChanges.filter((val) => val !== msg.guild.id);
+}
+
+async function changeStreamingRole(msg) {
+  msg.reply(`please provide the name/ID of the role or mention it.\nIf you'd like to disable the streaming role, just send \`disable\`.`);
+
+  try {
+    const collected = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
+
+    const newRoleID = resolvers.resolveRoleID(msg.guild, collected.first().content);
+
+    if (collected.first().content === `disable`) {
+      const result = await database.updateEntry(`Guilds`, {guildID: msg.guild.id}, {streamingRoleID: null});
+
+      if (result) {
+        msg.reply(`the streaming role has been disabled.`);
+      } else {
+        msg.reply(`there was an error disabling the streaming role.`);
+      }
+    } else if (newRoleID) {
+      const result = await database.updateOrCreateEntry(`Guilds`, {guildID: msg.guild.id}, {streamingRoleID: newRoleID});
+
+      if (result) {
+        msg.reply(`streaming role has been updated!`);
+      } else {
+        msg.reply(`there was an error updating the streaming role.\nTell the bot developers if the issue persists.`);
+      }
+    } else {
+      msg.reply(`that's an invalid role, please try again.`);
     }
   } catch (err) {
     console.error(err);

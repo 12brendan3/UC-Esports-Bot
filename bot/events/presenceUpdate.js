@@ -1,3 +1,5 @@
+const database = require("../helpers/database-manager");
+
 // Exports
 module.exports = {handle};
 
@@ -9,18 +11,22 @@ function handle(client, oldPresence, newPresence) {
 }
 
 // Private Functions
-function checkStreaming(presence) {
-  let streaming = false;
-  for (let i = 0; i < presence.activities.length > 0; i++) {
-    if (presence.activities[i].type === `LISTENING`) {
-      streaming = true;
-      break;
-    }
-  }
+async function checkStreaming(presence) {
+  const guildSettings = await database.getEntry(`Guilds`, {guildID: presence.guild.id});
 
-  if (streaming) {
-    // Give streaming role here
-  } else {
-    // Remove streaming role here
+  if (guildSettings && guildSettings.streamingRoleID) {
+    let streaming = false;
+    for (let i = 0; i < presence.activities.length > 0; i++) {
+      if (presence.activities[i].type === `STREAMING`) {
+        streaming = true;
+        break;
+      }
+    }
+
+    if (streaming) {
+      presence.member.roles.add(guildSettings.streamingRoleID);
+    } else {
+      presence.member.roles.remove(guildSettings.streamingRoleID);
+    }
   }
 }

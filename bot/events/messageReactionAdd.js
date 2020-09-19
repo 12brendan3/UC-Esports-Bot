@@ -20,23 +20,24 @@ async function handle(client, reaction, user) {
 
   const guildSettings = await database.getEntry(`Guilds`, {guildID: reaction.message.guild.id});
 
-  if (!guildSettings || !guildSettings.starboardChannelID || !reaction.message.guild.channels.cache.get(guildSettings.starboardChannelID) || !guildSettings.starboardThreshold) {
+  if (!guildSettings || !guildSettings.starboardChannelID || reaction.message.channel.id === guildSettings.starboardChannelID || !reaction.message.guild.channels.cache.get(guildSettings.starboardChannelID) || !guildSettings.starboardThreshold) {
     return;
   }
 
   if (reaction.emoji.identifier === detectedReactions[0] && reaction.count >= guildSettings.starboardThreshold) {
-    checkMessage(reaction, guildSettings);
+    const exists = await database.getEntry(`Starboard`, {guildID: reaction.message.guild.id, channelID: reaction.message.channel.id, originalMessageID: reaction.message.id});
+    checkMessage(reaction, guildSettings, exists);
   } else if (reaction.emoji.identifier === detectedReactions[1]) {
+    const exists = await database.getEntry(`Starboard`, {guildID: reaction.message.guild.id, channelID: reaction.message.channel.id, originalMessageID: reaction.message.id});
     const admin = await permissions.checkAdmin(reaction.message.guild.id, user.id);
 
-    if (admin) {
-      checkMessage(reaction, guildSettings);
+    if (exists || admin) {
+      checkMessage(reaction, guildSettings, exists);
     }
   }
 }
 
-async function checkMessage(reaction, guildSettings) {
-  const exists = await database.getEntry(`Starboard`, {guildID: reaction.message.guild.id, channelID: reaction.message.channel.id, originalMessageID: reaction.message.id});
+function checkMessage(reaction, guildSettings, exists) {
   if (exists) {
     updateMessage(reaction, exists, guildSettings);
   } else {

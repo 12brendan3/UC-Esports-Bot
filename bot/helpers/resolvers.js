@@ -1,11 +1,12 @@
 // Regex
+const regexRoleMention = RegExp(`^<@&[0-9]*>$`);
 const regexChannelMention = RegExp(`^<#[0-9]*>$`);
 const regexUserMention = RegExp(`^<@!?[0-9]*>$`);
 const regexUserTag = RegExp(`^.{1,}#[0-9]{4}$`);
 const regexObjectID = RegExp(`^[0-9]*$`);
 
 // Exports
-module.exports = {resolveChannelID, resolveUserID};
+module.exports = {resolveChannelID, resolveUserID, resolveRoleID};
 
 // Exported Functions
 function resolveChannelID(guild, channelObject) {
@@ -64,4 +65,27 @@ function resolveUserID(guild, userObject) {
   }
 
   return userID;
+}
+
+function resolveRoleID(guild, roleObject) {
+  let roleID = roleObject;
+  if (regexRoleMention.test(roleObject)) {
+    roleID = roleObject.substr(3).slice(0, -1);
+  } else if (regexObjectID.test(roleObject)) {
+    const foundRole = guild.roles.cache.get(roleObject);
+
+    if (!foundRole) {
+      roleID = false;
+    }
+  } else {
+    const foundRole = guild.roles.cache.find((role) => role.displayName === roleObject);
+
+    if (foundRole) {
+      roleID = foundRole.id;
+    } else {
+      roleID = false;
+    }
+  }
+
+  return roleID;
 }

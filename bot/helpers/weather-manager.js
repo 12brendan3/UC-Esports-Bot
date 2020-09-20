@@ -52,7 +52,7 @@ async function getWeatherData() {
       const sunset = new Date(newData.data.sunset.value).getTime();
 
       if (sunrise > currentTime || sunset < currentTime) {
-        newData.data.weather_code.value = newData.moon_phase.value;
+        newData.data.weather_code.value = newData.data.moon_phase.value;
       }
 
       currentData = newData.data;

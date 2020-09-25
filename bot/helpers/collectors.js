@@ -8,8 +8,8 @@ async function oneMessageFromUser(channel, authorID) {
   return collected;
 }
 
-async function oneReactionFromUser(msg) {
-  const filter = (reaction, user) => user.id === msg.author.id;
+async function oneReactionFromUser(msg, userID) {
+  const filter = (reaction, user) => user.id === userID;
   const collected = await msg.awaitReactions(filter, {max: 1, time: 60000, errors: [`time`]});
   return collected;
 }

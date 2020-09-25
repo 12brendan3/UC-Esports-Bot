@@ -80,7 +80,11 @@ function buildEmbed(reaction) {
   });
 
   embed.setColor(`#FFEE00`);
-  embed.setAuthor(reaction.message.member.displayName, reaction.message.author.displayAvatarURL());
+  if (reaction.message.member) {
+    embed.setAuthor(reaction.message.member.displayName, reaction.message.author.displayAvatarURL());
+  } else {
+    embed.setAuthor(reaction.message.author.username, reaction.message.author.displayAvatarURL());
+  }
   embed.setDescription(description);
 
   if (reaction.message.attachments) {

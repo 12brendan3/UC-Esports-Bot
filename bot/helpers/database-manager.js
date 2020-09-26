@@ -119,6 +119,10 @@ const Guilds = sequelize.define(`Guilds`, {
     type: Sequelize.STRING,
     allowNull: true,
   },
+  verifiedRoleID: {
+    type: Sequelize.STRING,
+    allowNull: true,
+  },
 });
 
 const ServerAdmins = sequelize.define(`ServerAdmins`, {

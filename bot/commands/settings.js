@@ -467,12 +467,18 @@ async function addRoleReaction(msg, client) {
           if (matchingRole) {
             msg.reply(`a role in that category is already using that emoji, please try again.`);
           } else {
-            const result = await database.createEntry(`Roles`, {guildID: msg.guild.id, roleID: role, roleCategory: roleCategory.ID, emojiID: emoji});
+            const totalRoles = await database.getAllEntries(`Roles`, {guildID: msg.guild.id, roleCategory: roleCategory.ID});
 
-            if (result) {
-              msg.reply(`the reaction role has been added!\nRun the "settings update-reaction-roles"`);
+            if (totalRoles.length > 19) {
+              msg.reply(`That category has the maximum amount of roles already, please try again.`);
             } else {
-              msg.reply(`there was an error adding the reaction role.\nTell the bot developers if the issue persists.`);
+              const result = await database.createEntry(`Roles`, {guildID: msg.guild.id, roleID: role, roleCategory: roleCategory.ID, emojiID: emoji});
+
+              if (result) {
+                msg.reply(`the reaction role has been added!\nRun the "settings update-reaction-roles"`);
+              } else {
+                msg.reply(`there was an error adding the reaction role.\nTell the bot developers if the issue persists.`);
+              }
             }
           }
         } else {

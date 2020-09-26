@@ -11,6 +11,8 @@
 
 const database = require(`./database-manager`);
 
+const categoryIDMap = new Map();
+
 // load and return all categories
 async function loadCategories() {
   const categories = await database.getAllEntries(`RoleCategories`);
@@ -30,13 +32,10 @@ async function loadRoles() {
 }
 
 
-async function sortRoles() {
-
+async function initRoles() {
   // load data
   const categories = await loadCategories();
   const roles = await loadRoles();
-
-  const categoryIDMap = new Map();
 
   // if either database query did not work, return.
   if (!(categories && roles)) {
@@ -56,46 +55,17 @@ async function sortRoles() {
     if (!(data[cat.guildID])) {
       data[cat.guildID] = {};
     }
-    data[cat.guildID][cat.categoryName] = [];
+    data[cat.guildID][cat.categoryName] = {categoryDescription: cat.categoryDescription, roles: []};
   }
 
   // for each role, place the role data in its proper guild and category
   for (const role of roles) {
     // use the map to quickly identify which guild and category a role belongs to.
     const cat = categoryIDMap.get(role.roleCategory);
-    data[cat.guildID][cat.categoryName].push(role);
+    data[cat.guildID][cat.categoryName].roles.push(role);
   }
 
   return data;
-
-  /*
-  data = {
-    guild1: {
-      guild1Category1: [
-        role1,
-        role2,
-        role3
-      ],
-      guild1Category2: [
-        role4,
-        role5,
-        role6
-      ]
-    },
-    guild1: {
-      guild2Category1: [
-        role1,
-        role2,
-        role3
-      ],
-      guild2Category2: [
-        role4,
-        role5,
-        role6
-      ]
-    }
-  }
-  */
 }
 
-module.exports = {sortRoles};
+module.exports = {initRoles};

@@ -5,7 +5,7 @@ const resolvers = require(`../helpers/resolvers`);
 const permissions = require("../helpers/permissions");
 
 // Vars
-const options = `Valid settings are: \`welcome-message\` \`welcome-channel\` \`admin-add\` \`admin-remove\` \`admin-list\` \`logs-channel\` \`starboard-channel\` \`starboard-threshold\` \`streaming-role\` \`role-reaction-channel\``;
+const options = `Valid settings are: \`welcome-message\` \`welcome-channel\` \`admin-add\` \`admin-remove\` \`admin-list\` \`logs-channel\` \`starboard-channel\` \`starboard-threshold\` \`streaming-role\` \`reaction-role-channel\` \`reaction-role-add\` \`reaction-role-remove\` \`reaction-role-update\``;
 let activeChanges = [];
 
 // Exports
@@ -29,7 +29,7 @@ async function handle(client, msg) {
       const option = msg.content.split(` `);
 
       if (option.length > 1) {
-        changeSettings(msg, option[1]);
+        changeSettings(msg, option[1], client);
       } else {
         msg.reply(`please provide a setting to change with your command.\n${options}`);
         activeChanges = activeChanges.filter((val) => val !== msg.guild.id);
@@ -45,7 +45,7 @@ function getHelp() {
 }
 
 // Private functions
-function changeSettings(msg, setting) {
+function changeSettings(msg, setting, client) {
   switch (setting) {
     case `welcome-message`:
       changeWelcomeMessage(msg);
@@ -74,11 +74,17 @@ function changeSettings(msg, setting) {
     case `streaming-role`:
       changeStreamingRole(msg);
       break;
-    case `role-reaction-channel`:
+    case `reaction-role-channel`:
       changeRoleChannel(msg);
       break;
-    case `add-role-reaction`:
-      addRoleReaction(msg);
+    case `reaction-role-add`:
+      addRoleReaction(msg, client);
+      break;
+    case `reaction-role-remove`:
+      removeRoleReaction(msg);
+      break;
+    case `reaction-role-update`:
+      updateRoleReactions(msg);
       break;
     default:
       activeChanges = activeChanges.filter((val) => val !== msg.guild.id);
@@ -399,7 +405,7 @@ async function changeRoleChannel(msg) {
     const collected = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
 
     if (collected.first().content === `disable`) {
-      const result = await database.updateOrCreateEntry(`Guilds`, {guildID: msg.guild.id}, {welcomeChannelID: null});
+      const result = await database.updateOrCreateEntry(`Guilds`, {guildID: msg.guild.id}, {rolesChannelID: null});
 
       if (result) {
         msg.reply(`the role reaction channel has been disabled.`);
@@ -407,10 +413,10 @@ async function changeRoleChannel(msg) {
         msg.reply(`there was an error disabling the role reaction channel.\nTell the bot developers if the issue persists.`);
       }
     } else {
-      const newWelcomeChannelID = resolvers.resolveChannelID(msg.guild, collected.first().content);
+      const newRolesChannelID = resolvers.resolveChannelID(msg.guild, collected.first().content);
 
-      if (newWelcomeChannelID) {
-        const result = await database.updateOrCreateEntry(`Guilds`, {guildID: msg.guild.id}, {welcomeChannelID: newWelcomeChannelID});
+      if (newRolesChannelID) {
+        const result = await database.updateOrCreateEntry(`Guilds`, {guildID: msg.guild.id}, {rolesChannelID: newRolesChannelID});
 
         if (result) {
           msg.reply(`role reaction channel has been updated!`);
@@ -429,36 +435,123 @@ async function changeRoleChannel(msg) {
   activeChanges = activeChanges.filter((val) => val !== msg.guild.id);
 }
 
-async function addRoleReaction(msg) {
-  msg.reply(`please provide the name/ID of the role that you want to add`);
+async function addRoleReaction(msg, client) {
+  msg.reply(`please provide the name/ID of the role that you want to add or mention it.`);
 
   try {
     const collectedRole = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
-
     const role = resolvers.resolveRoleID(msg.guild, collectedRole.first().content);
+
     if (role) {
-      const emojiMsg = await msg.reply(`React to this message with the emoji that you want to use for the role`);
+      const emojiMsg = await msg.reply(`react to this message with the emoji that you want to use for the role.`);
       const collectedReaction = await collectors.oneReactionFromUser(emojiMsg, msg.author.id);
+      const emojiData = collectedReaction ? collectedReaction.first().emoji : false;
 
-      if (collectedReaction) {
+      let emoji = false;
 
-        msg.reply(`Please provide a category name for this role reaction`);
+      if (emojiData && emojiData.id && client.emojis.cache.get(emojiData.id)) {
+        emoji = emojiData.id;
+      } else if (emojiData && !emojiData.id && emojiData.name) {
+        emoji = emojiData.name;
+      }
+
+      if (emoji) {
+        msg.reply(`please provide a category for this role reaction.`);
 
         const category = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
-        const roleCategory = await database.getEntry(`RoleCategories`, {categoryName: category.first().content, guildID: msg.guild.id});
+        const roleCategory = await database.getEntry(`RoleCategories`, {guildID: msg.guild.id, categoryName: category.first().content});
 
         if (roleCategory) {
-          const matchingRole = await database.getEntry(`Roles`, {emojiID: collectedReaction.emoji.identifier, roleCategory: roleCategory.ID});
+          const matchingRole = await database.getEntry(`Roles`, {roleCategory: roleCategory.ID, emojiID: emoji});
 
-          if (!(matchingRole)) {
-            msg.reply(`this could be added`);
+          if (matchingRole) {
+            msg.reply(`a role in that category is already using that emoji, please try again.`);
+          } else {
+            const result = await database.createEntry(`Roles`, {guildID: msg.guild.id, roleID: role, roleCategory: roleCategory.ID, emojiID: emoji});
+
+            if (result) {
+              msg.reply(`the reaction role has been added!\nRun the "settings update-reaction-roles"`);
+            } else {
+              msg.reply(`there was an error adding the reaction role.\nTell the bot developers if the issue persists.`);
+            }
+          }
+        } else {
+          msg.reply(`Since this is a new role category, please provide a description for it.`);
+          const description = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
+
+          if (description) {
+            const newRoleCategory = await database.createEntry(`RoleCategories`, {guildID: msg.guild.id, categoryName: category.first().content, categoryDescription: description.first().content});
+
+            const result = await database.createEntry(`Roles`, {guildID: msg.guild.id, roleID: role, roleCategory: newRoleCategory.ID, emojiID: emoji});
+
+            if (result) {
+              msg.reply(`the reaction role has been added!\nRun the "settings update-reaction-roles" command to update the reaction roles channel.`);
+            } else {
+              msg.reply(`there was an error adding the reaction role.\nTell the bot developers if the issue persists.`);
+            }
+          } else {
+            msg.reply(`invalid description, please try again.`);
           }
         }
+      } else {
+        msg.reply(`invalid reaction, please try again.`);
       }
+    } else {
+      msg.reply(`invalid role, please try again.`);
     }
   } catch (err) {
     msg.reply(`command timed out, please try again.`);
   }
 
   activeChanges = activeChanges.filter((val) => val !== msg.guild.id);
+}
+
+async function removeRoleReaction(msg) {
+  try {
+    const roleCategories = await database.getAllEntries(`RoleCategories`, {guildID: msg.guild.id});
+
+    if (roleCategories && roleCategories.length > 0) {
+      msg.reply(`please provide the category of the role reaction you want to remove.`);
+
+      const category = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
+      const roleCategory = await database.getEntry(`RoleCategories`, {guildID: msg.guild.id, categoryName: category.first().content});
+
+      if (roleCategory) {
+        msg.reply(`please provide the name/ID of the role that you want to remove or mention it.`);
+
+        const collectedRole = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
+        const role = resolvers.resolveRoleID(msg.guild, collectedRole.first().content);
+
+        if (role) {
+          const matchingRole = await database.removeEntry(`Roles`, {guildID: msg.guild.id, roleID: role, roleCategory: roleCategory.ID});
+
+          if (matchingRole) {
+            msg.reply(`the role has been removed.`);
+
+            const rolesLeft = await database.getAllEntries(`Roles`, {guildID: msg.guild.id, roleCategory: roleCategory.ID});
+
+            if (!rolesLeft || rolesLeft.length < 1) {
+              database.removeEntry(`RoleCategories`, {guildID: msg.guild.id, categoryName: category.first().content});
+            }
+          } else {
+            msg.reply(`no reaction role was found, please try again.`);
+          }
+        } else {
+          msg.reply(`no role was found, please try again.`);
+        }
+      } else {
+        msg.reply(`no role category was found, please try again.`);
+      }
+    } else {
+      msg.reply(`there are no reaction roles!`);
+    }
+  } catch (err) {
+    msg.reply(`command timed out, please try again.`);
+  }
+
+  activeChanges = activeChanges.filter((val) => val !== msg.guild.id);
+}
+
+function updateRoleReactions(msg) {
+  msg.reply(`not yet implemented.`);
 }

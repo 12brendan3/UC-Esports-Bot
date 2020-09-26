@@ -78,7 +78,7 @@ function resolveRoleID(guild, roleObject) {
       roleID = false;
     }
   } else {
-    const foundRole = guild.roles.cache.find((role) => role.displayName === roleObject);
+    const foundRole = guild.roles.cache.find((role) => role.name === roleObject);
 
     if (foundRole) {
       roleID = foundRole.id;

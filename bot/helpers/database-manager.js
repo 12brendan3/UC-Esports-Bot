@@ -204,7 +204,7 @@ const RoleCategories = sequelize.define(`RoleCategories`, {
   },
   messageID: {
     type: Sequelize.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   categoryName: {
     type: Sequelize.STRING,

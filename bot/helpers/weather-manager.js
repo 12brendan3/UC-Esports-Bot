@@ -35,10 +35,10 @@ async function getWeatherData() {
   if (currentTime >= lastCheck + 600000) {
     lastCheck = currentTime;
 
-    // lat/lon is somewhere on UC's campus towards the middle
+    // lat/lon is somewhere on UC's campus
     const params = {
-      lat: `39.1329`,
-      lon: `-84.5150`,
+      lat: `39.132920`,
+      lon: `-84.514952`,
       // eslint-disable-next-line babel/camelcase
       unit_system: `us`,
       fields: `temp,weather_code,sunrise,sunset,moon_phase`,

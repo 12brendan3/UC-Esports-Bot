@@ -57,7 +57,7 @@ async function getWeatherData() {
 
       currentData = newData.data;
     } catch (err) {
-      console.error(`There was an error fetching the weather data....`);
+      console.error(`There was an error fetching the weather data...`);
       console.error(err);
     }
   }

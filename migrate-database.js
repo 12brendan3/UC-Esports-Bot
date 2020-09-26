@@ -18,7 +18,7 @@ input.question(`If you understand and still wish to continue, type in "DATABASO 
 });
 
 async function migrate() {
-  console.info(`Deleting current database file....`);
+  console.info(`Deleting current database file...`);
 
   try {
     if (fs.existsSync(`./storage/database.sqlite`)) {
@@ -39,7 +39,7 @@ async function migrate() {
   const newDB = await loadNewDB();
 
   if (oldDB && newDB) {
-    console.info(`Migrating profiles....`);
+    console.info(`Migrating profiles...`);
     try {
       const oldProfiles = await oldDB.oldUsers.findAll();
       const queries = [];
@@ -54,7 +54,7 @@ async function migrate() {
     }
     console.info(`Profile migration done.`);
 
-    console.info(`Migrating XP leaderboard....`);
+    console.info(`Migrating XP leaderboard...`);
     try {
       const oldUsers = await oldDB.oldXP.findAll();
       const queries = [];
@@ -70,7 +70,7 @@ async function migrate() {
     }
     console.info(`XP leaderboard migration done.`);
 
-    console.info(`Database migration complete!\nExiting now....`);
+    console.info(`Database migration complete!\nExiting now...`);
     process.exit(0);
   } else {
     console.error(`One of the databases have an issue.\nProcess cancelled.`);
@@ -79,7 +79,7 @@ async function migrate() {
 }
 
 async function loadNewDB() {
-  console.info(`Loading new database....`);
+  console.info(`Loading new database...`);
   try {
     const sequelize = new Sequelize(`database`, `user`, `password`, {
       host: `localhost`,
@@ -259,7 +259,7 @@ async function loadNewDB() {
 }
 
 async function loadOldDB() {
-  console.info(`Loading old database....`);
+  console.info(`Loading old database...`);
   try {
     const oldSequelize = new Sequelize(`database`, `user`, `password`, {
       host: `localhost`,

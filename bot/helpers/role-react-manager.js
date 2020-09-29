@@ -103,7 +103,7 @@ async function updateGuildRoles(guildId) {
 
   // for each unique guild, for each unique category, an empty object to store roles.
   for (const cat of categories) {
-    roleData[guildId][cat.categoryName] = {categoryDescription: cat.categoryDescription, roles: []};
+    roleData[guildId][cat.categoryName] = {categoryDescription: cat.categoryDescription, categoryMessage: cat.messageID, roles: []};
   }
 
   // for each role, place the role data in its proper guild and category
@@ -126,6 +126,7 @@ data = {
       role3
       ]
       categoryDescription: "..."
+      categoryMessage: "..."
     },
     guild1Category2: {
       roles: [
@@ -134,6 +135,7 @@ data = {
       role3
       ]
       categoryDescription: "..."
+      categoryMessage: "..."
     },
   },
   guild1: {
@@ -144,6 +146,7 @@ data = {
       role3
       ]
       categoryDescription: "..."
+      categoryMessage: "..."
     },
     guild1Category2: {
       roles: [
@@ -152,9 +155,10 @@ data = {
       role3
       ]
       categoryDescription: "..."
+      categoryMessage: "..."
     },
   }
 }
 */
 
-module.exports = {initRoles, updateGuildRoles};
+module.exports = {initRoles, updateGuildRoles, roleData};

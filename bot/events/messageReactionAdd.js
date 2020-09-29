@@ -1,7 +1,9 @@
 const database = require(`../helpers/database-manager`);
 const permissions = require(`../helpers/permissions`);
+const roles = require(`../helpers/role-react-manager`);
 
 const Discord = require(`discord.js`);
+const {resolveRoleID} = require("../helpers/resolvers");
 
 // Reactions to detect, in order: ⭐🌟
 const detectedReactions = [`%E2%AD%90`, `%F0%9F%8C%9F`];
@@ -34,6 +36,28 @@ async function handle(client, reaction, user) {
     if (exists || admin) {
       checkMessage(reaction, guildSettings, exists);
     }
+  }
+
+  const roleReaction = await database.getEntry(`Guilds`, {rolesChannelID: reaction.message.guild.id});
+
+  if (roleReaction) {
+    for (const category in roles.roleData[reaction.message.guild.id]) {
+      if (category.categoryMessage === reaction.message.id) {
+        for (const role in category.roles) {
+          if (role.emojiID === reaction.identifier) {
+            const member = reaction.message.guild.members.cache.get(user.id);
+            const editRole = resolveRoleID(role.roleID);
+
+            if (member.roles.cache.get(editRole)) {
+              member.roles.remove(editRole);
+            } else {
+              member.roles.add(editRole);
+            }
+          }
+        }
+      }
+    }
+    reaction.user.remove();
   }
 }
 

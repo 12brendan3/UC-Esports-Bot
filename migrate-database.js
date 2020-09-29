@@ -201,6 +201,10 @@ async function loadNewDB() {
         type: Sequelize.STRING,
         allowNull: true,
       },
+      verifiedRoleID: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
     });
 
     const ServerAdmins = sequelize.define(`ServerAdmins`, {
@@ -246,7 +250,59 @@ async function loadNewDB() {
       },
     });
 
-    await Promise.all([Bearcats.sync(), XP.sync(), Starboard.sync(), Guilds.sync(), ServerAdmins.sync(), Feedback.sync()]);
+    const Roles = sequelize.define(`Roles`, {
+      ID: {
+        type: Sequelize.UUIDV4,
+        defaultValue: Sequelize.UUIDV4,
+        unique: true,
+        primaryKey: true,
+        allowNull: false,
+      },
+      guildID: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      roleID: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      roleCategory: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      emojiID: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+    });
+
+    const RoleCategories = sequelize.define(`RoleCategories`, {
+      ID: {
+        type: Sequelize.UUIDV4,
+        defaultValue: Sequelize.UUIDV4,
+        unique: true,
+        primaryKey: true,
+        allowNull: false,
+      },
+      guildID: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      messageID: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      categoryName: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      categoryDescription: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+    });
+
+    await Promise.all([Bearcats.sync(), XP.sync(), Starboard.sync(), Guilds.sync(), ServerAdmins.sync(), Feedback.sync(), Roles.sync(), RoleCategories.sync()]);
 
     console.info(`New database loaded.`);
 

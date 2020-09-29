@@ -2,7 +2,7 @@
 const database = require(`../helpers/database-manager`);
 const collectors = require(`../helpers/collectors`);
 const resolvers = require(`../helpers/resolvers`);
-const permissions = require("../helpers/permissions");
+const permissions = require(`../helpers/permissions`);
 
 // Vars
 const options = `Valid settings are: \`welcome-message\` \`welcome-channel\` \`admin-add\` \`admin-remove\` \`admin-list\` \`logs-channel\` \`starboard-channel\` \`starboard-threshold\` \`streaming-role\` \`reaction-role-channel\` \`reaction-role-add\` \`reaction-role-remove\` \`reaction-role-update\``;
@@ -445,15 +445,7 @@ async function addRoleReaction(msg, client) {
     if (role) {
       const emojiMsg = await msg.reply(`react to this message with the emoji that you want to use for the role.`);
       const collectedReaction = await collectors.oneReactionFromUser(emojiMsg, msg.author.id);
-      const emojiData = collectedReaction ? collectedReaction.first().emoji : false;
-
-      let emoji = false;
-
-      if (emojiData && emojiData.id && client.emojis.cache.get(emojiData.id)) {
-        emoji = emojiData.id;
-      } else if (emojiData && !emojiData.id && emojiData.name) {
-        emoji = emojiData.name;
-      }
+      const emoji = collectedReaction ? resolvers.resolveEmojiID(client, collectedReaction.first().emoji) : false;
 
       if (emoji) {
         msg.reply(`please provide a category for this role reaction.`);

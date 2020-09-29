@@ -16,13 +16,44 @@ module.exports = {handle};
 
 // Exported function
 async function handle(client, reaction, user) {
-  if (user.bot || reaction.message.channel.type === `dm` || !detectedReactions.includes(reaction.emoji.identifier)) {
+  if (user.bot || reaction.message.channel.type === `dm`) {
     return;
   }
 
   const guildSettings = await database.getEntry(`Guilds`, {guildID: reaction.message.guild.id});
 
-  if (!guildSettings || !guildSettings.starboardChannelID || reaction.message.channel.id === guildSettings.starboardChannelID || !reaction.message.guild.channels.cache.get(guildSettings.starboardChannelID) || !guildSettings.starboardThreshold) {
+  detectStarboard(guildSettings, reaction, user);
+
+  detectRoleReaction(guildSettings, reaction, user);
+}
+
+function detectRoleReaction(guildSettings, reaction, user) {
+  if (!guildSettings.rolesChannelID) {
+    return;
+  }
+
+  for (const category in roles.roleData[reaction.message.guild.id]) {
+    if (category.categoryMessage === reaction.message.id) {
+      for (const role in category.roles) {
+        if (role.emojiID === reaction.identifier) {
+          const member = reaction.message.guild.members.cache.get(user.id);
+          const editRole = resolveRoleID(role.roleID);
+
+          if (member.roles.cache.get(editRole)) {
+            member.roles.remove(editRole);
+          } else {
+            member.roles.add(editRole);
+          }
+        }
+      }
+    }
+  }
+
+  reaction.user.remove();
+}
+
+async function detectStarboard(guildSettings, reaction, user) {
+  if (!detectedReactions.includes(reaction.emoji.identifier) || !guildSettings || !guildSettings.starboardChannelID || reaction.message.channel.id === guildSettings.starboardChannelID || !reaction.message.guild.channels.cache.get(guildSettings.starboardChannelID) || !guildSettings.starboardThreshold) {
     return;
   }
 
@@ -36,28 +67,6 @@ async function handle(client, reaction, user) {
     if (exists || admin) {
       checkMessage(reaction, guildSettings, exists);
     }
-  }
-
-  const roleReaction = await database.getEntry(`Guilds`, {rolesChannelID: reaction.message.guild.id});
-
-  if (roleReaction) {
-    for (const category in roles.roleData[reaction.message.guild.id]) {
-      if (category.categoryMessage === reaction.message.id) {
-        for (const role in category.roles) {
-          if (role.emojiID === reaction.identifier) {
-            const member = reaction.message.guild.members.cache.get(user.id);
-            const editRole = resolveRoleID(role.roleID);
-
-            if (member.roles.cache.get(editRole)) {
-              member.roles.remove(editRole);
-            } else {
-              member.roles.add(editRole);
-            }
-          }
-        }
-      }
-    }
-    reaction.user.remove();
   }
 }
 

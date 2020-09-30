@@ -9,7 +9,7 @@ async function handle(client, member) {
 
   if (guildSettings && guildSettings.welcomeMessage && guildSettings.welcomeChannelID) {
     const welcomeMessage = guildSettings.welcomeMessage.replace(`!!newuser!!`, `${member}`);
-    const welcomeChannel = member.guild.channels.get(guildSettings.welcomeChannelID);
+    const welcomeChannel = member.guild.channels.cache.get(guildSettings.welcomeChannelID);
     welcomeChannel.send(welcomeMessage);
   }
 }

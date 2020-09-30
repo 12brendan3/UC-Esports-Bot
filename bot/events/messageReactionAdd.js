@@ -83,7 +83,7 @@ async function detectStarboard(guildSettings, reaction, user) {
     const exists = await database.getEntry(`Starboard`, {guildID: reaction.message.guild.id, channelID: reaction.message.channel.id, originalMessageID: reaction.message.id});
     const admin = await permissions.checkAdmin(reaction.message.guild.id, user.id);
 
-    if (exists || admin) {
+    if (exists || admin || reaction.message.guild.ownerID === user.id) {
       checkMessage(reaction, guildSettings, exists, true);
     }
   }

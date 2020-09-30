@@ -76,7 +76,7 @@ function changeSettings(msg, setting, client) {
       changeStreamingRole(msg);
       break;
     case `reaction-role-channel`:
-      changeRoleChannel(msg);
+      changeRoleChannel(msg, client);
       break;
     case `reaction-role-add`:
       addRoleReaction(msg, client);
@@ -399,7 +399,7 @@ async function changeStreamingRole(msg) {
   activeChanges = activeChanges.filter((val) => val !== msg.guild.id);
 }
 
-async function changeRoleChannel(msg) {
+async function changeRoleChannel(msg, client) {
   msg.reply(`please provide the name/ID of the new reaction roles channel or mention it.\nIf you'd like to disable the reaction roles channel, just send \`disable\`.`);
 
   try {
@@ -418,6 +418,8 @@ async function changeRoleChannel(msg) {
 
       if (newRolesChannelID) {
         const result = await database.updateOrCreateEntry(`Guilds`, {guildID: msg.guild.id}, {rolesChannelID: newRolesChannelID});
+
+        await reactManager.updateGuildEmbeds(client, msg.guild.id);
 
         if (result) {
           msg.reply(`reaction roles channel has been updated!`);

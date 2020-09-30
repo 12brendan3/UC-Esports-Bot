@@ -85,17 +85,18 @@ async function removeRoleData(client, guildID, categoryID, emojiID) {
     if (roleData[guildID][categoryID].roles === {}) {
       delete roleData[guildID][categoryID];
     }
+
+    roleData[guildID][categoryID].emojis = roleData[guildID][categoryID].emojis.filter((emoji) => emoji !== emojiID);
+    await updateGuildEmbeds(client, guildID, categoryID);
   } else {
     delete roleData[guildID][categoryID];
+
+    if (roleData[guildID] === {}) {
+      delete roleData[guildID];
+    }
+
+    await updateGuildEmbeds(client, guildID);
   }
-
-  if (roleData[guildID] === {}) {
-    delete roleData[guildID];
-  }
-
-  roleData[guildID][categoryID].emojis = roleData[guildID][categoryID].emojis.filter((emoji) => emoji !== emojiID);
-
-  await updateGuildEmbeds(client, guildID, categoryID);
 }
 
 function generateEmbed(client, guildID, categoryID) {
@@ -188,9 +189,11 @@ async function updateAllEmbeds(client, guildID, guildSettings) {
 
       const emojis = roleData[guildID][category].emojis;
 
-      emojis.forEach((emoji) => {
-        newMessage.react(emoji);
-      });
+      if (emojis) {
+        emojis.forEach((emoji) => {
+          newMessage.react(emoji);
+        });
+      }
 
       database.updateEntry(`RoleCategories`, {ID: category}, {messageID: newMessage.id});
     }

@@ -473,7 +473,7 @@ async function addRoleReaction(msg, client) {
                 await reactManager.addRoleData(client, msg.guild.id, roleCategory.ID, emoji, role);
 
                 if (result) {
-                  msg.reply(`the reaction role has been added!\nUpdating roles channel...`);
+                  msg.reply(`the reaction role has been added!`);
                 } else {
                   msg.reply(`there was an error adding the reaction role.\nTell the bot developers if the issue persists.`);
                 }
@@ -538,7 +538,7 @@ async function removeRoleReaction(msg, client) {
             const oldRole = await database.getEntry(`Roles`, {guildID: msg.guild.id, roleID: role, roleCategory: roleCategory.ID});
             const matchingRole = await database.removeEntry(`Roles`, {guildID: msg.guild.id, roleID: role, roleCategory: roleCategory.ID});
 
-            if (matchingRole) {
+            if (matchingRole && oldRole) {
               const rolesLeft = await database.getAllEntries(`Roles`, {guildID: msg.guild.id, roleCategory: roleCategory.ID});
 
               if (!rolesLeft || rolesLeft.length < 1) {

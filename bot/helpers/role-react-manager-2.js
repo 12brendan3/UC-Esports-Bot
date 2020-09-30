@@ -156,8 +156,9 @@ async function updateOneEmbed(client, guildID, categoryID, guildSettings) {
 
       const emojis = roleData[guildID][categoryID].emojis;
 
-      oldMessage.reactions.cache.each((reaction) => {
-        if (!emojis.includes(resolvers.resolveEmojiID(reaction.emoji))) {
+      oldMessage.reactions.cache.each(async (reaction) => {
+        const reactionEmoji = await resolvers.resolveEmojiID(client, reaction.emoji);
+        if (!emojis.includes(reactionEmoji)) {
           reaction.remove();
         }
       });

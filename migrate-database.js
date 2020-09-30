@@ -18,7 +18,7 @@ input.question(`If you understand and still wish to continue, type in "DATABASO 
 });
 
 async function migrate() {
-  console.info(`Deleting current database file....`);
+  console.info(`Deleting current database file...`);
 
   try {
     if (fs.existsSync(`./storage/database.sqlite`)) {
@@ -39,7 +39,7 @@ async function migrate() {
   const newDB = await loadNewDB();
 
   if (oldDB && newDB) {
-    console.info(`Migrating profiles....`);
+    console.info(`Migrating profiles...`);
     try {
       const oldProfiles = await oldDB.oldUsers.findAll();
       const queries = [];
@@ -54,7 +54,7 @@ async function migrate() {
     }
     console.info(`Profile migration done.`);
 
-    console.info(`Migrating XP leaderboard....`);
+    console.info(`Migrating XP leaderboard...`);
     try {
       const oldUsers = await oldDB.oldXP.findAll();
       const queries = [];
@@ -70,7 +70,7 @@ async function migrate() {
     }
     console.info(`XP leaderboard migration done.`);
 
-    console.info(`Database migration complete!\nExiting now....`);
+    console.info(`Database migration complete!\nExiting now...`);
     process.exit(0);
   } else {
     console.error(`One of the databases have an issue.\nProcess cancelled.`);
@@ -79,7 +79,7 @@ async function migrate() {
 }
 
 async function loadNewDB() {
-  console.info(`Loading new database....`);
+  console.info(`Loading new database...`);
   try {
     const sequelize = new Sequelize(`database`, `user`, `password`, {
       host: `localhost`,
@@ -201,6 +201,10 @@ async function loadNewDB() {
         type: Sequelize.STRING,
         allowNull: true,
       },
+      verifiedRoleID: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
     });
 
     const ServerAdmins = sequelize.define(`ServerAdmins`, {
@@ -246,7 +250,59 @@ async function loadNewDB() {
       },
     });
 
-    await Promise.all([Bearcats.sync(), XP.sync(), Starboard.sync(), Guilds.sync(), ServerAdmins.sync(), Feedback.sync()]);
+    const Roles = sequelize.define(`Roles`, {
+      ID: {
+        type: Sequelize.UUIDV4,
+        defaultValue: Sequelize.UUIDV4,
+        unique: true,
+        primaryKey: true,
+        allowNull: false,
+      },
+      guildID: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      roleID: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      roleCategory: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      emojiID: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+    });
+
+    const RoleCategories = sequelize.define(`RoleCategories`, {
+      ID: {
+        type: Sequelize.UUIDV4,
+        defaultValue: Sequelize.UUIDV4,
+        unique: true,
+        primaryKey: true,
+        allowNull: false,
+      },
+      guildID: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      messageID: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      categoryName: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      categoryDescription: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+    });
+
+    await Promise.all([Bearcats.sync(), XP.sync(), Starboard.sync(), Guilds.sync(), ServerAdmins.sync(), Feedback.sync(), Roles.sync(), RoleCategories.sync()]);
 
     console.info(`New database loaded.`);
 
@@ -259,7 +315,7 @@ async function loadNewDB() {
 }
 
 async function loadOldDB() {
-  console.info(`Loading old database....`);
+  console.info(`Loading old database...`);
   try {
     const oldSequelize = new Sequelize(`database`, `user`, `password`, {
       host: `localhost`,

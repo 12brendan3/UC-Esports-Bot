@@ -119,6 +119,10 @@ const Guilds = sequelize.define(`Guilds`, {
     type: Sequelize.STRING,
     allowNull: true,
   },
+  verifiedRoleID: {
+    type: Sequelize.STRING,
+    allowNull: true,
+  },
 });
 
 const ServerAdmins = sequelize.define(`ServerAdmins`, {
@@ -164,8 +168,60 @@ const Feedback = sequelize.define(`Feedback`, {
   },
 });
 
+const Roles = sequelize.define(`Roles`, {
+  ID: {
+    type: Sequelize.UUIDV4,
+    defaultValue: Sequelize.UUIDV4,
+    unique: true,
+    primaryKey: true,
+    allowNull: false,
+  },
+  guildID: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  roleID: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  roleCategory: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  emojiID: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+});
+
+const RoleCategories = sequelize.define(`RoleCategories`, {
+  ID: {
+    type: Sequelize.UUIDV4,
+    defaultValue: Sequelize.UUIDV4,
+    unique: true,
+    primaryKey: true,
+    allowNull: false,
+  },
+  guildID: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  messageID: {
+    type: Sequelize.STRING,
+    allowNull: true,
+  },
+  categoryName: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  categoryDescription: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+});
+
 // Make object containing tables
-const tables = {Bearcats, XP, Starboard, Guilds, ServerAdmins, Feedback};
+const tables = {Bearcats, XP, Starboard, Guilds, ServerAdmins, Feedback, Roles, RoleCategories};
 
 // Exports
 module.exports = {syncTables, createEntry, getEntry, getOrCreateEntry, updateEntry, updateOrCreateEntry, removeEntry, getAllEntries};
@@ -179,6 +235,8 @@ async function syncTables() {
     Guilds.sync(),
     ServerAdmins.sync(),
     Feedback.sync(),
+    Roles.sync(),
+    RoleCategories.sync(),
   ]);
   console.info(`Database tables synced.`);
 }

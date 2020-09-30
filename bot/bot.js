@@ -5,6 +5,7 @@ let client;
 const modules = require(`./helpers/module-manager`);
 const settings = require(`./helpers/settings-manager`);
 const database = require(`./helpers/database-manager`);
+const reactManager = require(`./helpers/role-react-manager-2`);
 
 // Exports
 module.exports = {startBot, stopBot, restartBot};
@@ -14,6 +15,8 @@ async function startBot() {
   client = new Discord.Client({partials: ['MESSAGE', 'REACTION']});
 
   await database.syncTables();
+
+  await reactManager.loadRoleData();
 
   modules.registerAll(client);
 

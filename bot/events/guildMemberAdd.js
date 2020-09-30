@@ -7,9 +7,9 @@ module.exports = {handle};
 async function handle(client, member) {
   const guildSettings = await database.getEntry(`Guilds`, {guildID: member.guild.id});
 
-  if (guildSettings && guildSettings.welcomeMessage && guildSettings.welcomeChannel) {
+  if (guildSettings && guildSettings.welcomeMessage && guildSettings.welcomeChannelID) {
     const welcomeMessage = guildSettings.welcomeMessage.replace(`!!newuser!!`, `${member}`);
-    const welcomeChannel = member.guild.channels.get(welcomeMessage.welcomeChannel);
+    const welcomeChannel = member.guild.channels.get(guildSettings.welcomeChannelID);
     welcomeChannel.send(welcomeMessage);
   }
 }

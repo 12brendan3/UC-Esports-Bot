@@ -164,7 +164,10 @@ async function updateOneEmbed(client, guildID, categoryID, guildSettings) {
       });
 
       emojis.forEach((emoji) => {
-        oldMessage.react(emoji);
+        const hasEmoji = oldMessage.reactions.cache.get(emoji);
+        if (!hasEmoji) {
+          oldMessage.react(emoji);
+        }
       });
     } else {
       await updateAllEmbeds(client, guildID, guildSettings);

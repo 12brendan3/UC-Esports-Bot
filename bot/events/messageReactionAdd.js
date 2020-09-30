@@ -1,9 +1,9 @@
 const database = require(`../helpers/database-manager`);
 const permissions = require(`../helpers/permissions`);
-const roles = require(`../helpers/role-react-manager`);
+const reactManager = require(`../helpers/role-react-manager-2`);
+const resolvers = require(`../helpers/resolvers`);
 
 const Discord = require(`discord.js`);
-const {resolveRoleID} = require("../helpers/resolvers");
 
 // Reactions to detect, in order: ⭐🌟
 const detectedReactions = [`%E2%AD%90`, `%F0%9F%8C%9F`];
@@ -22,34 +22,53 @@ async function handle(client, reaction, user) {
 
   const guildSettings = await database.getEntry(`Guilds`, {guildID: reaction.message.guild.id});
 
+  if (!guildSettings) {
+    return;
+  }
+
   detectStarboard(guildSettings, reaction, user);
 
-  detectRoleReaction(guildSettings, reaction, user);
+  detectRoleReaction(client, guildSettings, reaction, user);
 }
 
-function detectRoleReaction(guildSettings, reaction, user) {
+async function detectRoleReaction(client, guildSettings, reaction, user) {
   if (!guildSettings.rolesChannelID) {
     return;
   }
 
-  for (const category in roles.roleData[reaction.message.guild.id]) {
-    if (category.categoryMessage === reaction.message.id) {
-      for (const role in category.roles) {
-        if (role.emojiID === reaction.identifier) {
-          const member = reaction.message.guild.members.cache.get(user.id);
-          const editRole = resolveRoleID(role.roleID);
+  const roleData = reactManager.getRoleData();
 
-          if (member.roles.cache.get(editRole)) {
-            member.roles.remove(editRole);
+  if (!roleData[reaction.message.guild.id]) {
+    return;
+  }
+
+  for (const category in roleData[reaction.message.guild.id]) {
+    if (Object.prototype.hasOwnProperty.call(roleData[reaction.message.guild.id], category) && roleData[reaction.message.guild.id][category].msgID === reaction.message.id) {
+      const emoji = resolvers.resolveEmojiID(client, reaction.emoji);
+      const roleID = roleData[reaction.message.guild.id][category].roles[emoji];
+
+      if (roleID) {
+        const member = reaction.message.guild.members.cache.get(user.id);
+        const role = reaction.message.guild.roles.cache.get(roleID);
+
+        try {
+          if (member.roles.cache.get(roleID)) {
+            await member.roles.remove(roleID);
+            user.send(`You no longer have the \`${role.name}\` role.`);
           } else {
-            member.roles.add(editRole);
+            await member.roles.add(roleID);
+            user.send(`You have been given the \`${role.name}\` role.`);
           }
+        } catch {
+          const message = await reaction.message.channel.send(`${user}, there was an error giving you the \`${role.name}\` role.\nTell an admin if they don't notice.  There may be a permission issue.`);
+          setTimeout(() => message.delete(), 5000);
         }
+
+        reaction.users.remove(user.id);
+        break;
       }
     }
   }
-
-  reaction.user.remove();
 }
 
 async function detectStarboard(guildSettings, reaction, user) {

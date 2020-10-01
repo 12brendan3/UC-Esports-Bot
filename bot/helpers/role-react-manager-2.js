@@ -6,7 +6,7 @@ const resolvers = require(`./resolvers`);
 const roleData = {};
 
 // Exports
-module.exports = {loadRoleData, addRoleData, removeRoleData, updateGuildEmbeds, getRoleData};
+module.exports = {loadRoleData, addRoleData, removeRoleData, updateGuildEmbeds, getRoleData, updateCategoryData};
 
 async function loadRoleData() {
   const categories = await database.getAllEntries(`RoleCategories`);
@@ -96,6 +96,16 @@ async function removeRoleData(client, guildID, categoryID, emojiID) {
     }
 
     await updateGuildEmbeds(client, guildID);
+  }
+}
+
+async function updateCategoryData(client, guildID, categoryID, name, description) {
+  if (name) {
+    roleData[guildID][categoryID].name = name;
+    await updateGuildEmbeds(client, guildID, categoryID);
+  } else if (description) {
+    roleData[guildID][categoryID].description = description;
+    await updateGuildEmbeds(client, guildID, categoryID);
   }
 }
 

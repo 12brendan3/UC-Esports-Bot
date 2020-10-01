@@ -6,7 +6,7 @@ const permissions = require(`../helpers/permissions`);
 const reactManager = require(`../helpers/role-react-manager-2`);
 
 // Vars
-const options = `Valid settings are: \`welcome-message\` \`welcome-channel\` \`admin-add\` \`admin-remove\` \`admin-list\` \`logs-channel\` \`starboard-channel\` \`starboard-threshold\` \`streaming-role\` \`reaction-role-channel\` \`reaction-role-add\` \`reaction-role-remove\` \`reaction-role-update\``;
+const options = `Valid settings are: \`welcome-message\` \`welcome-channel\` \`admin-add\` \`admin-remove\` \`admin-list\` \`logs-channel\` \`starboard-channel\` \`starboard-threshold\` \`streaming-role\` \`react-channel\` \`react-add\` \`react-remove\` \`react-update\` \`react-cat-name\` \`react-cat-info\``;
 let activeChanges = [];
 
 // Exports
@@ -75,17 +75,23 @@ function changeSettings(msg, setting, client) {
     case `streaming-role`:
       changeStreamingRole(msg);
       break;
-    case `reaction-role-channel`:
+    case `react-channel`:
       changeRoleChannel(msg, client);
       break;
-    case `reaction-role-add`:
+    case `react-add`:
       addRoleReaction(msg, client);
       break;
-    case `reaction-role-remove`:
+    case `react-remove`:
       removeRoleReaction(msg, client);
       break;
-    case `reaction-role-update`:
+    case `react-update`:
       updateRoleReactions(msg, client);
+      break;
+    case `react-cat-name`:
+      updateCategoryName(msg, client);
+      break;
+    case `react-cat-info`:
+      updateCategoryInfo(msg, client);
       break;
     default:
       activeChanges = activeChanges.filter((val) => val !== msg.guild.id);
@@ -582,6 +588,68 @@ async function updateRoleReactions(msg, client) {
     msg.reply(`the role reactions have been updated.`);
   } else {
     msg.reply(`this guild has no role reactions channel, please set one up with the "settings reaction-role-channel" command.`);
+  }
+
+  activeChanges = activeChanges.filter((val) => val !== msg.guild.id);
+}
+
+async function updateCategoryName(msg, client) {
+  try {
+    const guildSettings = await database.getEntry(`Guilds`, {guildID: msg.guild.id});
+
+    if (guildSettings && guildSettings.rolesChannelID) {
+      msg.reply(`please provide the current name of the category.`);
+      const collectedOldName = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
+
+      msg.reply(`please provide the new name for the category.`);
+      const collectedNewName = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
+
+      const result = await database.updateEntry(`RoleCategories`, {guildID: msg.guild.id, categoryName: collectedOldName.first().content}, {categoryName: collectedNewName.first().content});
+      const newResult = await database.getEntry(`RoleCategories`, {guildID: msg.guild.id, categoryName: collectedNewName.first().content});
+
+      if (result && newResult) {
+        await reactManager.updateCategoryData(client, msg.guild.id, newResult.ID, collectedNewName.first().content);
+        msg.reply(`the category name was updated.`);
+      } else {
+        msg.reply(`failed to update that category, please try again.`);
+      }
+    } else {
+      msg.reply(`this guild has no role reactions channel, please set one up with the "settings reaction-role-channel" command.`);
+    }
+  } catch (err) {
+    console.error(err);
+    msg.reply(`command timed out, please try again.`);
+  }
+
+  activeChanges = activeChanges.filter((val) => val !== msg.guild.id);
+}
+
+async function updateCategoryInfo(msg, client) {
+  try {
+    const guildSettings = await database.getEntry(`Guilds`, {guildID: msg.guild.id});
+
+    if (guildSettings && guildSettings.rolesChannelID) {
+      msg.reply(`please provide the name of the category.`);
+      const collectedName = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
+
+      msg.reply(`please provide the new description for the category.`);
+      const collectedDescription = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
+
+      const result = await database.updateEntry(`RoleCategories`, {guildID: msg.guild.id, categoryName: collectedName.first().content}, {categoryDescription: collectedDescription.first().content});
+      const newResult = await database.getEntry(`RoleCategories`, {guildID: msg.guild.id, categoryName: collectedName.first().content});
+
+      if (result && newResult) {
+        await reactManager.updateCategoryData(client, msg.guild.id, newResult.ID, null, collectedDescription.first().content);
+        msg.reply(`the category description was updated.`);
+      } else {
+        msg.reply(`failed to update that category, please try again.`);
+      }
+    } else {
+      msg.reply(`this guild has no role reactions channel, please set one up with the "settings reaction-role-channel" command.`);
+    }
+  } catch (err) {
+    console.error(err);
+    msg.reply(`command timed out, please try again.`);
   }
 
   activeChanges = activeChanges.filter((val) => val !== msg.guild.id);

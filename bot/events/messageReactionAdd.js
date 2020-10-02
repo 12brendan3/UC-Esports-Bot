@@ -54,10 +54,10 @@ async function detectRoleReaction(client, guildSettings, reaction, user) {
         try {
           if (member.roles.cache.get(roleID)) {
             await member.roles.remove(roleID);
-            user.send(`You no longer have the \`${role.name}\` role.`);
+            user.send(`You no longer have the \`${role.name}\` role in \`${reaction.message.guild.name}\`.`);
           } else {
             await member.roles.add(roleID);
-            user.send(`You have been given the \`${role.name}\` role.`);
+            user.send(`You have been given the \`${role.name}\` role in \`${reaction.message.guild.name}\`.`);
           }
         } catch {
           const message = await reaction.message.channel.send(`${user}, there was an error giving you the \`${role.name}\` role.\nTell an admin if they don't notice.  There may be a permission issue.`);

@@ -15,7 +15,7 @@ async function handle(client, msg) {
   try {
     const collected = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
 
-    if (collected.first().content.trim()) {
+    if (collected.first().content) {
       const message = collected.first();
       const messageURL = message.channel.type === `dm` ? `Sent via DM` : message.url;
 

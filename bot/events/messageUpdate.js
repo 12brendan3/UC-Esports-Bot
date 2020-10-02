@@ -26,13 +26,13 @@ async function logMessageEdit(msgOld, msgNew) {
     if (msgOld.content) {
       embed.addField(`Before`, msgOld.content.length > 1000 ? msgOld.content.substr(0, 1000) : msgOld.content);
       if (msgOld.content.length > 1000) {
-        embed.addField(`Before Continued`, msgOld.content.substr(1000, msgOld.content.length));
+        embed.addField(`*** ***`, msgOld.content.substr(1000, msgOld.content.length));
       }
     }
     if (msgNew.content) {
       embed.addField(`After`, msgNew.content.length > 1000 ? msgNew.content.substr(0, 1000) : msgNew.content);
       if (msgNew.content.length > 1000) {
-        embed.addField(`After Continued`, msgNew.content.substr(1000, msgNew.content.length));
+        embed.addField(`*** ***`, msgNew.content.substr(1000, msgNew.content.length));
       }
     }
     embed.addField(`Message Link`, `[Jump to Message](${msgNew.url})`);

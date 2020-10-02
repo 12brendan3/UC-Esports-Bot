@@ -30,7 +30,7 @@ async function logMessageDeletion(msg) {
     if (msg.content) {
       embed.addField(`Message`, msg.content.length > 1000 ? msg.content.substr(0, 1000) : msg.content);
       if (msg.content.length > 1000) {
-        embed.addField(`Message Continued`, msg.content.substr(1000, msg.content.length));
+        embed.addField(`*** ***`, msg.content.substr(1000, msg.content.length));
       }
     }
 

@@ -6,8 +6,10 @@ const permissions = require(`../helpers/permissions`);
 module.exports = {handle, getHelp};
 
 // Help command text
-const help =
-null;
+const help = {
+  text: `Allows developers to delete feedback from the database.`,
+  level: `developer`,
+};
 
 // Exported functions
 function handle(client, msg) {

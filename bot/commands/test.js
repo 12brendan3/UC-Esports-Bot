@@ -10,8 +10,10 @@ const options = `Currently the only options are: "welcome-message" and "welcome-
 module.exports = {handle, getHelp};
 
 // Help command text
-const help =
-`Allows a server admin to test bot settings.`;
+const help = {
+  text: `Allows a server admin to test bot settings.`,
+  level: `admin`,
+};
 
 // Exported functions
 function handle(client, msg) {

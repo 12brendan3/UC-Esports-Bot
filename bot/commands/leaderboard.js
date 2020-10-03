@@ -7,8 +7,10 @@ const database = require(`../helpers/database-manager`);
 module.exports = {handle, getHelp};
 
 // Help command text
-const help =
-`Gets the leaderboard of users with the most XP.`;
+const help = {
+  text: `Gets the leaderboard of users with the most XP.`,
+  level: `user`,
+};
 
 // Exported functions
 function handle(client, msg) {

@@ -13,8 +13,10 @@ let activeChanges = [];
 module.exports = {handle, getHelp};
 
 // Help command text
-const help =
-`Allows a server admin to change bot settings.`;
+const help = {
+  text: `Allows a server admin to change bot settings.`,
+  level: `admin`,
+};
 
 // Exported functions
 async function handle(client, msg) {

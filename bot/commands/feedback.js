@@ -5,8 +5,10 @@ const database = require(`../helpers/database-manager`);
 module.exports = {handle, getHelp};
 
 // Help command text
-const help =
-`Allows anyone to provide feedback directly to the bot developers.  Use this command for improvements, bugs, etc.`;
+const help = {
+  text: `Allows anyone to provide feedback directly to the bot developers.  Use this command for improvements, bugs, etc.`,
+  level: `user`,
+};
 
 // Exported functions
 async function handle(client, msg) {

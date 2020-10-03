@@ -1,8 +1,11 @@
 // Exports
 module.exports = {handle, getHelp};
 
-const help =
-`Replies with "pong!" ...and the bot's actual ping.`;
+// Help command text
+const help = {
+  text: `Replies with "pong!" ...and the bot's actual ping.`,
+  level: `user`,
+};
 
 // Exported functions
 function handle(client, msg) {

@@ -6,8 +6,10 @@ const settings = require(`../helpers/settings-manager`);
 module.exports = {handle, getHelp};
 
 // Help command text
-const help =
-`Provides information about the bot.`;
+const help = {
+  text: `Provides information about the bot.`,
+  level: `user`,
+};
 
 // Exported functions
 function handle(client, msg) {

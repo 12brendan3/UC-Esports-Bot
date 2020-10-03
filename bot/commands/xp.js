@@ -6,8 +6,10 @@ const database = require(`../helpers/database-manager`);
 module.exports = {handle, getHelp};
 
 // Help command text
-const help =
-`Replies with your current XP.`;
+const help = {
+  text: `Replies with your current XP.`,
+  level: `user`,
+};
 
 // Exported functions
 async function handle(client, msg) {

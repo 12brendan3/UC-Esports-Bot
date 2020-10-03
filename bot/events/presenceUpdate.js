@@ -27,7 +27,7 @@ async function checkStreaming(presence) {
 
     if (streaming && !hasRole) {
       presence.member.roles.add(guildSettings.streamingRoleID);
-    } else if (hasRole) {
+    } else if (!streaming && hasRole) {
       presence.member.roles.remove(guildSettings.streamingRoleID);
     }
   }

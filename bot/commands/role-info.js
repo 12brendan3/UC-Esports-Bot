@@ -1,3 +1,5 @@
+const Discord = require(`discord.js`);
+
 const collectors = require(`../helpers/collectors`);
 const resolvers = require(`../helpers/resolvers`);
 const permissions = require(`../helpers/permissions`);
@@ -21,7 +23,20 @@ async function handle(client, msg) {
       const roleID = resolvers.resolveRoleID(msg.guild, collected.first().content);
       if (roleID) {
         const role = msg.guild.roles.cache.get(roleID);
-        msg.reply(`there are \`${role.members.size}\` members with the \`${role.name}\` role.\nThat's \`${(role.members.size / msg.guild.memberCount * 100).toFixed(2)}%\` of all users in the server.`);
+
+        const embed = new Discord.MessageEmbed();
+
+        embed.setColor(role.color);
+        embed.setAuthor(`${role.name} Role Information`, msg.guild.iconURL());
+        embed.setTimestamp(role.createdTimestamp);
+        embed.setFooter(`Role Created`);
+
+        embed.addField(`__Total Members__`, `${role.members.size} member${role.members.size > 1 ? `s` : ``}  (${(role.members.size / msg.guild.memberCount * 100).toFixed(2)}% of all server members)`);
+        embed.addField(`__Color (hex)__`, `\`${role.hexColor}\``);
+        embed.addField(`__Mentionable__`, role.mentionable ? `Yes` : `No`);
+        embed.addField(`__Externally Managed__`, role.managed ? `Yes` : `No`);
+
+        msg.channel.send(embed);
       } else {
         msg.reply(`no role found, please try again.`);
       }

@@ -105,3 +105,6 @@ dist
 
 # Ignore Bot Storage
 storage/
+
+# Ignore VS Code settings
+.vscode

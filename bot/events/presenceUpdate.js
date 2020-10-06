@@ -26,9 +26,9 @@ async function checkStreaming(presence) {
     const hasRole = presence.member.roles.cache.get(guildSettings.streamingRoleID);
 
     if (streaming && !hasRole) {
-      presence.member.roles.add(guildSettings.streamingRoleID);
-    } else if (hasRole) {
-      presence.member.roles.remove(guildSettings.streamingRoleID);
+      presence.member.roles.add(guildSettings.streamingRoleID, `Detected a livestream.`);
+    } else if (!streaming && hasRole) {
+      presence.member.roles.remove(guildSettings.streamingRoleID, `Detected no livestream.`);
     }
   }
 }

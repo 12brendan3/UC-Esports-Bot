@@ -42,7 +42,7 @@ async function handle(client, msg) {
 
   for (const key of Object.keys(commands)) {
     const helpInfo = commands[key].getHelp();
-    if (helpInfo) {
+    if (helpInfo && perms.includes(helpInfo.level)) {
       embed.addField(`__${prefix}${key}__`, helpInfo.text);
     }
   }

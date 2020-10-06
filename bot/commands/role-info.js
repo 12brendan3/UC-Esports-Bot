@@ -9,7 +9,7 @@ module.exports = {handle, getHelp};
 
 // Help command text
 const help = {
-  text: `Allows admins to get information about a role in the server.`,
+  text: `Allows a server admin to get information about a role in the server.`,
   level: `admin`,
 };
 

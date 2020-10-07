@@ -4,9 +4,10 @@ const collectors = require(`../helpers/collectors`);
 const resolvers = require(`../helpers/resolvers`);
 const permissions = require(`../helpers/permissions`);
 const reactManager = require(`../helpers/role-react-manager-2`);
+const settings = require(`../helpers/settings-manager`);
 
 // Vars
-const options = `Valid settings are: \`welcome-message\` \`welcome-channel\` \`admin-add\` \`admin-remove\` \`admin-list\` \`logs-channel\` \`starboard-channel\` \`starboard-threshold\` \`streaming-role\` \`react-channel\` \`react-add\` \`react-remove\` \`react-update\` \`react-cat-name\` \`react-cat-info\``;
+const options = `\n__Valid settings are:__\n\`welcome-message\`, \`welcome-channel\`, \`admin-add\`, \`admin-remove\`, \`admin-list\`, \`logs-channel\`, \`starboard-channel\`, \`starboard-threshold\`, \`streaming-role\`, \`react-channel\`, \`react-add\`, \`react-remove\`, \`react-update\`, \`react-cat-name\`, and \`react-cat-info\`\n\nFor example:  \`${settings.getSettings().prefix}settings welcome-message\``;
 let activeChanges = [];
 
 // Exports
@@ -113,7 +114,7 @@ async function changeWelcomeMessage(msg) {
     const result = await database.updateOrCreateEntry(`Guilds`, {guildID: msg.guild.id}, {welcomeMessage: newMessage});
 
     if (result) {
-      msg.reply(`join message has been updated!\nUse the "test welcome-message" command to try it.`);
+      msg.reply(`join message has been updated!\nUse "${settings.getSettings().prefix}test welcome-message" to try it.`);
     } else {
       msg.reply(`there was an error saving the new welcome message.\nTell the bot developers if the issue persists.`);
     }
@@ -134,7 +135,7 @@ async function changeWelcomeChannel(msg) {
       const result = await database.updateEntry(`Guilds`, {guildID: msg.guild.id}, {welcomeChannelID: null});
 
       if (result) {
-        msg.reply(`the welcome message has been disabled.\nUse the "test welcome-channel" command to try it.`);
+        msg.reply(`the welcome message has been disabled.\nUse "${settings.getSettings().prefix}test welcome-channel" to try it.`);
       } else {
         msg.reply(`there was an error disabling the welcome message.\nTell the bot developers if the issue persists.`);
       }
@@ -145,7 +146,7 @@ async function changeWelcomeChannel(msg) {
         const result = await database.updateOrCreateEntry(`Guilds`, {guildID: msg.guild.id}, {welcomeChannelID: newWelcomeChannelID});
 
         if (result) {
-          msg.reply(`welcome message channel has been updated!\nUse the "test welcome-channel" command to try it.`);
+          msg.reply(`welcome message channel has been updated!\nUse "${settings.getSettings().prefix}test welcome-channel" to try it.`);
         } else {
           msg.reply(`there was an error updating the welcome message channel.\nTell the bot developers if the issue persists.`);
         }
@@ -176,11 +177,11 @@ async function addAdmin(msg) {
         msg.reply(`that user is already an admin!`);
       } else if (success) {
         if (msg.guild.ownerID === newUserID && msg.author.id === msg.guild.ownerID) {
-          msg.reply(`admin has been added!\nUse the "settings admin-list" command to see the current admins.\n*Not sure why you added yourself when you're the server owner...*`);
+          msg.reply(`admin has been added!\nUse "${settings.getSettings().prefix}settings admin-list" to see the current admins.\n*Not sure why you added yourself when you're the server owner...*`);
         } else if (msg.guild.ownerID === newUserID) {
-          msg.reply(`admin has been added!\nUse the "settings admin-list" command to see the current admins.\n*Not sure why you added the server owner...*`);
+          msg.reply(`admin has been added!\nUse "${settings.getSettings().prefix}settings admin-list" to see the current admins.\n*Not sure why you added the server owner...*`);
         } else {
-          msg.reply(`admin has been added!\nUse the "settings admin-list" command to see the current admins.`);
+          msg.reply(`admin has been added!\nUse "${settings.getSettings().prefix}settings admin-list" to see the current admins.`);
         }
       } else {
         msg.reply(`there was an error adding the new admin.\nTell the bot developers if the issue persists.`);
@@ -213,7 +214,7 @@ async function removeAdmin(msg) {
           if (msg.author.id === removeUserID) {
             msg.reply(`admin has been removed!\n*Not sure why you removed yourself...*`);
           } else {
-            msg.reply(`admin has been removed!\nUse the "settings admin-list" command to see the current admins.`);
+            msg.reply(`admin has been removed!\nUse "${settings.getSettings().prefix}settings admin-list" to see the current admins.`);
           }
         } else {
           msg.reply(`there was an error removing the admin.\nTell the bot developers if the issue persists.`);
@@ -268,7 +269,7 @@ async function changeLogsChannel(msg) {
       const result = await database.updateEntry(`Guilds`, {guildID: msg.guild.id}, {logsChannelID: null});
 
       if (result) {
-        msg.reply(`the logs have been disabled.\nUse the "test logs-channel" command to try it.`);
+        msg.reply(`the logs have been disabled.\nUse "${settings.getSettings().prefix}test logs-channel" to try it.`);
       } else {
         msg.reply(`there was an error disabling logs.\nTell the bot developers if the issue persists.`);
       }
@@ -279,7 +280,7 @@ async function changeLogsChannel(msg) {
         const result = await database.updateOrCreateEntry(`Guilds`, {guildID: msg.guild.id}, {logsChannelID: newLogChannelID});
 
         if (result) {
-          msg.reply(`logs channel has been updated!\nUse the "test logs-channel" command to try it.`);
+          msg.reply(`logs channel has been updated!\nUse "${settings.getSettings().prefix}test logs-channel" to try it.`);
         } else {
           msg.reply(`there was an error updating the logs channel.\nTell the bot developers if the issue persists.`);
         }
@@ -322,7 +323,7 @@ async function changeStarboardChannel(msg) {
       const result = await database.updateOrCreateEntry(`Guilds`, {guildID: msg.guild.id}, {starboardChannelID: newStarboardChannelID, starboardThreshold: threshold});
 
       if (result) {
-        msg.reply(`starboard channel has been updated!\nThe default starboard threshold is 5 reactions.  Use the "settings starboard-threshold" command to change it.`);
+        msg.reply(`starboard channel has been updated!\nThe default starboard threshold is 5 reactions.  Use "${settings.getSettings().prefix}settings starboard-threshold" to change it.`);
       } else {
         msg.reply(`there was an error updating the starboard channel.\nTell the bot developers if the issue persists.`);
       }
@@ -359,7 +360,7 @@ async function changeStarboardThreshold(msg) {
       const result = await database.updateOrCreateEntry(`Guilds`, {guildID: msg.guild.id}, {starboardThreshold: newNum});
 
       if (result) {
-        msg.reply(`starboard threshold has been updated!\nMake sure you have a starboard channel set!  Use the "settings starboard-channel" command to change it.`);
+        msg.reply(`starboard threshold has been updated!\nMake sure you have a starboard channel set!  Use "${settings.getSettings().prefix}settings starboard-channel" to change it.`);
       } else {
         msg.reply(`there was an error updating the starboard channel.\nTell the bot developers if the issue persists.`);
       }
@@ -516,7 +517,7 @@ async function addRoleReaction(msg, client) {
         msg.reply(`invalid role, please try again.`);
       }
     } else {
-      msg.reply(`this guild has no reactions channel, please set one up with the "settings reaction-role-channel" command.`);
+      msg.reply(`this guild has no reactions channel, please set one up with "${settings.getSettings().prefix}settings reaction-role-channel."`);
     }
   } catch (err) {
     msg.reply(`command timed out, please try again.`);
@@ -572,7 +573,7 @@ async function removeRoleReaction(msg, client) {
         msg.reply(`there are no reaction roles!`);
       }
     } else {
-      msg.reply(`this guild has no reactions channel, please set one up with the "settings reaction-role-channel" command.`);
+      msg.reply(`this guild has no reactions channel, please set one up with "${settings.getSettings().prefix}settings reaction-role-channel."`);
     }
   } catch (err) {
     msg.reply(`command timed out, please try again.`);
@@ -589,7 +590,7 @@ async function updateRoleReactions(msg, client) {
 
     msg.reply(`the role reactions have been updated.`);
   } else {
-    msg.reply(`this guild has no role reactions channel, please set one up with the "settings reaction-role-channel" command.`);
+    msg.reply(`this guild has no role reactions channel, please set one up with "${settings.getSettings().prefix}settings reaction-role-channel."`);
   }
 
   activeChanges = activeChanges.filter((val) => val !== msg.guild.id);
@@ -616,7 +617,7 @@ async function updateCategoryName(msg, client) {
         msg.reply(`failed to update that category, please try again.`);
       }
     } else {
-      msg.reply(`this guild has no role reactions channel, please set one up with the "settings reaction-role-channel" command.`);
+      msg.reply(`this guild has no role reactions channel, please set one up with "${settings.getSettings().prefix}settings reaction-role-channel."`);
     }
   } catch (err) {
     console.error(err);
@@ -647,7 +648,7 @@ async function updateCategoryInfo(msg, client) {
         msg.reply(`failed to update that category, please try again.`);
       }
     } else {
-      msg.reply(`this guild has no role reactions channel, please set one up with the "settings reaction-role-channel" command.`);
+      msg.reply(`this guild has no role reactions channel, please set one up with "${settings.getSettings().prefix}settings reaction-role-channel."`);
     }
   } catch (err) {
     console.error(err);

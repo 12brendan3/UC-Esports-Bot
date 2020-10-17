@@ -22,25 +22,26 @@ const help = {
 // Exported functions
 async function handle(client, msg) {
   if (msg.channel.type === `dm`) {
-    msg.reply(`this command has to be used in a server.`);
-  } else {
-    const admin = msg.guild.ownerID === msg.author.id ? true : await permissions.checkAdmin(msg.guild.id, msg.author.id);
+    msg.reply(`That command has to be used in a server.`);
+    return;
+  }
 
-    if (admin && activeChanges.includes(msg.guild.id)) {
-      msg.reply(`only one change can be made at a time.`);
-    } else if (admin) {
-      activeChanges.push(msg.guild.id);
-      const option = msg.content.split(` `);
+  const admin = msg.guild.ownerID === msg.author.id ? true : await permissions.checkAdmin(msg.guild.id, msg.author.id);
 
-      if (option.length > 1) {
-        changeSettings(msg, option[1], client);
-      } else {
-        msg.reply(`please provide a setting to change with your command.\n${options}`);
-        activeChanges = activeChanges.filter((val) => val !== msg.guild.id);
-      }
+  if (admin && activeChanges.includes(msg.guild.id)) {
+    msg.reply(`only one change can be made at a time.`);
+  } else if (admin) {
+    activeChanges.push(msg.guild.id);
+    const option = msg.content.split(` `);
+
+    if (option.length > 1) {
+      changeSettings(msg, option[1], client);
     } else {
-      msg.reply(`you're not an admin on this server.`);
+      msg.reply(`please provide a setting to change with your command.\n${options}`);
+      activeChanges = activeChanges.filter((val) => val !== msg.guild.id);
     }
+  } else {
+    msg.reply(`you're not an admin on this server.`);
   }
 }
 

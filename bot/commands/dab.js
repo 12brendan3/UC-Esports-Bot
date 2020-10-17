@@ -13,6 +13,10 @@ function handle(client, msg) {
   } else {
     msg.reply(`there was an error running the command.`);
   }
+
+  if (msg.deletable) {
+    msg.delete();
+  }
 }
 
 function getHelp() {

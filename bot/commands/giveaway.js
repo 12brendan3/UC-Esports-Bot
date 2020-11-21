@@ -1,9 +1,10 @@
 // Imports
 
-const Discord = require('discord.js');
+const Discord = require(`discord.js`);
 
-const permissions = require('../helpers/permissions');
-const {resolveChannelID} = require('../helpers/resolvers');
+const permissions = require(`../helpers/permissions`);
+const resolvers = require(`../helpers/resolvers`);
+const collectors = require(`../helpers/collectors`);
 
 // Exports
 module.exports = {handle, getHelp};
@@ -18,7 +19,7 @@ const help = {
 async function handle(client, msg) {
 
   // Check if user is allowed to use this command.
-  const perm = permissions.checkAdmin(msg.author.id);
+  const perm = permissions.checkAdmin(msg.guild.id, msg.author.id);
   if (perm || msg.author.id === msg.guild.ownerID) {
 
     // Get giveaway info
@@ -35,45 +36,53 @@ async function handle(client, msg) {
     // send embed message
     const giveawayMessage = await info.giveawayChannel.send(embed);
 
+    giveawayMessage.react(`🎁`);
+
     // Filter only for gift reactions
     // Time is given in hours, multiply to milliseconds.
-    const filter = (reaction, user) => (reaction.emoji.name === '🎁' && !user.bot);
+    const filter = (reaction, user) => (reaction.emoji.name === `🎁` && !user.bot);
     const giveaway = await giveawayMessage.createReactionCollector(filter, {time: info.hours * 3600000});
 
-    giveawayMessage.react('🎁');
-
     // When the giveaway is over, send a message in the giveaway channel with the winner.
-    giveaway.on('end', (collected) => {
-      // get a random winner. this is bugged, you need to get the winner id from the selected winner object.
-      const winner = collected.random();
+    giveaway.on(`end`, (collected) => {
+      let isBot = true;
+      let winner;
 
-      info.giveawayChannel.send(`The winner is ${winner}. Please DM <@!${msg.author.id}> for your prize`);
+      while (isBot) {
+        winner = collected.get(`🎁`).users.cache.random();
+        if (!winner.bot) {
+          isBot = false;
+        }
+      }
+
+      embed.setDescription(`This giveaway has ended.`);
+
+      giveawayMessage.edit(embed);
+
+      info.giveawayChannel.send(`The winner is ${winner}.  Please DM ${msg.author} for your prize if they don't reach out shortly.`);
     });
 
   } else {
-    msg.channel.send('You do not have permission');
+    msg.channel.send(`You do not have permission`);
   }
 
   async function getGiveawayInfo() {
-    // Filter used for all 3 messageAwaits
-    const filter = (message, user) => user.id === msg.author.id;
-
     // Series of ask for data, collect from user, and pick out the content
 
     // Get giveaway title
-    msg.channel.send('Please give the name of the item for the giveaway');
-    const giveawayNameCollected = await msg.channel.awaitMessages(filter, {max: 1, time: 60000, errors: ['time']});
+    msg.channel.send(`Please give the name of the item for the giveaway`);
+    const giveawayNameCollected = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
     const giveawayName = giveawayNameCollected.first().content;
 
     // Get giveaway expiration in hours
-    msg.channel.send('Please give a numerical value for how long you want the giveaway to last');
-    const hoursCollected = await msg.channel.awaitMessages(filter, {max: 1, time: 60000, errors: ['time']});
+    msg.channel.send(`Please give a numerical value for how long you want the giveaway to last in hours`);
+    const hoursCollected = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
     const hours = hoursCollected.first().content;
 
     // Get giveaway channel
-    msg.channel.send('Please give the channel where you want to hold the giveaway');
-    const channelCollected = await msg.channel.awaitMessages(filter, {max: 1, time: 60000, errors: ['time']});
-    const giveawayChannel = resolveChannelID(msg.channel.guild, channelCollected.first().content);
+    msg.channel.send(`Please give the channel where you want to hold the giveaway`);
+    const channelCollected = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
+    const giveawayChannel = msg.guild.channels.cache.get(resolvers.resolveChannelID(msg.guild, channelCollected.first().content));
 
     return {giveawayName, hours, giveawayChannel};
   }
@@ -89,8 +98,8 @@ async function handle(client, msg) {
     let isPm = false;
     let embedHour = exp.getHours();
 
-    // If hours > 12, we know it's a PM time. else, it's AM. if hours is 0, that means 12 AM.
-    if (hours > 12) {
+    // If hours > 12, we know it`s a PM time. else, it`s AM. if hours is 0, that means 12 AM.
+    if (hours >= 12) {
       isPm = true;
       embedHour %= 12;
     } else if (hours === 0) {
@@ -100,10 +109,9 @@ async function handle(client, msg) {
     // Embed styling
     embed.setColor(`#FF0000`);
     embed.setAuthor(`${giveawayName} Giveaway!`);
-    embed.setAuthor(`This giveaway will expire: ${embedHour}:${exp.getMinutes()} ${isPm ? 'PM' : 'AM'} `);
+    embed.setDescription(`This giveaway will expire at ${embedHour}:${exp.getMinutes()} ${isPm ? `PM` : `AM`}.`);
 
     return embed;
-
   }
 }
 

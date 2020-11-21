@@ -7,7 +7,7 @@ const reactManager = require(`../helpers/role-react-manager-2`);
 const settings = require(`../helpers/settings-manager`);
 
 // Vars
-const options = `\n__Valid settings are:__\n\`welcome-message\`, \`welcome-channel\`, \`admin-add\`, \`admin-remove\`, \`admin-list\`, \`logs-channel\`, \`starboard-channel\`, \`starboard-threshold\`, \`streaming-role\`, \`react-channel\`, \`react-add\`, \`react-remove\`, \`react-update\`, \`react-cat-name\`, and \`react-cat-info\`\n\nFor example:  \`${settings.getSettings().prefix}settings welcome-message\``;
+const options = `\n__Valid settings are:__\n\`welcome-message\`, \`welcome-channel\`, \`admin-add\`, \`admin-remove\`, \`admin-list\`, \`logs-channel\`, \`starboard-channel\`, \`starboard-threshold\`, \`streaming-role\`, \`react-channel\`, \`react-add\`, \`react-remove\`, \`react-update\`, \`react-cat-name\`, \`react-cat-info\`, and \`react-verify\``;
 let activeChanges = [];
 
 // Exports
@@ -96,6 +96,9 @@ function changeSettings(msg, setting, client) {
       break;
     case `react-cat-info`:
       updateCategoryInfo(msg, client);
+      break;
+    case `react-verify`:
+      verifyReactRoles(msg, client);
       break;
     default:
       activeChanges = activeChanges.filter((val) => val !== msg.guild.id);
@@ -654,6 +657,47 @@ async function updateCategoryInfo(msg, client) {
   } catch (err) {
     console.error(err);
     msg.reply(`command timed out, please try again.`);
+  }
+
+  activeChanges = activeChanges.filter((val) => val !== msg.guild.id);
+}
+
+
+async function verifyReactRoles(msg, client) {
+  try {
+    const guildSettings = await database.getEntry(`Guilds`, {guildID: msg.guild.id});
+
+    if (guildSettings && guildSettings.rolesChannelID) {
+      const reactionCategories = await database.getAllEntries(`RoleCategories`, {guildID: msg.guild.id});
+      if (reactionCategories) {
+        msg.reply(`verifying reaction roles....`);
+        reactionCategories.forEach(async (category) => {
+          const catRoles = await database.getAllEntries(`Roles`, {guildID: msg.guild.id, roleCategory: category.ID});
+          catRoles.forEach(async (role) => {
+            if (msg.guild.roles.cache.get(role.roleID)) {
+              return;
+            }
+            await database.removeEntry(`Roles`, {ID: role.ID});
+            await reactManager.removeRoleData(client, msg.guild.id, category.ID, role.emojiID);
+          });
+
+          const rolesLeft = await database.getAllEntries(`Roles`, {guildID: msg.guild.id, roleCategory: category.ID});
+
+          if (!rolesLeft || rolesLeft.length < 1) {
+            await database.removeEntry(`RoleCategories`, {ID: category.ID});
+            await reactManager.removeRoleData(client, msg.guild.id, category.ID);
+          }
+        });
+        msg.reply(`reaction roles have been verified.  Any missing roles have been removed.`);
+      } else {
+        msg.reply(`this server doesn't have reaction roles set up.`);
+      }
+    } else {
+      msg.reply(`this server doesn't have rection roles set up.`);
+    }
+  } catch (err) {
+    console.error(err);
+    msg.reply(`there was an error verifying the reaction roles.`);
   }
 
   activeChanges = activeChanges.filter((val) => val !== msg.guild.id);

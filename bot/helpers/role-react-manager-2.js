@@ -190,9 +190,15 @@ async function updateOneEmbed(client, guildID, categoryID, guildSettings) {
 
 async function updateAllEmbeds(client, guildID, guildSettings) {
   const rolesChannel = client.guilds.cache.get(guildID).channels.cache.get(guildSettings.rolesChannelID);
-  const messages = await rolesChannel.messages.fetch();
-  rolesChannel.bulkDelete(messages);
+  let messages = await rolesChannel.messages.fetch();
 
+  rolesChannel.bulkDelete(messages, true);
+
+  messages = await rolesChannel.messages.fetch();
+
+  messages.forEach((msg) => {
+    msg.delete();
+  });
   for (const category in roleData[guildID]) {
     if (Object.prototype.hasOwnProperty.call(roleData[guildID], category)) {
       const newEmbed = generateEmbed(client, guildID, category);

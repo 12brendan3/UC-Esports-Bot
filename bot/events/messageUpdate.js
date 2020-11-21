@@ -2,6 +2,10 @@ const Discord = require(`discord.js`);
 
 const database = require(`../helpers/database-manager`);
 
+const WordFilter = require('bad-words');
+
+const filter = new WordFilter();
+
 // Exports
 module.exports = {handle};
 
@@ -9,6 +13,10 @@ module.exports = {handle};
 function handle(client, msgOld, msgNew) {
   if (msgNew.channel.type !== `dm` && !msgNew.author.bot) {
     logMessageEdit(msgOld, msgNew);
+  }
+
+  if (msgNew.guild.id === `772589330710659083` && filter.isProfane(msgNew.content) && msgNew.deletable) {
+    msgNew.delete();
   }
 }
 

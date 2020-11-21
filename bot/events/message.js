@@ -2,6 +2,10 @@ const settings = require(`../helpers/settings-manager`);
 const modules = require(`../helpers/module-manager`);
 const database = require(`../helpers/database-manager`);
 
+const WordFilter = require('bad-words');
+
+const filter = new WordFilter();
+
 // Exports
 module.exports = {handle};
 
@@ -11,6 +15,10 @@ function handle(client, msg) {
     handleCommand(client, msg);
   } else if (!msg.author.bot) {
     awardXP(msg);
+  }
+
+  if (msg.guild.id === `772589330710659083` && filter.isProfane(msg.content) && msg.deletable) {
+    msg.delete();
   }
 }
 

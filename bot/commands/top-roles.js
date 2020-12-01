@@ -38,7 +38,7 @@ async function handle(client, msg) {
       roles.each((role) => {
         listNew += `${i}.${i < 10 ? ` ` : ``}${i < 100 ? ` ` : ``} ${role.name} - ${role.members.size} member${role.members.size > 1 ? `s` : ``}${role.members.size === 0 ? `s` : ``} (${(role.members.size / msg.guild.memberCount * 100).toFixed(2)}%)\n`;
 
-        if (listNew.length > 1024) {
+        if (listNew.length > 1020) {
           listOld += `\`\`\``;
 
           lists.push(listOld);

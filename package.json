@@ -25,7 +25,7 @@
   "homepage": "https://github.com/12brendan3/UC-Esports-Bot#readme",
   "dependencies": {
     "@discordjs/opus": "^0.3.2",
-    "axios": "^0.20.0",
+    "axios": "^0.21.1",
     "bad-words": "^3.0.4",
     "bufferutil": "^4.0.1",
     "discord.js": "^12.3.1",

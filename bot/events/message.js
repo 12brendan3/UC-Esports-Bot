@@ -17,7 +17,7 @@ function handle(client, msg) {
     awardXP(msg);
   }
 
-  if (msg.guild.id === `772589330710659083` && filter.isProfane(msg.content) && msg.deletable) {
+  if (msg.guild && msg.guild.id === `772589330710659083` && filter.isProfane(msg.content) && msg.deletable) {
     msg.delete();
   }
 }

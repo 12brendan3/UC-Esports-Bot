@@ -13,7 +13,7 @@ module.exports = {handle};
 function handle(client, msg) {
   if (!msg.author.bot && msg.content.startsWith(settings.getSettings().prefix)) {
     handleCommand(client, msg);
-  } else if (!msg.author.bot) {
+  } else if (!msg.author.bot && msg.guild.id !== `764980314745208863`) {
     awardXP(msg);
   }
 

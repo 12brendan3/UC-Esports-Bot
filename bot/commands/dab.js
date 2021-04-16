@@ -6,7 +6,7 @@ const help = null;
 
 // Exported functions
 function handle(client, msg) {
-  const random = Math.random() * 2;
+  const random = Math.floor(Math.random() * 2);
   let emojiName;
 
   if (random === 1) {

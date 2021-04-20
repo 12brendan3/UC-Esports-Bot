@@ -24,7 +24,7 @@ function handle(client, msg) {
 
 // Private function
 function handleCommand(client, msg) {
-  console.info(`${msg.channel.name ? `#${msg.channel.name}` : `via DM`} <${msg.author.username}> ${msg.content}`);
+  console.info(`${msg.guild === null ? `Via DM` : `#${msg.channel.name}`} <${msg.author.username}> ${msg.content}`);
 
   let command = msg.content.substr(settings.getSettings().prefix.length);
 

@@ -121,7 +121,7 @@ async function addToQueue(msg, newItem) {
     msg.reply(`added to queue.`);
   } else {
     const connection = await msg.member.voice.channel.join();
-    players.set(msg.guild.id, {textChannel: msg.channel, voiceChannel: msg.member.voice.channel, queue: [newItem], volume: 0.5, connection, paused: false});
+    players.set(msg.guild.id, {textChannel: msg.channel, voiceChannel: msg.member.voice.channel, queue: [newItem], volume: 0.35, connection, paused: false});
     playNext(msg.guild.id);
   }
 }

@@ -1,5 +1,6 @@
 const settings = require(`../helpers/settings-manager`);
 const ytdl = require('ytdl-core');
+const ytsearch = require('youtube-search');
 
 // Exports
 module.exports = {checkUser, checkChannel};
@@ -9,6 +10,10 @@ const regexYT = RegExp(`(^(https?\\:\\/\\/)?(www\\.youtube\\.com|youtu\\.be)\\/(
 
 // Vars
 const players = new Map();
+const ytSearchOpts = {
+  maxResults: 1,
+  key: null,
+};
 
 function checkUser(msg, type) {
   if (msg.guild === null) {
@@ -78,7 +83,7 @@ async function checkYT(msg) {
       msg.reply(`failed to fetch video information.  Please make sure the video URL/ID is valid and public.`);
     }
   } else {
-    msg.reply(`please use a valid YouTube URL or ID.`);
+    searchYT(msg, video);
   }
 }
 
@@ -160,5 +165,31 @@ function checkChannel(newState) {
   if (player && player.voiceChannel.id === newState.channel.id && newState.channel.members.size < 2) {
     player.textChannel.send(`Everyone left voice chat, disconnecting.`);
     stopPlaying(newState.guild.id);
+  }
+}
+
+function searchYT(msg, search) {
+  if (!ytSearchOpts.key && settings.getAuth().ytKey && settings.getAuth().ytKey !== `replace me`) {
+    ytSearchOpts.key = settings.getAuth().ytKey;
+  } else {
+    console.error(`No YouTube key found, please edit the "auth.json" file in the storage folder.\nYou can then type "restart" and then press enter.\nTo exit, type "exit" and then press enter.`);
+  }
+
+  if (ytSearchOpts.key) {
+    ytsearch(search, ytSearchOpts, (err, results) => {
+      if (err) {
+        msg.reply(`failed to search YouTube.`);
+        console.error(err);
+      } else {
+        const newItem = {
+          type: `youtube`,
+          title: results[0].title,
+          url: results[0].id,
+        };
+        addToQueue(msg, newItem);
+      }
+    });
+  } else {
+    msg.reply(`YouTube search is currently disabled.`);
   }
 }

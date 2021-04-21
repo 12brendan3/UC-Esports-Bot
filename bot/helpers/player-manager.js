@@ -46,6 +46,9 @@ function checkUser(msg, type) {
     case `volume`:
       changeVolume(msg);
       break;
+    case `leave`:
+      stopPlaying(msg.guild.id);
+      break;
     default:
       console.error(`If you're seeing this, you incorrectly interacted with the music manager.`);
       break;
@@ -146,11 +149,16 @@ function playNext(guildID) {
   }
 }
 
+function stopPlaying(guildID) {
+  const player = players.get(guildID);
+  player.connection.disconnect();
+  players.delete(guildID);
+}
+
 function checkChannel(newState) {
   const player = players.get(newState.guild.id);
   if (player && player.voiceChannel.id === newState.channel.id && newState.channel.members.size < 2) {
     player.textChannel.send(`Everyone left voice chat, disconnecting.`);
-    player.connection.disconnect();
-    players.delete(newState.guild.id);
+    stopPlaying(newState.guild.id);
   }
 }

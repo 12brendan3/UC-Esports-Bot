@@ -17,10 +17,10 @@ function handle(client) {
   const lolGeneralChannel = esportsGuild ? esportsGuild.channels.cache.get(`427300580306976788`) : false;
   if (lolGeneralChannel) {
     const image = new Discord.MessageAttachment(`./assets/img/lol-general-meme.png`, `lol.png`);
-    cronTask = cronos.scheduleTask(`00 16 * * *`, () => {
+    cronTask = cronos.scheduleTask(`00 19 * * *`, () => {
       lolGeneralChannel.send(image);
     });
-    console.info(`Got the channel and set up for posting at 4 PM every day.`);
+    console.info(`Got the channel and set up for posting at 7 PM every day.`);
   } else {
     console.info(`Failed to fetch the channel.`);
   }
@@ -37,7 +37,7 @@ function handle(client) {
 }
 
 function clear() {
-  console.log(`Clearing LoL 4 PM message post task...`);
+  console.info(`Clearing LoL 4 PM message post task...`);
   cronTask.stop();
-  console.log(`LoL 4 PM message post task cleared.`);
+  console.info(`LoL 4 PM message post task cleared.`);
 }

@@ -49,8 +49,10 @@ async function verifyUser(msg) {
     DMChannel = msg.channel;
     startedFromDM = true;
   } else {
+    if (msg.deletable) {
+      msg.delete();
+    }
     DMChannel = await msg.author.createDM();
-    msg.reply(`you've been sent a DM.`);
   }
 
   const prevVerified = await database.getEntry(`Bearcats`, {userID: msg.author.id});
@@ -82,7 +84,7 @@ async function verifyUser(msg) {
     return;
   }
 
-  DMChannel.send(`This process verifies that you are a student at UC.\nIn order to do so, we email you a verification code to your UC email.\nWith that being said, what is your UC Email?`);
+  DMChannel.send(`This process verifies that you are a student at UC.\nIn order to do so, we email you a verification code to your UC email.\nWith that being said, what is your UC email?`);
 
   let emailCollected;
   try {
@@ -108,7 +110,7 @@ async function verifyUser(msg) {
     const verificationCode = await sendEmail(email);
 
     if (verificationCode) {
-      DMChannel.send(`An email has been sent with a verification code, please reply with the code.\nYou have 5 minutes to reply before this command times out.`);
+      DMChannel.send(`An email has been sent with a verification code; please reply with the code.\nYou have 5 minutes to reply before this command times out.\nMake sure to check your junk mail!`);
     } else {
       DMChannel.send(`Failed to send a verification code.\nTry again later and let the bot devs know if the issue persists.`);
       userTimeouts.delete(msg.author.id);
@@ -145,33 +147,33 @@ async function verifyUser(msg) {
 
     if (startedFromDM) {
       // \nIf you'd like to complete your user profile, run the "profile-setup" command.
-      DMChannel.send(`Success!\nYour Email has been saved.\nIn order to get a verified role, run this command again from a server you want a verified role in.  You won't be asked to verify your email again.`);
+      DMChannel.send(`Success!\nYour email has been saved.\nIn order to get a verified role, run this command again from a server you want a verified role in.  You won't be asked to verify your email again.`);
     } else {
       const guildSettings = await database.getEntry(`Guilds`, {guildID: msg.guild.id});
       let role = false;
 
       if (guildSettings.verifiedRoleID) {
-        role = msg.guild.roles.cache.has(guildSettings.verifiedRoleID);
+        role = msg.guild.roles.cache.get(guildSettings.verifiedRoleID);
       }
 
       if (role) {
         if (msg.member.roles.cache.has(guildSettings.verifiedRoleID)) {
           // \nIf you'd like to complete your user profile, run the "profile-setup" command.
-          DMChannel.send(`Success!\nYour Email has been saved.`);
+          DMChannel.send(`Success!\nYour email has been saved.`);
         } else {
           await msg.member.roles.add(guildSettings.verifiedRoleID, `User requested role addition.`);
           // \nIf you'd like to complete your user profile, run the "profile-setup" command.
-          DMChannel.send(`Success!\nYour Email has been saved and you now have the ${role.name} role in ${msg.guild.name}.`);
+          DMChannel.send(`Success!\nYour email has been saved and you now have the ${role.name} role in ${msg.guild.name}.`);
         }
       } else {
         // \nIf you'd like to complete your user profile, run the "profile-setup" command.
-        DMChannel.send(`Success!\nYour Email has been saved.  The server you verified in doesn't have a verified role.\nIf one is added, you can re-run this command to get the role.  You will not be asked to verify your email again.`);
+        DMChannel.send(`Success!\nYour email has been saved.  The server you verified in doesn't have a verified role.\nIf one is added, you can re-run this command to get the role.  You will not be asked to verify your email again.`);
       }
     }
 
     userTimeouts.delete(msg.author.id);
   } else {
-    DMChannel.send(`That is not a valid UC Email.  Please try again in 5 minutes.`);
+    DMChannel.send(`That is not a valid UC email.  Please try again in 5 minutes.`);
     userTimeouts.set(msg.author.id, {status: `timeout`, timeout: Date.now()});
   }
 }
@@ -193,10 +195,10 @@ function sendEmail(email) {
       const token = buffer.toString('hex');
 
       const mailOptions = {
-        from: `Bearcat Bot`,
+        from: settings.getAuth().gmailUN,
         to: email,
         subject: `UC Esports verification code`,
-        text: `Your verification code is: ${token.toUpperCase()}`,
+        text: `Your verification code is: ${token.toUpperCase()}\nPlease copy this code and send it to the Bearcat Bot.`,
       };
 
       emailer.sendMail(mailOptions, (error) => {

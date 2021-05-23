@@ -7,7 +7,7 @@ const reactManager = require(`../helpers/role-react-manager-2`);
 const settings = require(`../helpers/settings-manager`);
 
 // Vars
-const options = `\n__Valid settings are:__\n\`welcome-message\`, \`welcome-channel\`, \`admin-add\`, \`admin-remove\`, \`admin-list\`, \`logs-channel\`, \`starboard-channel\`, \`starboard-threshold\`, \`streaming-role\`, \`react-channel\`, \`react-add\`, \`react-remove\`, \`react-update\`, \`react-cat-name\`, \`react-cat-info\`, and \`react-verify\``;
+const options = `\n__Valid settings are:__\n\`welcome-message\`, \`welcome-channel\`, \`admin-add\`, \`admin-remove\`, \`admin-list\`, \`logs-channel\`, \`starboard-channel\`, \`starboard-threshold\`, \`streaming-role\`, \`react-channel\`, \`react-add\`, \`react-remove\`, \`react-update\`, \`react-cat-name\`, \`react-cat-info\`, \`react-verify\`, and \`verified-role\``;
 let activeChanges = [];
 
 // Exports
@@ -99,6 +99,9 @@ function changeSettings(msg, setting, client) {
       break;
     case `react-verify`:
       verifyReactRoles(msg, client);
+      break;
+    case `verified-role`:
+      changeVerifiedRole(msg);
       break;
     default:
       activeChanges = activeChanges.filter((val) => val !== msg.guild.id);
@@ -698,6 +701,41 @@ async function verifyReactRoles(msg, client) {
   } catch (err) {
     console.error(err);
     msg.reply(`there was an error verifying the reaction roles.`);
+  }
+
+  activeChanges = activeChanges.filter((val) => val !== msg.guild.id);
+}
+
+async function changeVerifiedRole(msg) {
+  msg.reply(`please provide the name/ID of the role or mention it.\nIf you'd like to disable the verified role, just send \`disable\`.`);
+
+  try {
+    const collected = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
+
+    const newRoleID = resolvers.resolveRoleID(msg.guild, collected.first().content);
+
+    if (collected.first().content === `disable`) {
+      const result = await database.updateEntry(`Guilds`, {guildID: msg.guild.id}, {verifiedRoleID: null});
+
+      if (result) {
+        msg.reply(`the verified role has been disabled.`);
+      } else {
+        msg.reply(`there was an error disabling the verified role.`);
+      }
+    } else if (newRoleID) {
+      const result = await database.updateOrCreateEntry(`Guilds`, {guildID: msg.guild.id}, {verifiedRoleID: newRoleID});
+
+      if (result) {
+        msg.reply(`verified role has been updated!`);
+      } else {
+        msg.reply(`there was an error updating the verified role.\nTell the bot developers if the issue persists.`);
+      }
+    } else {
+      msg.reply(`that's an invalid role, please try again.`);
+    }
+  } catch (err) {
+    console.error(err);
+    msg.reply(`command timed out, please try again.`);
   }
 
   activeChanges = activeChanges.filter((val) => val !== msg.guild.id);

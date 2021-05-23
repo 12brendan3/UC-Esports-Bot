@@ -6,6 +6,7 @@ const modules = require(`./helpers/module-manager`);
 const settings = require(`./helpers/settings-manager`);
 const database = require(`./helpers/database-manager`);
 const reactManager = require(`./helpers/role-react-manager-2`);
+const bearcatManager = require(`./helpers/bearcat-manager`);
 
 // Exports
 module.exports = {startBot, stopBot, restartBot};
@@ -26,6 +27,8 @@ async function startBot() {
   modules.registerAll(client);
 
   settings.loadAll();
+
+  bearcatManager.prepEmail();
 
   const botToken = settings.getAuth().botToken;
 

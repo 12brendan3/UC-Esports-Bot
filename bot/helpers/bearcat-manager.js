@@ -192,7 +192,7 @@ function sendEmail(email) {
       const token = buffer.toString('hex');
 
       const mailOptions = {
-        from: `ucesportsbot@gmail.com`,
+        from: `Bearcat Bot`,
         to: email,
         subject: `UC Esports verification code`,
         text: `Your verification code is: ${token.toUpperCase()}`,

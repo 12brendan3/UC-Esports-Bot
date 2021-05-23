@@ -7,7 +7,7 @@ const reactManager = require(`../helpers/role-react-manager-2`);
 const settings = require(`../helpers/settings-manager`);
 
 // Vars
-const options = `\n__Valid settings are:__\n\`welcome-message\`, \`welcome-channel\`, \`admin-add\`, \`admin-remove\`, \`admin-list\`, \`logs-channel\`, \`starboard-channel\`, \`starboard-threshold\`, \`streaming-role\`, \`react-channel\`, \`react-add\`, \`react-remove\`, \`react-update\`, \`react-cat-name\`, \`react-cat-info\`, \`react-verify\`, and \`verified-role\``;
+const options = `\n__Valid settings are:__\n\`welcome-message\`, \`welcome-channel\`, \`admin-add\`, \`admin-remove\`, \`admin-list\`, \`logs-channel\`, \`starboard-channel\`, \`starboard-threshold\`, \`streaming-role\`, \`react-channel\`, \`react-add\`, \`react-remove\`, \`react-update\`, \`react-cat-name\`, \`react-cat-info\`, \`react-verify\`, \`verified-role\`, \`report-channel\`, and \`report-role\``;
 let activeChanges = [];
 
 // Exports
@@ -102,6 +102,12 @@ function changeSettings(msg, setting, client) {
       break;
     case `verified-role`:
       changeVerifiedRole(msg);
+      break;
+    case `report-channel`:
+      changeReportChannel(msg);
+      break;
+    case `report-role`:
+      changeReportRole(msg);
       break;
     default:
       activeChanges = activeChanges.filter((val) => val !== msg.guild.id);
@@ -673,7 +679,7 @@ async function verifyReactRoles(msg, client) {
     if (guildSettings && guildSettings.rolesChannelID) {
       const reactionCategories = await database.getAllEntries(`RoleCategories`, {guildID: msg.guild.id});
       if (reactionCategories) {
-        msg.reply(`verifying reaction roles....`);
+        msg.reply(`verifying reaction roles...`);
         reactionCategories.forEach(async (category) => {
           const catRoles = await database.getAllEntries(`Roles`, {guildID: msg.guild.id, roleCategory: category.ID});
           catRoles.forEach(async (role) => {
@@ -729,6 +735,78 @@ async function changeVerifiedRole(msg) {
         msg.reply(`verified role has been updated!`);
       } else {
         msg.reply(`there was an error updating the verified role.\nTell the bot developers if the issue persists.`);
+      }
+    } else {
+      msg.reply(`that's an invalid role, please try again.`);
+    }
+  } catch (err) {
+    console.error(err);
+    msg.reply(`command timed out, please try again.`);
+  }
+
+  activeChanges = activeChanges.filter((val) => val !== msg.guild.id);
+}
+
+async function changeReportChannel(msg) {
+  msg.reply(`please provide the name/ID of the new report channel or mention it.\nIf you'd like to disable the report channel, just send \`disable\`.`);
+
+  try {
+    const collected = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
+
+    if (collected.first().content === `disable`) {
+      const result = await database.updateEntry(`Guilds`, {guildID: msg.guild.id}, {reportChannelID: null});
+
+      if (result) {
+        msg.reply(`the report channel has been disabled.`);
+      } else {
+        msg.reply(`there was an error disabling the report channel.\nTell the bot developers if the issue persists.`);
+      }
+    } else {
+      const newReportChannelID = resolvers.resolveChannelID(msg.guild, collected.first().content);
+
+      if (newReportChannelID) {
+        const result = await database.updateOrCreateEntry(`Guilds`, {guildID: msg.guild.id}, {reportChannelID: newReportChannelID});
+
+        if (result) {
+          msg.reply(`report channel has been updated!`);
+        } else {
+          msg.reply(`there was an error updating the report channel.\nTell the bot developers if the issue persists.`);
+        }
+      } else {
+        msg.reply(`no channel found, please try again.`);
+      }
+    }
+  } catch (err) {
+    console.error(err);
+    msg.reply(`command timed out, please try again.`);
+  }
+
+  activeChanges = activeChanges.filter((val) => val !== msg.guild.id);
+}
+
+async function changeReportRole(msg) {
+  msg.reply(`please provide the name/ID of the role or mention it.\nIf you'd like to disable the report role, just send \`disable\`.`);
+
+  try {
+    const collected = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
+
+    const newRoleID = resolvers.resolveRoleID(msg.guild, collected.first().content);
+
+    if (collected.first().content === `disable`) {
+      const result = await database.updateEntry(`Guilds`, {guildID: msg.guild.id}, {reportRoleID: null});
+
+      if (result) {
+        msg.reply(`the report role has been disabled.`);
+      } else {
+        msg.reply(`there was an error disabling the report role.`);
+      }
+    } else if (newRoleID) {
+      const result = await database.updateOrCreateEntry(`Guilds`, {guildID: msg.guild.id}, {reportRoleID: newRoleID});
+
+      if (result) {
+        msg.reply(`report role has been updated!`);
+      } else {
+        msg.reply(`there was an error updating the report role.\nTell the bot developers if the issue persists.`);
       }
     } else {
       msg.reply(`that's an invalid role, please try again.`);

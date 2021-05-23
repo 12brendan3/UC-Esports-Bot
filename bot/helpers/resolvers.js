@@ -6,7 +6,7 @@ const regexUserTag = RegExp(`^.{1,}#[0-9]{4}$`);
 const regexObjectID = RegExp(`^[0-9]*$`);
 
 // Exports
-module.exports = {resolveChannelID, resolveUserID, resolveRoleID, resolveEmojiID};
+module.exports = {resolveChannelID, resolveUserID, resolveRoleID, resolveEmojiID, resolveGuildID};
 
 // Exported Functions
 function resolveChannelID(guild, channelObject) {
@@ -92,11 +92,26 @@ function resolveRoleID(guild, roleObject) {
 
 function resolveEmojiID(client, emoji) {
   let foundEmoji = false;
-  if (emoji && emoji.id && client.emojis.cache.get(emoji.id)) {
+  if (emoji && emoji.id && client.emojis.cache.has(emoji.id)) {
     foundEmoji = emoji.id;
   } else if (emoji && !emoji.id && emoji.name) {
     foundEmoji = emoji.name;
   }
 
   return foundEmoji;
+}
+
+function resolveGuildID(client, guildObject) {
+  let guildID = false;
+  if (client.guilds.cache.has(guildObject)) {
+    guildID = guildObject;
+  } else {
+    const foundGuild = client.guilds.cache.find((guild) => guild.name === guildObject);
+
+    if (foundGuild) {
+      guildID = foundGuild.id;
+    }
+  }
+
+  return guildID;
 }

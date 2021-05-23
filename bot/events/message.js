@@ -24,7 +24,10 @@ function handle(client, msg) {
 
 // Private function
 function handleCommand(client, msg) {
-  console.info(`${msg.guild === null ? `Via DM` : `#${msg.channel.name}`} <${msg.author.username}> ${msg.content}`);
+  // Ignore report command to keep it as anonymous as possible
+  if (!msg.content.startsWith(`${settings.getSettings().prefix}report`)) {
+    console.info(`${msg.guild === null ? `Via DM` : `#${msg.channel.name}`} <${msg.author.username}> ${msg.content}`);
+  }
 
   let command = msg.content.substr(settings.getSettings().prefix.length);
 

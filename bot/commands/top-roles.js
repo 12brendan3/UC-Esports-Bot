@@ -21,7 +21,7 @@ async function handle(client, msg) {
   try {
     const isAdmin = await permissions.checkAdmin(msg.guild.id, msg.author.id);
     if (isAdmin || msg.author.id === msg.guild.ownerID) {
-      await msg.reply(`Crunching numbers now....`);
+      await msg.reply(`Crunching numbers now...`);
       const embed = new Discord.MessageEmbed();
 
       embed.setColor(`#00EDCD`);

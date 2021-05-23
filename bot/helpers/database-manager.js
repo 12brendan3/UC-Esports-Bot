@@ -123,6 +123,14 @@ const Guilds = sequelize.define(`Guilds`, {
     type: Sequelize.STRING,
     allowNull: true,
   },
+  reportChannelID: {
+    type: Sequelize.STRING,
+    allowNull: true,
+  },
+  reportRoleID: {
+    type: Sequelize.STRING,
+    allowNull: true,
+  },
 });
 
 const ServerAdmins = sequelize.define(`ServerAdmins`, {
@@ -228,6 +236,8 @@ module.exports = {syncTables, createEntry, getEntry, getOrCreateEntry, updateEnt
 
 // Exported Functions
 async function syncTables() {
+  console.info(`Syncing database tables...`);
+  // Add "{alter: true}" to a sync to migrate the table to a newer version - it's usually really slow so it's not kept set by default
   await Promise.all([
     Bearcats.sync(),
     XP.sync(),

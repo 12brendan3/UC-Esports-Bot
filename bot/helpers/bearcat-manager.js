@@ -55,7 +55,7 @@ async function verifyUser(msg) {
 
   const prevVerified = await database.getEntry(`Bearcats`, {userID: msg.author.id});
 
-  if (prevVerified) {
+  if (prevVerified && prevVerified.email) {
     if (startedFromDM) {
       msg.reply(`You've already verified, please run this command from a server to get the verified user role.`);
     } else {

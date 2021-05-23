@@ -125,6 +125,7 @@ async function verifyUser(msg) {
       } catch {
         userTimeouts.delete(msg.author.id);
         DMChannel.send(`Verification command timed out, please try again.`);
+        return;
       }
 
       if (verificationCode.toLowerCase() === replyCode.first().content.toLowerCase()) {

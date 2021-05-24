@@ -65,11 +65,11 @@ async function handle(client, msg) {
 
       msg.channel.send(embed);
     } else {
-      msg.reply(`you're not an admin on this server.`);
+      msg.reply(`You're not an admin on this server.`);
     }
   } catch (err) {
     console.log(err);
-    msg.reply(`command timed out, please try again.`);
+    msg.reply(`Command timed out, please try again.`);
   }
 }
 

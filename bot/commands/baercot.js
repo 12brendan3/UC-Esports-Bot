@@ -11,7 +11,7 @@ function handle(client, msg) {
   if (baercotEmoji && !baercotEmoji.deleted) {
     msg.channel.send(`${baercotEmoji}`);
   } else {
-    msg.reply(`there was an error running the command.`);
+    msg.reply(`There was an error running the command.`);
   }
 
   if (msg.deletable) {

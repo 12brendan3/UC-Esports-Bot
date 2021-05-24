@@ -25,7 +25,7 @@ function handle(client, msg) {
     if (option.length > 1) {
       testSettings(msg, option[1]);
     } else {
-      msg.reply(`please provide a setting to test.\n${options}`);
+      msg.reply(`Please provide a setting to test.\n${options}`);
     }
   }
 }
@@ -59,7 +59,7 @@ async function testWelcomeMessage(msg) {
     const welcomeMessage = guildSettings.welcomeMessage.replace(`!!newuser!!`, `${msg.member}`);
     msg.channel.send(welcomeMessage);
   } else {
-    msg.reply(`there is no welcome message set up for this guild!`);
+    msg.reply(`There is no welcome message set up for this guild!`);
   }
 }
 
@@ -71,9 +71,9 @@ async function testWelcomeChannel(msg) {
     const welcomeChannel = msg.guild.channels.cache.get(guildSettings.welcomeChannelID);
     welcomeChannel.send(welcomeMessage);
   } else if (guildSettings && guildSettings.welcomeChannelID) {
-    msg.reply(`there is no welcome message set up for this guild!`);
+    msg.reply(`There is no welcome message set up for this guild!`);
   } else {
-    msg.reply(`there is no welcome channel set up for this guild!`);
+    msg.reply(`There is no welcome channel set up for this guild!`);
   }
 }
 
@@ -94,6 +94,6 @@ async function testLogsChannel(msg) {
 
     logsChannel.send(embed);
   } else {
-    msg.reply(`there is no logs channel set up for this guild!`);
+    msg.reply(`There is no logs channel set up for this guild!`);
   }
 }

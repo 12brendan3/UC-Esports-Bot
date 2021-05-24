@@ -17,24 +17,24 @@ const ytSearchOpts = {
 
 function checkUser(msg, type) {
   if (msg.guild === null) {
-    msg.reply(`this command only works in a server.`);
+    msg.reply(`This command only works in a server.`);
     return;
   }
 
   if (!msg.member.voice.channel) {
-    msg.reply(`you need to be connected to a voice channel.`);
+    msg.reply(`You need to be connected to a voice channel.`);
     return;
   }
 
   const player = players.get(msg.guild.id);
 
   if (player && player.voiceChannel.id !== msg.member.voice.channel.id) {
-    msg.reply(`you need to be connected to the active voice channel.`);
+    msg.reply(`You need to be connected to the active voice channel.`);
     return;
   }
 
   if (!player && type !== `play`) {
-    msg.reply(`there is no active queue.`);
+    msg.reply(`There is no active queue.`);
     return;
   }
 
@@ -80,7 +80,7 @@ async function checkYT(msg) {
       };
       addToQueue(msg, newItem);
     } catch {
-      msg.reply(`failed to fetch video information.  Please make sure the video URL/ID is valid and public.`);
+      msg.reply(`Failed to fetch video information.  Please make sure the video URL/ID is valid and public.`);
     }
   } else {
     searchYT(msg, video);
@@ -90,13 +90,13 @@ async function checkYT(msg) {
 function pause(msg) {
   const player = players.get(msg.guild.id);
   player.connection.dispatcher.pause(true);
-  msg.reply(`audio has been paused.`);
+  msg.reply(`Audio has been paused.`);
 }
 
 function resume(msg) {
   const player = players.get(msg.guild.id);
   player.connection.dispatcher.resume();
-  msg.reply(`audio has been resumed.`);
+  msg.reply(`Audio has been resumed.`);
 }
 
 function skip(guildID) {
@@ -106,19 +106,19 @@ function skip(guildID) {
 
 function changeVolume(msg) {
   if (msg.content.length < settings.getSettings().prefix.length + 7) {
-    msg.reply(`please include the new volume on a scale of 1 to 100.`);
+    msg.reply(`Please include the new volume on a scale of 1 to 100.`);
     return;
   }
 
   const volume = parseFloat(msg.content.substr(settings.getSettings().prefix.length + 7)) / 100;
 
   if (isNaN(volume)) {
-    msg.reply(`that's not a number...`);
+    msg.reply(`That's not a number...`);
   } else {
     const player = players.get(msg.guild.id);
     player.volume = volume;
     player.connection.dispatcher.setVolumeLogarithmic(volume);
-    msg.reply(`changed the volume to ${volume * 100}%.`);
+    msg.reply(`Changed the volume to ${volume * 100}%.`);
   }
 }
 
@@ -126,7 +126,7 @@ async function addToQueue(msg, newItem) {
   const player = players.get(msg.guild.id);
   if (player) {
     player.queue.push(newItem);
-    msg.reply(`added to queue.`);
+    msg.reply(`Added to queue.`);
   } else {
     const connection = await msg.member.voice.channel.join();
     players.set(msg.guild.id, {textChannel: msg.channel, voiceChannel: msg.member.voice.channel, queue: [newItem], volume: 0.35, connection, paused: false});
@@ -178,7 +178,7 @@ function searchYT(msg, search) {
   if (ytSearchOpts.key) {
     ytsearch(search, ytSearchOpts, (err, results) => {
       if (err) {
-        msg.reply(`failed to search YouTube.`);
+        msg.reply(`Failed to search YouTube.`);
         console.error(err);
       } else {
         const newItem = {

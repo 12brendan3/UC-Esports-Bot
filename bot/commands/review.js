@@ -57,11 +57,11 @@ async function sendFeedback(client, msg) {
         msg.channel.send(embed);
       }
     } else {
-      msg.reply(`there is no feedback.`);
+      msg.reply(`There is no feedback.`);
     }
   } catch (err) {
     console.error(err);
-    msg.reply(`there was an error?`);
+    msg.reply(`There was an error?`);
   }
 }
 

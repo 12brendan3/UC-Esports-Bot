@@ -29,7 +29,7 @@ async function handle(client, msg) {
       msg.reply(`You don't have any XP.`);
     }
   } catch {
-    msg.reply(`there was an error fetching your XP.  Tell the bot devs if the issue persists.`);
+    msg.reply(`There was an error fetching your XP.  Tell the bot devs if the issue persists.`);
   }
 }
 

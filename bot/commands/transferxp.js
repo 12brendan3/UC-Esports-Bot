@@ -32,7 +32,7 @@ async function transferXP(msg) {
   const user1 = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
   const parsedUser1 = resolvers.resolveUserID(msg.guild, user1.first().content);
   if (!parsedUser1) {
-    msg.reply(`invalid user, process canceled, please try again.`);
+    msg.reply(`Invalid user, process canceled, please try again.`);
     return;
   }
 

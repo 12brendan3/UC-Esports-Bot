@@ -23,7 +23,7 @@ async function handle(client, msg) {
   try {
     const isAdmin = await permissions.checkAdmin(msg.guild.id, msg.author.id);
     if (isAdmin || msg.author.id === msg.guild.ownerID) {
-      msg.reply(`what role do you want information on?`);
+      msg.reply(`What role do you want information on?`);
       const collected = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
       const roleID = resolvers.resolveRoleID(msg.guild, collected.first().content);
       if (roleID) {
@@ -43,14 +43,14 @@ async function handle(client, msg) {
 
         msg.channel.send(embed);
       } else {
-        msg.reply(`no role found, please try again.`);
+        msg.reply(`No role found, please try again.`);
       }
     } else {
-      msg.reply(`you're not an admin on this server.`);
+      msg.reply(`You're not an admin on this server.`);
     }
   } catch (err) {
     console.log(err);
-    msg.reply(`command timed out, please try again.`);
+    msg.reply(`Command timed out, please try again.`);
   }
 }
 

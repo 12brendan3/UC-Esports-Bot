@@ -104,7 +104,12 @@ function generateReportEmbed(msg, user) {
   embed.setDescription(`A message has been flagged.`);
   embed.setColor(`#FF0000`);
   embed.setAuthor(msg.author.tag, msg.author.displayAvatarURL());
-  embed.addField(`Message`, msg.content);
+  if (msg.content) {
+    embed.addField(`Message`, msg.content.length > 1000 ? msg.content.substr(0, 1000) : msg.content);
+    if (msg.content.length > 1000) {
+      embed.addField(`*** ***`, msg.content.substr(1000, msg.content.length));
+    }
+  }
   embed.addField(`Message Link`, `[View Message](${msg.url})`);
   embed.setFooter(user.tag, user.displayAvatarURL());
   embed.setTimestamp();
@@ -190,7 +195,12 @@ function buildEmbed(reaction) {
     embed.setImage(images[0]);
   }
 
-  embed.addField(`Message`, reaction.message.content);
+  if (reaction.message.content) {
+    embed.addField(`Message`, reaction.message.content.length > 1000 ? reaction.message.content.substr(0, 1000) : reaction.message.content);
+    if (reaction.message.content.length > 1000) {
+      embed.addField(`*** ***`, reaction.message.content.substr(1000, reaction.message.content.length));
+    }
+  }
 
   embed.addField(`Message Link`, `[View Message](${reaction.message.url})`);
 

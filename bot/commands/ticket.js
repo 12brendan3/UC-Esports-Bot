@@ -134,7 +134,10 @@ function generateReportEmbed(text, msg, anonymous) {
   } else {
     embed.setAuthor(msg.author.tag, msg.author.displayAvatarURL());
   }
-  embed.addField(`Message`, text);
+  embed.addField(`Message`, text.length > 1000 ? text.substr(0, 1000) : text);
+  if (text.length > 1000) {
+    embed.addField(`*** ***`, text.substr(1000, text.length));
+  }
   embed.setTimestamp();
 
   return embed;

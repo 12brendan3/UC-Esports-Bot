@@ -25,7 +25,7 @@ function handle(client, msg) {
 // Private function
 function handleCommand(client, msg) {
   // Ignore report command to keep it as anonymous as possible
-  if (!msg.content.startsWith(`${settings.getSettings().prefix}report`)) {
+  if (!msg.content.startsWith(`${settings.getSettings().prefix}ticket`)) {
     console.info(`${msg.guild === null ? `Via DM` : `#${msg.channel.name}`} <${msg.author.username}> ${msg.content}`);
   }
 

@@ -83,15 +83,33 @@ function detectFlagReaction(guildSettings, reaction, user) {
     return;
   }
 
-  user.send(`Message has been reported.`);
+  reaction.remove();
+
+  const newEmbed = generateReportEmbed(reaction.message, user);
 
   const repChannel = reaction.message.guild.channels.cache.get(guildSettings.reportChannelID);
 
   if (guildSettings.reportRoleID) {
-    repChannel.send(`<@&${guildSettings.reportRoleID}> A message has been reported:\n${reaction.message.url}`);
+    repChannel.send(`<@&${guildSettings.reportRoleID}>`, newEmbed);
   } else {
-    repChannel.send(`A message has been reported:\n${reaction.message.url}`);
+    repChannel.send(newEmbed);
   }
+
+  user.send(`Message has been flagged for review by admins.`);
+}
+
+function generateReportEmbed(msg, user) {
+  const embed = new Discord.MessageEmbed();
+
+  embed.setDescription(`A message has been flagged.`);
+  embed.setColor(`#FF0000`);
+  embed.setAuthor(msg.author.tag, msg.author.displayAvatarURL());
+  embed.addField(`Message`, msg.content);
+  embed.addField(`Message Link`, `[View Message](${msg.url})`);
+  embed.setFooter(user.tag, user.displayAvatarURL());
+  embed.setTimestamp();
+
+  return embed;
 }
 
 async function detectStarboard(guildSettings, reaction, user) {
@@ -172,14 +190,9 @@ function buildEmbed(reaction) {
     embed.setImage(images[0]);
   }
 
-  if (reaction.message.content) {
-    embed.addField(`Message`, reaction.message.content.length > 1000 ? reaction.message.content.substr(0, 1000) : reaction.message.content);
-    if (reaction.message.content.length > 1000) {
-      embed.addField(`Message Continued`, reaction.message.content.substr(1000, reaction.message.content.length));
-    }
-  }
+  embed.addField(`Message`, reaction.message.content);
 
-  embed.addField(`Message Link`, `[Jump to Message](${reaction.message.url})`);
+  embed.addField(`Message Link`, `[View Message](${reaction.message.url})`);
 
   embed.setTimestamp(reaction.message.createdTimestamp);
 

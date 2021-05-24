@@ -2,6 +2,8 @@ const database = require(`../helpers/database-manager`);
 const collectors = require(`../helpers/collectors`);
 const resolvers = require("../helpers/resolvers");
 
+const Discord = require(`discord.js`);
+
 const activeReports = new Set();
 
 // Exports
@@ -9,7 +11,7 @@ module.exports = {handle, getHelp};
 
 // Help command text
 const help = {
-  text: `Allows a user to submit a report to a specific server.`,
+  text: `Allows a user to submit a ticket for a specific server.`,
   level: `user`,
 };
 
@@ -20,7 +22,7 @@ async function handle(client, msg) {
   let guildID;
 
   if (activeReports.has(msg.author.id)) {
-    msg.reply(`You already have an active report in progress.`);
+    msg.reply(`You already have an active ticket in progress.`);
     return;
   }
 
@@ -45,7 +47,7 @@ async function handle(client, msg) {
       guildString += `\`${guild.name}\` `;
     });
 
-    DMChannel.send(`First of all, what server would you like to submit a report to?  Servers shared with you are:\n${guildString}`);
+    DMChannel.send(`First of all, what server would you like to submit a ticket to?  Servers shared with you are:\n${guildString}`);
 
     let guildResponse;
     try {
@@ -70,7 +72,7 @@ async function handle(client, msg) {
   const guildSettings = await database.getEntry(`Guilds`, {guildID});
 
   if (guildSettings && guildSettings.reportChannelID) {
-    DMChannel.send(`Would you like this report to be anonymous? (yes/no)`);
+    DMChannel.send(`Would you like this ticket to be anonymous? (yes/no)`);
 
     let anonResponse;
 
@@ -86,9 +88,9 @@ async function handle(client, msg) {
 
     if (anonResponse.first().content === `yes`) {
       anonymous = true;
-      DMChannel.send(`The report *will* be anonymous.\nWhat would you like to say in the report?\nType "cancel" to cancel this report.`);
+      DMChannel.send(`The ticket *will* be anonymous.\nWhat would you like to say in the ticket?\nType "cancel" to cancel this ticket.`);
     } else {
-      DMChannel.send(`The report *will not* be anonymous.\nWhat would you like to say in the report?\nType "cancel" to cancel this report.`);
+      DMChannel.send(`The ticket *will not* be anonymous.\nWhat would you like to say in the ticket?\nType "cancel" to cancel this ticket.`);
     }
 
     let reportText;
@@ -107,30 +109,35 @@ async function handle(client, msg) {
       return;
     }
 
-    let fullReport;
-
-    if (anonymous) {
-      fullReport = `${guildSettings.reportRoleID ? `<@&${guildSettings.reportRoleID}> ` : ``}Anonymous report:\n${reportText.first().content}`;
-    } else {
-      fullReport = `${guildSettings.reportRoleID ? `<@&${guildSettings.reportRoleID}> ` : ``}Report from ${msg.author} (${msg.author.username}):\n${reportText.first().content}`;
-    }
+    const reportEmbed = generateReportEmbed(reportText.first().content, msg, anonymous);
 
     const reportGuild = client.guilds.cache.get(guildID);
     const reportChannel = reportGuild.channels.cache.get(guildSettings.reportChannelID);
 
-    if (fullReport.length > 2000) {
-      reportChannel.send(fullReport.substr(0, 2000));
-      reportChannel.send(fullReport.substr(2000));
-    } else {
-      reportChannel.send(fullReport);
-    }
+    reportChannel.send(reportEmbed);
 
-    DMChannel.send(`The report has been sent.`);
+    DMChannel.send(`The ticket has been sent.`);
     activeReports.delete(msg.author.id);
   } else {
-    DMChannel.send(`That server doesn't have a report channel set up.  Report cancelled.`);
+    DMChannel.send(`That server doesn't have a ticket channel set up.  Ticket cancelled.`);
     activeReports.delete(msg.author.id);
   }
+}
+
+function generateReportEmbed(text, msg, anonymous) {
+  const embed = new Discord.MessageEmbed();
+
+  embed.setDescription(`A ticket has been submitted.`);
+  embed.setColor(`#FFFB1F`);
+  if (anonymous) {
+    embed.setAuthor(`Anonymous`);
+  } else {
+    embed.setAuthor(msg.author.tag, msg.author.displayAvatarURL());
+  }
+  embed.addField(`Message`, text);
+  embed.setTimestamp();
+
+  return embed;
 }
 
 function getHelp() {

@@ -88,7 +88,7 @@ async function testLogsChannel(msg) {
     embed.setAuthor(msg.member.displayName, msg.author.displayAvatarURL());
     embed.setDescription(`Message was sent by ${msg.author} in ${msg.channel} to test the logs channel.`);
     embed.addField(`Message Content`, `${msg.content}`);
-    embed.addField(`Message Link`, `[Jump to Message](${msg.url})`);
+    embed.addField(`Message Link`, `[View Message](${msg.url})`);
     embed.setTimestamp();
     embed.setFooter(`${msg.author.tag}`);
 

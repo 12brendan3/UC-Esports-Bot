@@ -22,7 +22,7 @@ async function logMessageDeletion(msg) {
 
   if (guildSettings && guildSettings.logsChannelID) {
     // Ignore report command to keep it as anonymous as possible
-    if (msg.content.startsWith(`${settings.getSettings().prefix}report`)) {
+    if (msg.content.startsWith(`${settings.getSettings().prefix}ticket`)) {
       return;
     }
 

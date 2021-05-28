@@ -127,9 +127,9 @@ async function detectStarboard(guildSettings, reaction, user) {
     checkMessage(reaction, guildSettings, exists, false);
   } else if (reaction.emoji.identifier === detectedStarboardReactions[1]) {
     const exists = await database.getEntry(`Starboard`, {guildID: reaction.message.guild.id, channelID: reaction.message.channel.id, originalMessageID: reaction.message.id});
-    const admin = await permissions.checkAdmin(reaction.message.guild.id, user.id);
+    const admin = await permissions.checkAdmin(reaction.message.guild, user.id);
 
-    if (exists || admin || reaction.message.guild.ownerID === user.id) {
+    if (exists || admin) {
       checkMessage(reaction, guildSettings, exists, true);
     }
   }

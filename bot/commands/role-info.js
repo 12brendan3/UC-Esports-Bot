@@ -21,8 +21,8 @@ async function handle(client, msg) {
   }
 
   try {
-    const isAdmin = await permissions.checkAdmin(msg.guild.id, msg.author.id);
-    if (isAdmin || msg.author.id === msg.guild.ownerID) {
+    const isAdmin = await permissions.checkAdmin(msg.guild, msg.author.id);
+    if (isAdmin) {
       msg.reply(`What role do you want information on?`);
       const collected = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
       const roleID = resolvers.resolveRoleID(msg.guild, collected.first().content);

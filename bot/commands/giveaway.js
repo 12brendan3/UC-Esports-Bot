@@ -19,8 +19,8 @@ const help = {
 async function handle(client, msg) {
 
   // Check if user is allowed to use this command.
-  const perm = permissions.checkAdmin(msg.guild.id, msg.author.id);
-  if (perm || msg.author.id === msg.guild.ownerID) {
+  const perm = permissions.checkAdmin(msg.guild, msg.author.id);
+  if (perm) {
 
     // Get giveaway info
     /* {

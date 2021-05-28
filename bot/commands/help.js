@@ -29,9 +29,9 @@ async function handle(client, msg) {
   if (msg.channel.type === `dm`) {
     perms.push(`admin`);
   } else {
-    const isAdmin = await permissions.checkAdmin(msg.guild.id, msg.author.id);
+    const isAdmin = await permissions.checkAdmin(msg.guild, msg.author.id);
 
-    if (isAdmin || msg.author.id === msg.guild.ownerID) {
+    if (isAdmin) {
       perms.push(`admin`);
     }
   }

@@ -26,7 +26,7 @@ async function handle(client, msg) {
     return;
   }
 
-  const admin = msg.guild.ownerID === msg.author.id ? true : await permissions.checkAdmin(msg.guild.id, msg.author.id);
+  const admin = await permissions.checkAdmin(msg.guild, msg.author.id);
 
   if (admin && activeChanges.includes(msg.guild.id)) {
     msg.reply(`Only one change can be made at a time.`);
@@ -62,10 +62,10 @@ function changeSettings(msg, setting, client) {
       addAdmin(msg);
       break;
     case `admin-remove`:
-      removeAdmin(msg);
+      removeAdmin(msg, client);
       break;
     case `admin-list`:
-      listAdmins(msg);
+      listAdmins(msg, client);
       break;
     case `logs-channel`:
       changeLogsChannel(msg);
@@ -183,7 +183,7 @@ async function addAdmin(msg) {
     const newUserID = resolvers.resolveUserID(msg.guild, collected.first().content);
 
     if (newUserID) {
-      const success = await permissions.addAdmin(msg.guild.id, newUserID);
+      const success = await permissions.addAdmin(msg.guild, newUserID);
 
       if (success && success === `duplicate`) {
         msg.reply(`That user is already an admin!`);
@@ -208,9 +208,9 @@ async function addAdmin(msg) {
   activeChanges = activeChanges.filter((val) => val !== msg.guild.id);
 }
 
-async function removeAdmin(msg) {
-  if (await sendAdminList(msg)) {
-    msg.reply(`Please provide the name/ID of the admin to remove or mention them.`);
+async function removeAdmin(msg, client) {
+  if (await sendAdminList(msg, client)) {
+    msg.channel.send(`Please provide the name/ID of the admin to remove or mention them.`);
 
     try {
       const collected = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
@@ -241,8 +241,8 @@ async function removeAdmin(msg) {
   activeChanges = activeChanges.filter((val) => val !== msg.guild.id);
 }
 
-async function sendAdminList(msg) {
-  const admins = await permissions.getAdmins(msg.guild.id);
+async function sendAdminList(msg, client) {
+  const admins = await permissions.getAdmins(msg.guild);
 
   if (admins && admins === `noadmins`) {
     msg.reply(`You're the only admin on this server.`);
@@ -251,11 +251,15 @@ async function sendAdminList(msg) {
     let adminList = ``;
 
     for (let i = 0; i < admins.length; i++) {
-      const adminMember = msg.guild.members.cache.get(admins[i].userID);
-      adminList += `${adminMember ? adminMember.user.tag : admins[i]}\n`;
+      const adminUser = client.users.cache.get(admins[i].userID);
+      if (adminUser) {
+        adminList += `${adminUser.tag}\n`;
+      } else {
+        adminList += `${admins[i].userID} (Unknown User)\n`;
+      }
     }
 
-    msg.reply(`Here are the admins:\n\`\`\`${adminList}\`\`\`\nNote: The server owner is always an admin.`);
+    msg.reply(`Here are the admins:\n\`\`\`${adminList}\`\`\`\nNote: The server owner and developers are always admins.`);
     return true;
   } else {
     msg.reply(`There was an error getting the admins.\nTell the bot developers if the issue persists.`);
@@ -263,8 +267,8 @@ async function sendAdminList(msg) {
   }
 }
 
-async function listAdmins(msg) {
-  await sendAdminList(msg);
+async function listAdmins(msg, client) {
+  await sendAdminList(msg, client);
 
   activeChanges = activeChanges.filter((val) => val !== msg.guild.id);
 }

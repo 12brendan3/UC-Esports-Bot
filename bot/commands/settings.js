@@ -167,8 +167,7 @@ async function changeWelcomeChannel(msg) {
         msg.reply(`No channel found, please try again.`);
       }
     }
-  } catch (err) {
-    console.error(err);
+  } catch {
     msg.reply(`Command timed out, please try again.`);
   }
 
@@ -202,8 +201,7 @@ async function addAdmin(msg) {
     } else {
       msg.reply(`No user found, please try again.`);
     }
-  } catch (err) {
-    console.error(err);
+  } catch {
     msg.reply(`Command timed out, please try again.`);
   }
 
@@ -235,8 +233,7 @@ async function removeAdmin(msg) {
       } else {
         msg.reply(`No user found, please try again.`);
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
       msg.reply(`Command timed out, please try again.`);
     }
   }
@@ -301,8 +298,7 @@ async function changeLogsChannel(msg) {
         msg.reply(`No channel found, please try again.`);
       }
     }
-  } catch (err) {
-    console.error(err);
+  } catch {
     msg.reply(`Command timed out, please try again.`);
   }
 
@@ -343,8 +339,7 @@ async function changeStarboardChannel(msg) {
     } else {
       msg.reply(`No channel found, please try again.`);
     }
-  } catch (err) {
-    console.error(err);
+  } catch {
     msg.reply(`Command timed out, please try again.`);
   }
 
@@ -378,8 +373,7 @@ async function changeStarboardThreshold(msg) {
         msg.reply(`There was an error updating the starboard channel.\nTell the bot developers if the issue persists.`);
       }
     }
-  } catch (err) {
-    console.error(err);
+  } catch {
     msg.reply(`Command timed out, please try again.`);
   }
 
@@ -413,8 +407,7 @@ async function changeStreamingRole(msg) {
     } else {
       msg.reply(`That's an invalid role, please try again.`);
     }
-  } catch (err) {
-    console.error(err);
+  } catch {
     msg.reply(`Command timed out, please try again.`);
   }
 
@@ -452,8 +445,7 @@ async function changeRoleChannel(msg, client) {
         msg.reply(`No channel found, please try again.`);
       }
     }
-  } catch (err) {
-    console.error(err);
+  } catch {
     msg.reply(`Command timed out, please try again.`);
   }
 
@@ -532,7 +524,7 @@ async function addRoleReaction(msg, client) {
     } else {
       msg.reply(`This guild has no reactions channel, please set one up with "${settings.getSettings().prefix}settings reaction-role-channel."`);
     }
-  } catch (err) {
+  } catch {
     msg.reply(`Command timed out, please try again.`);
   }
 
@@ -588,7 +580,7 @@ async function removeRoleReaction(msg, client) {
     } else {
       msg.reply(`This guild has no reactions channel, please set one up with "${settings.getSettings().prefix}settings reaction-role-channel."`);
     }
-  } catch (err) {
+  } catch {
     msg.reply(`Command timed out, please try again.`);
   }
 
@@ -632,8 +624,7 @@ async function updateCategoryName(msg, client) {
     } else {
       msg.reply(`This guild has no role reactions channel, please set one up with "${settings.getSettings().prefix}settings reaction-role-channel."`);
     }
-  } catch (err) {
-    console.error(err);
+  } catch {
     msg.reply(`Command timed out, please try again.`);
   }
 
@@ -663,8 +654,7 @@ async function updateCategoryInfo(msg, client) {
     } else {
       msg.reply(`This guild has no role reactions channel, please set one up with "${settings.getSettings().prefix}settings reaction-role-channel."`);
     }
-  } catch (err) {
-    console.error(err);
+  } catch {
     msg.reply(`Command timed out, please try again.`);
   }
 
@@ -704,8 +694,7 @@ async function verifyReactRoles(msg, client) {
     } else {
       msg.reply(`This server doesn't have rection roles set up.`);
     }
-  } catch (err) {
-    console.error(err);
+  } catch {
     msg.reply(`There was an error verifying the reaction roles.`);
   }
 
@@ -739,8 +728,7 @@ async function changeVerifiedRole(msg) {
     } else {
       msg.reply(`That's an invalid role, please try again.`);
     }
-  } catch (err) {
-    console.error(err);
+  } catch {
     msg.reply(`Command timed out, please try again.`);
   }
 
@@ -776,8 +764,7 @@ async function changeReportChannel(msg) {
         msg.reply(`No channel found, please try again.`);
       }
     }
-  } catch (err) {
-    console.error(err);
+  } catch {
     msg.reply(`Command timed out, please try again.`);
   }
 
@@ -811,8 +798,7 @@ async function changeReportRole(msg) {
     } else {
       msg.reply(`That's an invalid role, please try again.`);
     }
-  } catch (err) {
-    console.error(err);
+  } catch {
     msg.reply(`Command timed out, please try again.`);
   }
 

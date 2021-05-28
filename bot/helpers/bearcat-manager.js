@@ -17,6 +17,11 @@ module.exports = {prepEmail, verifyUser, setupProfile};
 
 // Exported Functions
 function prepEmail() {
+  if (settings.getAuth().gmailUN === `replace me` || settings.getAuth().gmailPW === `replace me`) {
+    console.error(`No Gmail username and/or password found, please edit the "auth.json" file in the storage folder.\nYou can then type "restart" and then press enter.\nTo exit, type "exit" and then press enter.`);
+    return;
+  }
+
   emailer = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -27,6 +32,11 @@ function prepEmail() {
 }
 
 async function verifyUser(msg) {
+  if (!emailer) {
+    msg.reply(`The email verification system isn't set up on this bot, bug the bot developers to set it up.`);
+    return;
+  }
+
   const userStatus = userTimeouts.get(msg.author.id);
   if (userStatus) {
     if (userStatus.status === `active`) {
@@ -72,7 +82,7 @@ async function verifyUser(msg) {
         if (msg.member.roles.cache.has(guildSettings.verifiedRoleID)) {
           DMChannel.send(`You already have the verified user role in ${msg.guild.name}.`);
         } else {
-          await msg.member.roles.add(guildSettings.verifiedRoleID, `User requested role addition.`);
+          await msg.member.roles.add(guildSettings.verifiedRoleID, `User has previously passed verification.`);
           DMChannel.send(`You now have the ${role.name} role in ${msg.guild.name}.`);
         }
       } else {
@@ -161,7 +171,7 @@ async function verifyUser(msg) {
           // \nIf you'd like to complete your user profile, run the "profile-setup" command.
           DMChannel.send(`Success!\nYour email has been saved.`);
         } else {
-          await msg.member.roles.add(guildSettings.verifiedRoleID, `User requested role addition.`);
+          await msg.member.roles.add(guildSettings.verifiedRoleID, `User passed verification.`);
           // \nIf you'd like to complete your user profile, run the "profile-setup" command.
           DMChannel.send(`Success!\nYour email has been saved and you now have the ${role.name} role in ${msg.guild.name}.`);
         }

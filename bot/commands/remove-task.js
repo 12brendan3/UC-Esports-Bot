@@ -74,7 +74,7 @@ async function handle(client, msg) {
     return;
   }
 
-  const resultRemoval = await taskManager.removeTask(taskID, `${taskID}.${result.taskFile}`);
+  const resultRemoval = await taskManager.removeTask(taskID, result.taskFile);
 
   if (resultRemoval) {
     msg.reply(`Successfully removed the task.`);

@@ -67,8 +67,7 @@ async function handle(client, msg) {
     } else {
       msg.reply(`You're not an admin on this server.`);
     }
-  } catch (err) {
-    console.log(err);
+  } catch {
     msg.reply(`Command timed out, please try again.`);
   }
 }

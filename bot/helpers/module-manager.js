@@ -33,8 +33,6 @@ function reloadCommands() {
 }
 
 function clearAll() {
-  eventImports.ready.clear();
-
   eventImports = {};
   commandImports = {};
 

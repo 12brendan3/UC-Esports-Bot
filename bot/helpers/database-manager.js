@@ -228,8 +228,38 @@ const RoleCategories = sequelize.define(`RoleCategories`, {
   },
 });
 
+const Tasks = sequelize.define(`Tasks`, {
+  ID: {
+    type: Sequelize.UUIDV4,
+    defaultValue: Sequelize.UUIDV4,
+    unique: true,
+    primaryKey: true,
+    allowNull: false,
+  },
+  guildID: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  channelID: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  cronString: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  taskMessage: {
+    type: Sequelize.STRING,
+    allowNull: true,
+  },
+  taskFile: {
+    type: Sequelize.STRING,
+    allowNull: true,
+  },
+});
+
 // Make object containing tables
-const tables = {Bearcats, XP, Starboard, Guilds, ServerAdmins, Feedback, Roles, RoleCategories};
+const tables = {Bearcats, XP, Starboard, Guilds, ServerAdmins, Feedback, Roles, RoleCategories, Tasks};
 
 // Exports
 module.exports = {syncTables, createEntry, getEntry, getOrCreateEntry, updateEntry, updateOrCreateEntry, removeEntry, getAllEntries};
@@ -247,6 +277,7 @@ async function syncTables() {
     Feedback.sync(),
     Roles.sync(),
     RoleCategories.sync(),
+    Tasks.sync(),
   ]);
   console.info(`Database tables synced.`);
 }

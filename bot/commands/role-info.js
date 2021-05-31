@@ -16,7 +16,7 @@ const help = {
 // Exported functions
 async function handle(client, msg) {
   if (msg.channel.type === `dm`) {
-    msg.reply(`That command has to be used in a server.`);
+    msg.reply(`This command has to be used in a server.`);
     return;
   }
 
@@ -48,8 +48,7 @@ async function handle(client, msg) {
     } else {
       msg.reply(`You're not an admin on this server.`);
     }
-  } catch (err) {
-    console.log(err);
+  } catch {
     msg.reply(`Command timed out, please try again.`);
   }
 }

@@ -52,6 +52,10 @@ function loadSettings() {
 
     fs.writeFileSync(`./storage/settings.json`, JSON.stringify(settingsTemplate, null, 2));
   }
+
+  if (!fs.existsSync(`./storage/task-files`)) {
+    fs.mkdirSync(`./storage/task-files`);
+  }
 }
 
 function getSettings() {

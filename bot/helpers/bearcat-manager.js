@@ -8,6 +8,9 @@ const nodemailer = require('nodemailer');
 
 const regexEmail = RegExp(`^.+@((uc)?mail.)?uc.edu$`);
 
+const emailHTML1 = `<head><style>*{font-family:Arial,Helvetica Neue,Helvetica,sans-serif;padding:0;margin:0}body{background-color:#E00122}#top-text{padding-top:1vw;font-size:4vw;font-weight:bold}#code{padding-top:1vw;font-size:6vw;font-weight:bold}#bottom-text{padding-top:2vw;font-size:2vw}#text-area{margin-left:auto;margin-right:auto;text-align:center;background-color:white;height:20vw;width:60vw}</style></head><body> <img src="cid:verHeaderImg"/><div id="text-area"><p id="top-text">Your verification code is:</p><p id="code">`;
+const emailHTML2 = `</p><p id="bottom-text">Please copy this code and send it to the Bearcat Bot.</p></div> <img src="cid:verFooterImg"/></body>`;
+
 const userTimeouts = new Map();
 
 let emailer;
@@ -209,6 +212,17 @@ function sendEmail(email) {
         to: email,
         subject: `UC Esports verification code`,
         text: `Your verification code is: ${token.toUpperCase()}\nPlease copy this code and send it to the Bearcat Bot.`,
+        html: `${emailHTML1}${token.toUpperCase()}${emailHTML2}`,
+        attachments: [{
+          filename: 'header.svg',
+          path: './assets/email/header.svg',
+          cid: 'verHeaderImg',
+        },
+        {
+          filename: 'footer.svg',
+          path: './assets/email/footer.svg',
+          cid: 'verFooterImg',
+        }],
       };
 
       emailer.sendMail(mailOptions, (error) => {

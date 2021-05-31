@@ -55,7 +55,7 @@ async function handle(client, msg) {
   msg.reply(`What would you like the task to say?\nYou may also or alternatively attach an image.`);
   let taskMsg;
   try {
-    taskMsg = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
+    taskMsg = await collectors.oneMessageFromUser(msg.channel, msg.author.id, 600000);
   } catch {
     msg.reply(`Command timed out, please try again.`);
     return;

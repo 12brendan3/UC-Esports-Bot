@@ -63,7 +63,7 @@ async function handle(client, msg) {
         embed.addField(`*** ***`, lists[x]);
       }
 
-      msg.channel.send(embed);
+      msg.channel.send({embeds: [embed]});
     } else {
       msg.reply(`You're not an admin on this server.`);
     }

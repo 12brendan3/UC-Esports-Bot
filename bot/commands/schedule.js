@@ -63,7 +63,7 @@ async function handle(client, msg) {
 
   const task = taskMsg.first();
 
-  if (task.attachments.size > 0 && verifyImage(task) !== 'valid') {
+  if (task.attachments.size > 0 && verifyImage(task) !== `valid`) {
     msg.reply(`That isn't a valid image, please try again.`);
     return;
   }
@@ -90,7 +90,7 @@ async function handle(client, msg) {
 
   if (result) {
     if (task.attachments.size > 0) {
-      const res = await axios({method: 'get', url: task.attachments.first().proxyURL, responseType: `stream`});
+      const res = await axios({method: `get`, url: task.attachments.first().proxyURL, responseType: `stream`});
       await res.data.pipe(fs.createWriteStream(`./storage/task-files/${result.ID}.${result.taskFile}`));
     }
 
@@ -108,7 +108,7 @@ function verifyImage(msg) {
   const img = msg.attachments.first();
   const fileExt = path.extname(img.name).toLowerCase();
 
-  if (fileExt !== '.png' && fileExt !== '.jpg' && fileExt !== '.jpeg' && fileExt !== '.gif') {
+  if (fileExt !== `.png` && fileExt !== `.jpg` && fileExt !== `.jpeg` && fileExt !== `.gif`) {
     return `That isn't a valid image type, please try again.`;
   }
 
@@ -116,5 +116,5 @@ function verifyImage(msg) {
     return `That image is too large, please try again.`;
   }
 
-  return 'valid';
+  return `valid`;
 }

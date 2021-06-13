@@ -47,7 +47,7 @@ async function handle(client, msg) {
     }
   }
 
-  msg.channel.send(embed);
+  msg.channel.send({embeds: [embed]});
 }
 
 function getHelp() {

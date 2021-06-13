@@ -92,7 +92,7 @@ function detectFlagReaction(guildSettings, reaction, user) {
   if (guildSettings.reportRoleID) {
     repChannel.send(`<@&${guildSettings.reportRoleID}>`, newEmbed);
   } else {
-    repChannel.send(newEmbed);
+    repChannel.send({embeds: [newEmbed]});
   }
 
   user.send(`Message has been flagged for review by admins.`);
@@ -148,7 +148,7 @@ async function starMessage(reaction, guildSettings) {
   const embed = buildEmbed(reaction);
 
   const starboardChannel = reaction.message.guild.channels.cache.get(guildSettings.starboardChannelID);
-  const starboardMessage = await starboardChannel.send(embed);
+  const starboardMessage = await starboardChannel.send({embeds: [embed]});
 
   database.createEntry(`Starboard`, {guildID: reaction.message.guild.id, channelID: reaction.message.channel.id, originalMessageID: reaction.message.id, starboardMessageID: starboardMessage.id});
 }
@@ -160,9 +160,9 @@ async function updateMessage(reaction, entry, guildSettings) {
   try {
     const starboardMessage = await starboardChannel.messages.fetch(entry.starboardMessageID);
 
-    starboardMessage.edit(embed);
+    starboardMessage.edit({embeds: [embed]});
   } catch {
-    const starboardMessage = await starboardChannel.send(embed);
+    const starboardMessage = await starboardChannel.send({embeds: [embed]});
     database.updateEntry(`Starboard`, {guildID: reaction.message.guild.id, channelID: reaction.message.channel.id, originalMessageID: reaction.message.id}, {starboardMessageID: starboardMessage.id});
   }
 }

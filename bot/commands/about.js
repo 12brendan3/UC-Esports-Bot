@@ -27,7 +27,7 @@ function handle(client, msg) {
 
   embed.setFooter(settings.version);
 
-  msg.channel.send(embed);
+  msg.channel.send({embeds: [embed]});
 }
 
 function getHelp() {

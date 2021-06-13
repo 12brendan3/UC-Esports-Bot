@@ -2,7 +2,7 @@ const Discord = require(`discord.js`);
 
 const database = require(`../helpers/database-manager`);
 
-const WordFilter = require('bad-words');
+const WordFilter = require(`bad-words`);
 
 const filter = new WordFilter();
 
@@ -47,6 +47,6 @@ async function logMessageEdit(msgOld, msgNew) {
     embed.setTimestamp();
     embed.setFooter(msgNew.author.tag);
 
-    logsChannel.send(embed);
+    logsChannel.send({embeds: [embed]});
   }
 }

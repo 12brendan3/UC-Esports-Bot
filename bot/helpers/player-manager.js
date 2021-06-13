@@ -1,9 +1,9 @@
 const settings = require(`../helpers/settings-manager`);
-const ytdl = require('ytdl-core');
-const ytsearch = require('youtube-search');
+const ytdl = require(`ytdl-core`);
+const ytsearch = require(`youtube-search`);
 
 // Exports
-module.exports = {checkUser, checkChannel};
+module.exports = {checkUser, checkChannel, prepKey};
 
 // Regex
 const regexYT = RegExp(`(^(https?\\:\\/\\/)?(www\\.youtube\\.com|youtu\\.be)\\/(watch\\?v=.{11}|.{11})$)|(^.{11}$)`);
@@ -14,6 +14,17 @@ const ytSearchOpts = {
   maxResults: 1,
   key: null,
 };
+
+function prepKey() {
+  const newKey = settings.getAuth().ytKey;
+  if (newKey && newKey !== `replace me`) {
+    ytSearchOpts.key = newKey;
+  } else {
+    console.error(`No YouTube key found, please edit the "auth.json" file in the storage folder.\nYou can then type "restart" and then press enter.\nTo exit, type "exit" and then press enter.`);
+  }
+
+  console.info(`YouTube API key set.`);
+}
 
 function checkUser(msg, type) {
   if (msg.guild === null) {
@@ -138,10 +149,10 @@ function playNext(guildID) {
   const player = players.get(guildID);
 
   if (player.queue.length > 0) {
-    const dispatcher = player.connection.play(ytdl(player.queue[0].url, {quality: `highestaudio`, highWaterMark: 128}), {plp: 1, fec: true, bitrate: `auto`, highWaterMark: 2}).on(`finish`, () => {
+    const dispatcher = player.connection.play(ytdl(player.queue[0].url, {quality: `highestaudio`, highWaterMark: 1}), {bitrate: `auto`, highWaterMark: 1}).on(`finish`, () => {
       player.queue.shift();
       playNext(guildID);
-    }).on("error", (err) => {
+    }).on(`error`, (err) => {
       console.error(err);
     });
 
@@ -169,12 +180,6 @@ function checkChannel(newState) {
 }
 
 function searchYT(msg, search) {
-  if (!ytSearchOpts.key && settings.getAuth().ytKey && settings.getAuth().ytKey !== `replace me`) {
-    ytSearchOpts.key = settings.getAuth().ytKey;
-  } else {
-    console.error(`No YouTube key found, please edit the "auth.json" file in the storage folder.\nYou can then type "restart" and then press enter.\nTo exit, type "exit" and then press enter.`);
-  }
-
   if (ytSearchOpts.key) {
     ytsearch(search, ytSearchOpts, (err, results) => {
       if (err) {

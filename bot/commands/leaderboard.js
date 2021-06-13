@@ -28,7 +28,7 @@ async function sendLeaderboard(client, msg) {
 
   embed.addField(`Leaderboard - Top 10`, list);
 
-  msg.channel.send(embed);
+  msg.channel.send({embeds: [embed]});
 }
 
 async function getUserList(client) {

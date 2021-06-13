@@ -1,6 +1,6 @@
 const database = require(`../helpers/database-manager`);
 const collectors = require(`../helpers/collectors`);
-const resolvers = require("../helpers/resolvers");
+const resolvers = require(`../helpers/resolvers`);
 
 const Discord = require(`discord.js`);
 
@@ -114,7 +114,7 @@ async function handle(client, msg) {
     const reportGuild = client.guilds.cache.get(guildID);
     const reportChannel = reportGuild.channels.cache.get(guildSettings.reportChannelID);
 
-    reportChannel.send(reportEmbed);
+    reportChannel.send({embeds: [reportEmbed]});
 
     DMChannel.send(`The ticket has been sent.`);
     activeReports.delete(msg.author.id);

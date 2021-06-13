@@ -3,7 +3,6 @@ const settings = require(`./settings-manager`);
 
 let lastCheck = 0;
 
-// eslint-disable-next-line babel/camelcase
 let currentData = {temp: {value: `...`}, weather_code: {value: `unknown`}};
 
 // Exports
@@ -18,7 +17,7 @@ async function setBotStatus(client) {
   if (settings.getAuth().weatherToken || settings.getAuth().weatherToken === `replace me`) {
     await getWeatherData();
     const status = `for ${settings.getSettings().prefix}help | ${getEmoji(currentData.weather_code.value)} ${Math.round(currentData.temp.value)}°F`;
-    client.user.setPresence({activity: {name: status, type: `WATCHING`}});
+    client.user.setPresence({status: `online`, afk: false, activities: [{name: status, type: `WATCHING`}]});
 
     setTimeout(() => {
       setBotStatus(client);
@@ -39,7 +38,6 @@ async function getWeatherData() {
     const params = {
       lat: settings.getSettings().weatherLatitude,
       lon: settings.getSettings().weatherLongitude,
-      // eslint-disable-next-line babel/camelcase
       unit_system: `us`,
       fields: `temp,weather_code,sunrise,sunset,moon_phase`,
       apikey: settings.getAuth().weatherToken,

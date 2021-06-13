@@ -2,9 +2,9 @@ const settings = require(`./settings-manager`);
 const collectors = require(`./collectors`);
 const database = require(`./database-manager`);
 
-const Crypto = require('crypto');
+const Crypto = require(`crypto`);
 
-const nodemailer = require('nodemailer');
+const nodemailer = require(`nodemailer`);
 
 const regexEmail = RegExp(`^.+@((uc)?mail.)?uc.edu$`);
 
@@ -26,12 +26,14 @@ function prepEmail() {
   }
 
   emailer = nodemailer.createTransport({
-    service: 'gmail',
+    service: `gmail`,
     auth: {
       user: settings.getAuth().gmailUN,
       pass: settings.getAuth().gmailPW,
     },
   });
+
+  console.info(`Email username and password set.`);
 }
 
 async function verifyUser(msg) {
@@ -205,7 +207,7 @@ function sendEmail(email) {
         resolve(false);
       }
 
-      const token = buffer.toString('hex');
+      const token = buffer.toString(`hex`);
 
       const mailOptions = {
         from: settings.getAuth().gmailUN,
@@ -214,14 +216,14 @@ function sendEmail(email) {
         text: `Your verification code is: ${token.toUpperCase()}\nPlease copy this code and send it to the Bearcat Bot.`,
         html: `${emailHTML1}${token.toUpperCase()}${emailHTML2}`,
         attachments: [{
-          filename: 'header.svg',
-          path: './assets/email/header.svg',
-          cid: 'verHeaderImg',
+          filename: `header.svg`,
+          path: `./assets/email/header.svg`,
+          cid: `verHeaderImg`,
         },
         {
-          filename: 'footer.svg',
-          path: './assets/email/footer.svg',
-          cid: 'verFooterImg',
+          filename: `footer.svg`,
+          path: `./assets/email/footer.svg`,
+          cid: `verFooterImg`,
         }],
       };
 

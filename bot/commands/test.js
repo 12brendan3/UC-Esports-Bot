@@ -92,7 +92,7 @@ async function testLogsChannel(msg) {
     embed.setTimestamp();
     embed.setFooter(`${msg.author.tag}`);
 
-    logsChannel.send(embed);
+    logsChannel.send({embeds: [embed]});
   } else {
     msg.reply(`There is no logs channel set up for this guild!`);
   }

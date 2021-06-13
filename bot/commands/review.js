@@ -54,7 +54,7 @@ async function sendFeedback(client, msg) {
         }
         embed.addField(`Message Link`, link);
 
-        msg.channel.send(embed);
+        msg.channel.send({embeds: [embed]});
       }
     } else {
       msg.reply(`There is no feedback.`);

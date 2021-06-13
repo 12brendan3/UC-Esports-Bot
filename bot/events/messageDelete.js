@@ -53,6 +53,6 @@ async function logMessageDeletion(msg) {
     embed.setTimestamp();
     embed.setFooter(msg.author.tag);
 
-    logsChannel.send(embed);
+    logsChannel.send({embeds: [embed]});
   }
 }

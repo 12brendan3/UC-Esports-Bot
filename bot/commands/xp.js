@@ -24,7 +24,7 @@ async function handle(client, msg) {
       embed.setTimestamp();
       embed.setDescription(`XP: ${result.XP}`);
 
-      msg.channel.send(embed);
+      msg.channel.send({embeds: [embed]});
     } else {
       msg.reply(`You don't have any XP.`);
     }

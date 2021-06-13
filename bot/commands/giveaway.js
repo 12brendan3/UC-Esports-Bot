@@ -34,7 +34,7 @@ async function handle(client, msg) {
     const embed = createEmbedListener(info.giveawayName, info.hours);
 
     // send embed message
-    const giveawayMessage = await info.giveawayChannel.send(embed);
+    const giveawayMessage = await info.giveawayChannel.send({embeds: [embed]});
 
     giveawayMessage.react(`🎁`);
 

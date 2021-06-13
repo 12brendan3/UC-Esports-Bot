@@ -41,7 +41,7 @@ async function handle(client, msg) {
         embed.addField(`__Mentionable__`, role.mentionable ? `Yes` : `No`);
         embed.addField(`__Externally Managed__`, role.managed ? `Yes` : `No`);
 
-        msg.channel.send(embed);
+        msg.channel.send({embeds: [embed]});
       } else {
         msg.reply(`No role found, please try again.`);
       }

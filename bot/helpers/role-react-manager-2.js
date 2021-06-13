@@ -162,7 +162,7 @@ async function updateOneEmbed(client, guildID, categoryID, guildSettings) {
     const oldMessage = rolesChannel.messages.cache.get(roleData[guildID][categoryID].msgID);
 
     if (oldMessage) {
-      oldMessage.edit(newEmbed);
+      oldMessage.edit({embeds: [newEmbed]});
 
       const emojis = roleData[guildID][categoryID].emojis;
 
@@ -202,7 +202,7 @@ async function updateAllEmbeds(client, guildID, guildSettings) {
   for (const category in roleData[guildID]) {
     if (Object.prototype.hasOwnProperty.call(roleData[guildID], category)) {
       const newEmbed = generateEmbed(client, guildID, category);
-      const newMessage = await rolesChannel.send(newEmbed);
+      const newMessage = await rolesChannel.send({embeds: [newEmbed]});
 
       // eslint-disable-next-line require-atomic-updates
       roleData[guildID][category].msgID = newMessage.id;

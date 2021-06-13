@@ -2,7 +2,7 @@ const settings = require(`../helpers/settings-manager`);
 const modules = require(`../helpers/module-manager`);
 const database = require(`../helpers/database-manager`);
 
-const WordFilter = require('bad-words');
+const WordFilter = require(`bad-words`);
 
 const filter = new WordFilter();
 

@@ -29,9 +29,9 @@ async function registerExisting(client) {
 function registerTask(taskID, channel, message, file, cronString) {
   const cronTask = cronos.scheduleTask(cronString, () => {
     if (message && file) {
-      channel.send(message, file);
+      channel.send({content: message, files: [file]});
     } else if (file) {
-      channel.send(file);
+      channel.send({files: [file]});
     } else {
       channel.send(message);
     }

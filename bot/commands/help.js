@@ -10,15 +10,14 @@ module.exports = {handle, getHelp};
 
 // Help command text
 const help = {
-  text: `This command :)`,
+  text: `Sends a list of all commands you can use and the descriptions.`,
   level: `user`,
 };
 
 // Exported functions
-async function handle(client, msg) {
+async function handle(client, interaction) {
   const commands = modules.getCommands();
   const embed = new Discord.MessageEmbed();
-  const prefix = settings.getSettings().prefix;
 
   embed.setColor(`#FF00CC`);
   embed.setAuthor(client.user.username, client.user.displayAvatarURL());
@@ -26,28 +25,28 @@ async function handle(client, msg) {
 
   const perms = [`user`];
 
-  if (msg.channel.type === `dm`) {
+  if (interaction.channel.type === `dm`) {
     perms.push(`admin`);
   } else {
-    const isAdmin = await permissions.checkAdmin(msg.guild, msg.author.id);
+    const isAdmin = await permissions.checkAdmin(interaction.guild, interaction.user.id);
 
     if (isAdmin) {
       perms.push(`admin`);
     }
   }
 
-  if (permissions.checkDev(msg.author.id)) {
+  if (permissions.checkDev(interaction.user.id)) {
     perms.push(`developer`);
   }
 
   for (const key of Object.keys(commands)) {
     const helpInfo = commands[key].getHelp();
     if (helpInfo && perms.includes(helpInfo.level)) {
-      embed.addField(`__${prefix}${key}__`, helpInfo.text);
+      embed.addField(`__${key}__`, helpInfo.text);
     }
   }
 
-  msg.channel.send({embeds: [embed]});
+  interaction.reply({embeds: [embed], ephemeral: true});
 }
 
 function getHelp() {

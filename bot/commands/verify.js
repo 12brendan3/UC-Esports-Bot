@@ -7,11 +7,19 @@ module.exports = {handle, getHelp};
 const help = {
   text: `Allows a user to verify they're a student at UC and grants the verified role in servers.`,
   level: `user`,
+  options: [
+    {
+      name: `email`,
+      type: `STRING`,
+      description: `The UC email to link and send a verification code to.`,
+      required: false,
+    },
+  ],
 };
 
 // Exported functions
-function handle(client, msg) {
-  bearcatManager.verifyUser(msg);
+function handle(client, interaction) {
+  bearcatManager.verifyUser(interaction);
 }
 
 function getHelp() {

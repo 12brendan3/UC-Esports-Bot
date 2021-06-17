@@ -339,7 +339,12 @@ async function updateOrCreateEntry(table, filter, newData) {
 
 async function removeEntry(table, filter) {
   try {
-    await tables[table].destroy({where: filter});
+    const result = await tables[table].destroy({where: filter});
+
+    if (result === 0) {
+      return false;
+    }
+
     return true;
   } catch (err) {
     console.error(err);

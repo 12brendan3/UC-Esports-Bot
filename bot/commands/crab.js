@@ -2,15 +2,15 @@
 module.exports = {handle, getHelp};
 
 // Help command text
-const help = null;
+const help = {
+  text: `Sends a crab emoji in chat.`,
+  level: `user`,
+};
 
 // Exported functions
-function handle(client, msg) {
-  msg.channel.send(`🦀`);
-
-  if (msg.deletable) {
-    msg.delete();
-  }
+function handle(client, interaction) {
+  interaction.channel.send(`🦀`);
+  interaction.reply({content: `Sent!`, ephemeral: true});
 }
 
 function getHelp() {

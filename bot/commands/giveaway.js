@@ -9,11 +9,13 @@ const collectors = require(`../helpers/collectors`);
 // Exports
 module.exports = {handle, getHelp};
 
-// Help command text
-const help = {
+// Help command text -- Temporarily disable the command.
+const help = null;
+/*
+{
   text: `Runs a giveaway`,
   level: `admin`,
-};
+};*/
 
 // Exported Functions
 async function handle(client, msg) {

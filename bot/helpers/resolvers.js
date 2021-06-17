@@ -1,9 +1,13 @@
+const uniEmojiRegexReq = require(`emoji-regex/index.js`);
+
 // Regex
 const regexRoleMention = RegExp(`^<@&[0-9]*>$`);
 const regexChannelMention = RegExp(`^<#[0-9]*>$`);
 const regexUserMention = RegExp(`^<@!?[0-9]*>$`);
 const regexUserTag = RegExp(`^.{1,}#[0-9]{4}$`);
 const regexObjectID = RegExp(`^[0-9]*$`);
+const uniEmojiRegex = uniEmojiRegexReq();
+const discordEmojiRegex = RegExp(`^<a?:.+:[0-9]{18}>$`);
 
 // Exports
 module.exports = {resolveChannelID, resolveUserID, resolveRoleID, resolveEmojiID, resolveGuildID};
@@ -96,6 +100,11 @@ function resolveEmojiID(client, emoji) {
     foundEmoji = emoji.id;
   } else if (emoji && !emoji.id && emoji.name) {
     foundEmoji = emoji.name;
+  } else if (emoji && uniEmojiRegex.test(emoji)) {
+    foundEmoji = emoji;
+  } else if (emoji && discordEmojiRegex.test(emoji)) {
+    const emojiSplt = emoji.split(`:`)[2];
+    foundEmoji = emojiSplt.substr(0, emojiSplt.length - 1);
   }
 
   return foundEmoji;

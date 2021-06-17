@@ -1,5 +1,4 @@
 const database = require(`../helpers/database-manager`);
-const collectors = require(`../helpers/collectors`);
 const permissions = require(`../helpers/permissions`);
 
 // Exports
@@ -9,33 +8,38 @@ module.exports = {handle, getHelp};
 const help = {
   text: `Allows developers to delete feedback from the database.`,
   level: `developer`,
+  options: [
+    {
+      name: `entryid`,
+      type: `STRING`,
+      description: `The ID of the entry to remove.`,
+      required: true,
+    },
+  ],
 };
 
 // Exported functions
-function handle(client, msg) {
-  const perm = permissions.checkDev(msg.author.id);
+function handle(client, interaction) {
+  const perm = permissions.checkDev(interaction.user.id);
 
   if (perm) {
-    removeFeedback(msg);
+    removeFeedback(interaction);
+  } else {
+    interaction.reply({content: `You're not a developer.`, ephemeral: true});
   }
 }
 
-async function removeFeedback(msg) {
-  msg.reply(`What is the ID of the entry to remove?`);
-
+async function removeFeedback(interaction) {
   try {
-    const removeID = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
-
-    const result = await database.removeEntry(`Feedback`, {ID: removeID.first().content});
-
+    const result = await database.removeEntry(`Feedback`, {ID: interaction.options.get(`entryid`).value});
     if (result) {
-      msg.reply(`The feedback entry was removed.`);
+      interaction.reply({content: `The feedback entry was removed.`, ephemeral: true});
     } else {
-      msg.reply(`There was an error removing the feedback.`);
+      interaction.reply({content: `No feedback with that ID was found.`, ephemeral: true});
     }
   } catch (err) {
     console.error(err);
-    msg.reply(`Command timed out.`);
+    interaction.reply({content: `There was an error.`, ephemeral: true});
   }
 }
 

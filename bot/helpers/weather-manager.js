@@ -16,8 +16,8 @@ function getWeather() {
 async function setBotStatus(client) {
   if (settings.getAuth().weatherToken || settings.getAuth().weatherToken === `replace me`) {
     await getWeatherData();
-    const status = `for ${settings.getSettings().prefix}help | ${getEmoji(currentData.weather_code.value)} ${Math.round(currentData.temp.value)}°F`;
-    client.user.setPresence({status: `online`, afk: false, activities: [{name: status, type: `WATCHING`}]});
+    const status = `the sky | ${getEmoji(currentData.weather_code.value)} ${Math.round(currentData.temp.value)}°F`;
+    client.user.setPresence({status: `ONLINE`, afk: false, activities: [{name: status, type: `WATCHING`}]});
 
     setTimeout(() => {
       setBotStatus(client);

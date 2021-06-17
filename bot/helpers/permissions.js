@@ -55,7 +55,9 @@ async function getAdmins(guild) {
   admins.push({userID: guild.ownerID});
 
   devs.forEach((dev) => {
-    admins.push({userID: dev});
+    if (dev !== guild.ownerID) {
+      admins.push({userID: dev});
+    }
   });
 
   if (admins && admins.length < 1) {

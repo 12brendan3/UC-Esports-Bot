@@ -2,10 +2,13 @@
 module.exports = {handle, getHelp};
 
 // Help command text
-const help = null;
+const help = {
+  text: `Sends a dabbing emoji in chat.`,
+  level: `user`,
+};
 
 // Exported functions
-function handle(client, msg) {
+function handle(client, interaction) {
   const random = Math.floor(Math.random() * 2);
   let emojiName;
 
@@ -18,13 +21,10 @@ function handle(client, msg) {
   const dabEmoji = client.emojis.cache.find((emoji) => emoji.name === emojiName);
 
   if (dabEmoji && !dabEmoji.deleted) {
-    msg.channel.send(`${dabEmoji}`);
+    interaction.channel.send(`${dabEmoji}`);
+    interaction.reply({content: `Sent!`, ephemeral: true});
   } else {
-    msg.reply(`There was an error running the command.`);
-  }
-
-  if (msg.deletable) {
-    msg.delete();
+    interaction.reply({content: `There was an error running the command.`, ephemeral: true});
   }
 }
 

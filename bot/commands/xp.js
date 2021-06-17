@@ -12,24 +12,24 @@ const help = {
 };
 
 // Exported functions
-async function handle(client, msg) {
+async function handle(client, interaction) {
   try {
-    const result = await database.getEntry(`XP`, {userID: msg.author.id});
+    const result = await database.getEntry(`XP`, {userID: interaction.user.id});
 
     if (result) {
       const embed = new Discord.MessageEmbed();
 
       embed.setColor(`#CC00FF`);
-      embed.setAuthor(msg.author.tag, msg.author.displayAvatarURL());
+      embed.setAuthor(interaction.user.username, interaction.user.displayAvatarURL());
       embed.setTimestamp();
       embed.setDescription(`XP: ${result.XP}`);
 
-      msg.channel.send({embeds: [embed]});
+      interaction.reply({embeds: [embed]});
     } else {
-      msg.reply(`You don't have any XP.`);
+      interaction.reply(`You don't have any XP.`);
     }
   } catch {
-    msg.reply(`There was an error fetching your XP.  Tell the bot devs if the issue persists.`);
+    interaction.reply({content: `There was an error fetching your XP.  Tell the bot devs if the issue persists.`, ephemeral: true});
   }
 }
 

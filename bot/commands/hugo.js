@@ -2,20 +2,20 @@
 module.exports = {handle, getHelp};
 
 // Help command text
-const help = null;
+const help = {
+  text: `Sends the csHUGO emoji in chat.`,
+  level: `user`,
+};
 
 // Exported functions
-function handle(client, msg) {
+function handle(client, interaction) {
   const hugoEmoji = client.emojis.cache.find((emoji) => emoji.name === `csHUGO`);
 
   if (hugoEmoji && !hugoEmoji.deleted) {
-    msg.channel.send(`${hugoEmoji}`);
+    interaction.channel.send(`${hugoEmoji}`);
+    interaction.reply({content: `Sent!`, ephemeral: true});
   } else {
-    msg.reply(`There was an error running the command.`);
-  }
-
-  if (msg.deletable) {
-    msg.delete();
+    interaction.reply({content: `There was an error running the command.`, ephemeral: true});
   }
 }
 

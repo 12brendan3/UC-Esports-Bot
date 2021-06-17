@@ -31,6 +31,7 @@
     "bufferutil": "^4.0.3",
     "cronosjs": "^1.7.1",
     "discord.js": "^13.0.0-dev.02693bc02f45980d8165820a103220f0027b96b7",
+    "emoji-regex": "^9.2.2",
     "erlpack": "github:discord/erlpack",
     "ffmpeg-static": "^4.3.0",
     "node-gyp": "^8.1.0",

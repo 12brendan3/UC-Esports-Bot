@@ -13,7 +13,7 @@ const help = {
 };
 
 // Exported functions
-function handle(client, msg) {
+function handle(client, interaction) {
   const embed = new Discord.MessageEmbed();
 
   embed.setTimestamp();
@@ -27,7 +27,7 @@ function handle(client, msg) {
 
   embed.setFooter(settings.version);
 
-  msg.channel.send({embeds: [embed]});
+  interaction.reply({embeds: [embed]});
 }
 
 function getHelp() {

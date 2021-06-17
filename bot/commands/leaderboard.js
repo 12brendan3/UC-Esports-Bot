@@ -8,16 +8,16 @@ module.exports = {handle, getHelp};
 
 // Help command text
 const help = {
-  text: `Gets the leaderboard of users with the most XP.`,
+  text: `Sends the leaderboard of the top 10 users with the most XP.`,
   level: `user`,
 };
 
 // Exported functions
-function handle(client, msg) {
-  sendLeaderboard(client, msg);
+function handle(client, interaction) {
+  sendLeaderboard(client, interaction);
 }
 
-async function sendLeaderboard(client, msg) {
+async function sendLeaderboard(client, interaction) {
   const embed = new Discord.MessageEmbed();
 
   embed.setColor(`#CC00FF`);
@@ -28,7 +28,7 @@ async function sendLeaderboard(client, msg) {
 
   embed.addField(`Leaderboard - Top 10`, list);
 
-  msg.channel.send({embeds: [embed]});
+  interaction.reply({embeds: [embed]});
 }
 
 async function getUserList(client) {

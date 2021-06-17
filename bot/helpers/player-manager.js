@@ -26,44 +26,44 @@ function prepKey() {
   console.info(`YouTube API key set.`);
 }
 
-function checkUser(msg, type) {
-  if (msg.guild === null) {
-    msg.reply(`This command only works in a server.`);
+function checkUser(interaction, type) {
+  if (interaction.guild === null) {
+    interaction.reply({content: `This command only works in a server.`, ephemeral: true});
     return;
   }
 
-  if (!msg.member.voice.channel) {
-    msg.reply(`You need to be connected to a voice channel.`);
+  if (!interaction.member.voice.channel) {
+    interaction.reply({content: `You need to be connected to a voice channel.`, ephemeral: true});
     return;
   }
 
-  const player = players.get(msg.guild.id);
+  const player = players.get(interaction.guild.id);
 
-  if (player && player.voiceChannel.id !== msg.member.voice.channel.id) {
-    msg.reply(`You need to be connected to the active voice channel.`);
+  if (player && player.voiceChannel.id !== interaction.member.voice.channel.id) {
+    interaction.reply({content: `You need to be connected to the active voice channel.`, ephemeral: true});
     return;
   }
 
   if (!player && type !== `play`) {
-    msg.reply(`There is no active queue.`);
+    interaction.reply({content: `There is no active queue.`, ephemeral: true});
     return;
   }
 
   switch (type) {
     case `play`:
-      play(msg);
+      play(interaction);
       break;
     case `pause`:
-      pause(msg);
+      pause(interaction);
       break;
     case `skip`:
-      skip(msg.guild.id);
+      skip(interaction.guild.id);
       break;
     case `volume`:
-      changeVolume(msg);
+      changeVolume(interaction);
       break;
     case `leave`:
-      stopPlaying(msg.guild.id);
+      stopPlaying(interaction.guild.id);
       break;
     default:
       console.error(`If you're seeing this, you incorrectly interacted with the music manager.`);
@@ -71,16 +71,16 @@ function checkUser(msg, type) {
   }
 }
 
-function play(msg) {
-  if (msg.content.length > settings.getSettings().prefix.length + 4) {
-    checkYT(msg);
+function play(interaction) {
+  if (interaction.options.has(`ytsearch`)) {
+    checkYT(interaction);
   } else {
-    resume(msg);
+    resume(interaction);
   }
 }
 
-async function checkYT(msg) {
-  const video = msg.content.substr(settings.getSettings().prefix.length + 5);
+async function checkYT(interaction) {
+  const video = interaction.options.get(`ytsearch`).value;
   if (regexYT.test(video)) {
     try {
       const videoInfo = await ytdl.getInfo(video);
@@ -89,25 +89,25 @@ async function checkYT(msg) {
         title: videoInfo.videoDetails.title,
         url: videoInfo.videoDetails.video_url,
       };
-      addToQueue(msg, newItem);
+      addToQueue(interaction, newItem);
     } catch {
-      msg.reply(`Failed to fetch video information.  Please make sure the video URL/ID is valid and public.`);
+      interaction.reply(`Failed to fetch video information.  Please make sure the video URL/ID is valid and public.`);
     }
   } else {
-    searchYT(msg, video);
+    searchYT(interaction, video);
   }
 }
 
-function pause(msg) {
-  const player = players.get(msg.guild.id);
+function pause(interaction) {
+  const player = players.get(interaction.guildID);
   player.connection.dispatcher.pause(true);
-  msg.reply(`Audio has been paused.`);
+  interaction.reply(`Audio has been paused.`);
 }
 
-function resume(msg) {
-  const player = players.get(msg.guild.id);
+function resume(interaction) {
+  const player = players.get(interaction.guildID);
   player.connection.dispatcher.resume();
-  msg.reply(`Audio has been resumed.`);
+  interaction.reply(`Audio has been resumed.`);
 }
 
 function skip(guildID) {
@@ -115,33 +115,23 @@ function skip(guildID) {
   player.connection.dispatcher.end();
 }
 
-function changeVolume(msg) {
-  if (msg.content.length < settings.getSettings().prefix.length + 7) {
-    msg.reply(`Please include the new volume on a scale of 1 to 100.`);
-    return;
-  }
-
-  const volume = parseFloat(msg.content.substr(settings.getSettings().prefix.length + 7)) / 100;
-
-  if (isNaN(volume)) {
-    msg.reply(`That's not a number...`);
-  } else {
-    const player = players.get(msg.guild.id);
-    player.volume = volume;
-    player.connection.dispatcher.setVolumeLogarithmic(volume);
-    msg.reply(`Changed the volume to ${volume * 100}%.`);
-  }
+function changeVolume(interaction) {
+  const volume = parseInt(interaction.options.get(`volume`).value);
+  const player = players.get(interaction.guildID);
+  player.volume = volume / 100;
+  player.connection.dispatcher.setVolumeLogarithmic(volume);
+  interaction.reply(`Changed the volume to ${volume}%.`);
 }
 
-async function addToQueue(msg, newItem) {
-  const player = players.get(msg.guild.id);
+async function addToQueue(interaction, newItem) {
+  const player = players.get(interaction.guildID);
   if (player) {
     player.queue.push(newItem);
-    msg.reply(`Added to queue.`);
+    interaction.reply(`Added to queue.`);
   } else {
-    const connection = await msg.member.voice.channel.join();
-    players.set(msg.guild.id, {textChannel: msg.channel, voiceChannel: msg.member.voice.channel, queue: [newItem], volume: 0.35, connection, paused: false});
-    playNext(msg.guild.id);
+    const connection = await interaction.member.voice.channel.join();
+    players.set(interaction.guildID, {textChannel: interaction.channel, voiceChannel: interaction.member.voice.channel, queue: [newItem], volume: 0.35, connection, paused: false});
+    playNext(interaction.guildID);
   }
 }
 
@@ -179,11 +169,11 @@ function checkChannel(newState) {
   }
 }
 
-function searchYT(msg, search) {
+function searchYT(interaction, search) {
   if (ytSearchOpts.key) {
     ytsearch(search, ytSearchOpts, (err, results) => {
       if (err) {
-        msg.reply(`Failed to search YouTube.`);
+        interaction.reply(`Failed to search YouTube.`);
         console.error(err);
       } else {
         const newItem = {
@@ -191,10 +181,10 @@ function searchYT(msg, search) {
           title: results[0].title,
           url: results[0].id,
         };
-        addToQueue(msg, newItem);
+        addToQueue(interaction, newItem);
       }
     });
   } else {
-    msg.reply(`YouTube search is currently disabled.`);
+    interaction.reply(`YouTube search is currently disabled.`);
   }
 }

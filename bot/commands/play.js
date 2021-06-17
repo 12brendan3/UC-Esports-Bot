@@ -11,8 +11,8 @@ const help = {
 };
 
 // Exported functions
-function handle(client, msg) {
-  playerManager.checkUser(msg, `play`);
+function handle(client, interaction) {
+  playerManager.checkUser(interaction, `play`);
 }
 
 function getHelp() {

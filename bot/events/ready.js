@@ -3,7 +3,7 @@ const taskManger = require(`../helpers/task-manager`);
 const modules = require(`../helpers/module-manager`);
 
 // Exports
-module.exports = {handle};
+module.exports = {handle, registerSlashCommands};
 
 // Exported Function
 async function handle(client) {

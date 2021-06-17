@@ -1,18 +1,20 @@
 const settings = require(`../helpers/settings-manager`);
 const ytdl = require(`ytdl-core`);
 const ytsearch = require(`youtube-search`);
+const voice = require(`@discordjs/voice`);
 
 // Exports
 module.exports = {checkUser, checkChannel, prepKey};
 
 // Regex
-const regexYT = RegExp(`(^(https?\\:\\/\\/)?(www\\.youtube\\.com|youtu\\.be)\\/(watch\\?v=.{11}|.{11})$)|(^.{11}$)`);
+const regexYT = RegExp(`(^(https?\\:\\/\\/)?(www\\.youtube\\.com|youtu\\.be)\\/(watch\\?v=.{11}|.{11})$)`);
 
 // Vars
 const players = new Map();
 const ytSearchOpts = {
   maxResults: 1,
   key: null,
+  type: `video`,
 };
 
 function prepKey() {
@@ -57,7 +59,7 @@ function checkUser(interaction, type) {
       pause(interaction);
       break;
     case `skip`:
-      skip(interaction.guild.id);
+      skip(interaction);
       break;
     case `volume`:
       changeVolume(interaction);
@@ -80,6 +82,7 @@ function play(interaction) {
 }
 
 async function checkYT(interaction) {
+  interaction.reply(`One moment....`);
   const video = interaction.options.get(`ytsearch`).value;
   if (regexYT.test(video)) {
     try {
@@ -100,26 +103,27 @@ async function checkYT(interaction) {
 
 function pause(interaction) {
   const player = players.get(interaction.guildID);
-  player.connection.dispatcher.pause(true);
+  player.audioPlayer.pause();
   interaction.reply(`Audio has been paused.`);
 }
 
 function resume(interaction) {
   const player = players.get(interaction.guildID);
-  player.connection.dispatcher.resume();
+  player.audioPlayer.unpause();
   interaction.reply(`Audio has been resumed.`);
 }
 
-function skip(guildID) {
-  const player = players.get(guildID);
-  player.connection.dispatcher.end();
+function skip(interaction) {
+  const player = players.get(interaction.guildID);
+  player.audioPlayer.stop();
+  interaction.reply(`Skipped!`);
 }
 
 function changeVolume(interaction) {
   const volume = parseInt(interaction.options.get(`volume`).value);
   const player = players.get(interaction.guildID);
   player.volume = volume / 100;
-  player.connection.dispatcher.setVolumeLogarithmic(volume);
+  player.resource.volume.setVolumeLogarithmic(player.volume);
   interaction.reply(`Changed the volume to ${volume}%.`);
 }
 
@@ -127,43 +131,50 @@ async function addToQueue(interaction, newItem) {
   const player = players.get(interaction.guildID);
   if (player) {
     player.queue.push(newItem);
-    interaction.reply(`Added to queue.`);
+    interaction.editReply(`Added to queue: ${newItem.title}`);
   } else {
-    const connection = await interaction.member.voice.channel.join();
-    players.set(interaction.guildID, {textChannel: interaction.channel, voiceChannel: interaction.member.voice.channel, queue: [newItem], volume: 0.35, connection, paused: false});
+    const connectionplayer = prepConnection(interaction);
+    players.set(interaction.guildID, {textChannel: interaction.channel, voiceChannel: interaction.member.voice.channel, queue: [`filler`, newItem], volume: 0.35, connection: connectionplayer.voiceConnection, audioPlayer: connectionplayer.audioPlayer, resource: null, killed: false});
     playNext(interaction.guildID);
   }
 }
 
 function playNext(guildID) {
   const player = players.get(guildID);
+  player.queue.shift();
 
   if (player.queue.length > 0) {
-    const dispatcher = player.connection.play(ytdl(player.queue[0].url, {quality: `highestaudio`, highWaterMark: 1}), {bitrate: `auto`, highWaterMark: 1}).on(`finish`, () => {
-      player.queue.shift();
-      playNext(guildID);
-    }).on(`error`, (err) => {
-      console.error(err);
+    const resource = voice.createAudioResource(ytdl(player.queue[0].url, {quality: `highestaudio`, highWaterMark: 1 << 25}), {
+      inputType: voice.StreamType.Arbitrary,
+      inlineVolume: true,
     });
-
-    dispatcher.setVolumeLogarithmic(player.volume);
+    resource.volume.setVolumeLogarithmic(player.volume);
+    player.resource = resource;
+    player.audioPlayer.play(resource);
     player.textChannel.send(`Now playing ${player.queue[0].title}.`);
   } else {
+    if (player.killed) {
+      return;
+    }
+
     player.textChannel.send(`End of queue, disconnecting.`);
-    player.connection.disconnect();
-    players.delete(guildID);
+    stopPlaying(guildID);
   }
 }
 
 function stopPlaying(guildID) {
   const player = players.get(guildID);
-  player.connection.disconnect();
-  players.delete(guildID);
+  if (player && !player.killed) {
+    player.killed = true;
+    player.audioPlayer.stop(true);
+    player.connection.destroy();
+    players.delete(guildID);
+  }
 }
 
 function checkChannel(newState) {
   const player = players.get(newState.guild.id);
-  if (player && player.voiceChannel.id === newState.channel.id && newState.channel.members.size < 2) {
+  if (player && player.voiceChannel.members.size < 2) {
     player.textChannel.send(`Everyone left voice chat, disconnecting.`);
     stopPlaying(newState.guild.id);
   }
@@ -187,4 +198,53 @@ function searchYT(interaction, search) {
   } else {
     interaction.reply(`YouTube search is currently disabled.`);
   }
+}
+
+function prepConnection(interaction) {
+  const voiceConnection = voice.joinVoiceChannel({channelId: interaction.member.voice.channel.id, guildId: interaction.guildID, adapterCreator: interaction.guild.voiceAdapterCreator});
+
+  voiceConnection.on(`stateChange`, async (_, newState) => {
+    if (newState.status === voice.VoiceConnectionStatus.Disconnected) {
+      if (newState.reason === voice.VoiceConnectionDisconnectReason.WebSocketClose && newState.closeCode === 4014) {
+        try {
+          await voice.entersState(voiceConnection, voice.VoiceConnectionStatus.Connecting, 5000);
+        } catch {
+          stopPlaying(interaction.guildID);
+        }
+      } else if (voiceConnection.rejoinAttempts < 5) {
+        await wait((voiceConnection.rejoinAttempts + 1) * 5000);
+        voiceConnection.rejoin();
+      } else {
+        stopPlaying(interaction.guildID);
+      }
+    } else if (newState.status === voice.VoiceConnectionStatus.Destroyed) {
+      stopPlaying(interaction.guildID);
+    } else if (newState.status === voice.VoiceConnectionStatus.Connecting || newState.status === voice.VoiceConnectionStatus.Signalling) {
+      try {
+        await voice.entersState(voiceConnection, voice.VoiceConnectionStatus.Ready, 20000);
+      } catch {
+        if (voiceConnection.state.status !== voice.VoiceConnectionStatus.Destroyed) {
+          stopPlaying(interaction.guildID);
+        }
+      }
+    }
+  });
+
+  const audioPlayer = voice.createAudioPlayer();
+
+  audioPlayer.on(`stateChange`, (oldState, newState) => {
+    if (newState.status === voice.AudioPlayerStatus.Idle && oldState.status !== voice.AudioPlayerStatus.Idle) {
+      playNext(interaction.guildID);
+    }
+  });
+
+  audioPlayer.on(`error`, (error) => console.error(error));
+
+  voiceConnection.subscribe(audioPlayer);
+
+  return {audioPlayer, voiceConnection};
+}
+
+function wait(time) {
+  return new Promise((resolve) => setTimeout(resolve, time).unref());
 }

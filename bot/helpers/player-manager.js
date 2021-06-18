@@ -66,6 +66,7 @@ function checkUser(interaction, type) {
       break;
     case `leave`:
       stopPlaying(interaction.guild.id);
+      interaction.reply(`Disconnected and cleared the queue.`);
       break;
     default:
       console.error(`If you're seeing this, you incorrectly interacted with the music manager.`);
@@ -135,6 +136,7 @@ async function addToQueue(interaction, newItem) {
   } else {
     const connectionplayer = prepConnection(interaction);
     players.set(interaction.guildID, {textChannel: interaction.channel, voiceChannel: interaction.member.voice.channel, queue: [`filler`, newItem], volume: 0.35, connection: connectionplayer.voiceConnection, audioPlayer: connectionplayer.audioPlayer, resource: null, killed: false});
+    interaction.editReply(`Connected to voice.`);
     playNext(interaction.guildID);
   }
 }

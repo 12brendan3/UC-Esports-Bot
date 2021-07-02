@@ -123,6 +123,14 @@ const Guilds = sequelize.define(`Guilds`, {
     type: Sequelize.STRING,
     allowNull: true,
   },
+  reportChannelID: {
+    type: Sequelize.STRING,
+    allowNull: true,
+  },
+  reportRoleID: {
+    type: Sequelize.STRING,
+    allowNull: true,
+  },
 });
 
 const ServerAdmins = sequelize.define(`ServerAdmins`, {
@@ -220,14 +228,46 @@ const RoleCategories = sequelize.define(`RoleCategories`, {
   },
 });
 
+const Tasks = sequelize.define(`Tasks`, {
+  ID: {
+    type: Sequelize.UUIDV4,
+    defaultValue: Sequelize.UUIDV4,
+    unique: true,
+    primaryKey: true,
+    allowNull: false,
+  },
+  guildID: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  channelID: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  cronString: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  taskMessage: {
+    type: Sequelize.STRING,
+    allowNull: true,
+  },
+  taskFile: {
+    type: Sequelize.STRING,
+    allowNull: true,
+  },
+});
+
 // Make object containing tables
-const tables = {Bearcats, XP, Starboard, Guilds, ServerAdmins, Feedback, Roles, RoleCategories};
+const tables = {Bearcats, XP, Starboard, Guilds, ServerAdmins, Feedback, Roles, RoleCategories, Tasks};
 
 // Exports
 module.exports = {syncTables, createEntry, getEntry, getOrCreateEntry, updateEntry, updateOrCreateEntry, removeEntry, getAllEntries};
 
 // Exported Functions
 async function syncTables() {
+  console.info(`Syncing database tables...`);
+  // Add "{alter: true}" to a sync to migrate the table to a newer version - it's usually really slow so it's not kept set by default
   await Promise.all([
     Bearcats.sync(),
     XP.sync(),
@@ -237,6 +277,7 @@ async function syncTables() {
     Feedback.sync(),
     Roles.sync(),
     RoleCategories.sync(),
+    Tasks.sync(),
   ]);
   console.info(`Database tables synced.`);
 }

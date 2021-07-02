@@ -24,7 +24,7 @@ async function setBotStatus(client) {
       setBotStatus(client);
     }, 600000);
   } else {
-    console.error(`No weather token found, please edit the "settings.json" file in the storage folder.\nYou can then type "restart" and then press enter.\nTo exit, type "exit" and then press enter.`);
+    console.error(`No weather token found, please edit the "auth.json" file in the storage folder.\nYou can then type "restart" and then press enter.\nTo exit, type "exit" and then press enter.`);
   }
 }
 

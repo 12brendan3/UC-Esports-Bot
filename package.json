@@ -24,22 +24,25 @@
   },
   "homepage": "https://github.com/12brendan3/UC-Esports-Bot#readme",
   "dependencies": {
-    "@discordjs/opus": "^0.3.3",
+    "@discordjs/opus": "^0.5.0",
     "axios": "^0.21.1",
     "bad-words": "^3.0.4",
     "bufferutil": "^4.0.3",
-    "discord.js": "^12.5.1",
+    "cronosjs": "^1.7.1",
+    "discord.js": "^12.5.3",
     "erlpack": "^0.1.3",
-    "libsodium-wrappers": "^0.7.8",
-    "nodemailer": "^6.4.17",
-    "sequelize": "^6.4.0",
-    "sqlite3": "^5.0.1",
-    "utf-8-validate": "^5.0.4",
+    "libsodium-wrappers": "^0.7.9",
+    "nodemailer": "^6.6.0",
+    "sequelize": "^6.6.2",
+    "sqlite3": "^5.0.2",
+    "utf-8-validate": "^5.0.5",
+    "youtube-search": "^1.1.6",
+    "ytdl-core": "^4.8.0",
     "zlib-sync": "^0.1.7"
   },
   "devDependencies": {
-    "@shopify/eslint-plugin": "^39.0.4",
-    "eslint": "^7.18.0"
+    "@shopify/eslint-plugin": "^40.2.3",
+    "eslint": "^7.27.0"
   },
   "eslintConfig": {
     "extends": [

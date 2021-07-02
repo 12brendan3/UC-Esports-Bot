@@ -6,6 +6,9 @@ const WordFilter = require('bad-words');
 
 const filter = new WordFilter();
 
+const xpWhitelist = new Set([`313455932896182283`, `772589330710659083`, `403356697327828995`]);
+const profaneWhitelist = new Set([`772589330710659083`]);
+
 // Exports
 module.exports = {handle};
 
@@ -13,18 +16,19 @@ module.exports = {handle};
 function handle(client, msg) {
   if (!msg.author.bot && msg.content.startsWith(settings.getSettings().prefix)) {
     handleCommand(client, msg);
-  } else if (!msg.author.bot) {
+  } else if (!msg.author.bot && msg.channel.type !== `dm`) {
     awardXP(msg);
   }
 
-  if (msg.guild && msg.guild.id === `772589330710659083` && filter.isProfane(msg.content) && msg.deletable) {
-    msg.delete();
-  }
+  checkProfane(msg);
 }
 
-// Private function
+// Private functions
 function handleCommand(client, msg) {
-  console.info(`${msg.channel.name ? `#${msg.channel.name}` : `via DM`} <${msg.author.username}> ${msg.content}`);
+  // Ignore report command to keep it as anonymous as possible
+  if (!msg.content.startsWith(`${settings.getSettings().prefix}ticket`)) {
+    console.info(`${msg.guild === null ? `Via DM` : `#${msg.channel.name}`} <${msg.author.username}> ${msg.content}`);
+  }
 
   let command = msg.content.substr(settings.getSettings().prefix.length);
 
@@ -42,12 +46,16 @@ function handleCommand(client, msg) {
 }
 
 async function awardXP(msg) {
+  if (!xpWhitelist.has(msg.guild.id)) {
+    return;
+  }
+
   const result = await database.getEntry(`XP`, {userID: msg.author.id});
 
   const time = Date.now();
 
   if ((result && result.lastXP + 60000 <= time) || !result) {
-    let newXP = rollXP();
+    let newXP = Math.ceil(Math.random() * 5);
 
     if (result && result.XP) {
       newXP = result.XP + newXP;
@@ -57,6 +65,12 @@ async function awardXP(msg) {
   }
 }
 
-function rollXP() {
-  return Math.ceil(Math.random() * 5);
+function checkProfane(msg) {
+  if (!msg.guild || !profaneWhitelist.has(msg.guild.id)) {
+    return;
+  }
+
+  if (filter.isProfane(msg.content) && msg.deletable) {
+    msg.delete();
+  }
 }

@@ -29,13 +29,13 @@ async function removeFeedback(msg) {
     const result = await database.removeEntry(`Feedback`, {ID: removeID.first().content});
 
     if (result) {
-      msg.reply(`the feedback entry was removed.`);
+      msg.reply(`The feedback entry was removed.`);
     } else {
-      msg.reply(`there was an error removing the feedback.`);
+      msg.reply(`There was an error removing the feedback.`);
     }
   } catch (err) {
     console.error(err);
-    msg.reply(`command timed out.`);
+    msg.reply(`Command timed out.`);
   }
 }
 

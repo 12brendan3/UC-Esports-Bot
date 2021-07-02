@@ -205,6 +205,14 @@ async function loadNewDB() {
         type: Sequelize.STRING,
         allowNull: true,
       },
+      reportChannelID: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      reportRoleID: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
     });
 
     const ServerAdmins = sequelize.define(`ServerAdmins`, {

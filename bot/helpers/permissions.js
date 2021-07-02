@@ -5,25 +5,25 @@ const database = require(`../helpers/database-manager`);
 module.exports = {checkAdmin, addAdmin, removeAdmin, getAdmins, checkDev};
 
 // Devs are hard-coded
-const devs = [`145730448105013248`, `151079705917915136`];
+const devs = new Set([`145730448105013248`, `151079705917915136`]);
 
 // Exported Function
-async function checkAdmin(guildID, userID) {
-  const adminCheck = await database.getEntry(`ServerAdmins`, {guildID, userID});
-  if (adminCheck || devs.includes(userID)) {
+async function checkAdmin(guild, userID) {
+  const adminCheck = await database.getEntry(`ServerAdmins`, {guildID: guild.id, userID});
+  if (adminCheck || devs.has(userID) || guild.ownerID === userID) {
     return true;
   } else {
     return false;
   }
 }
 
-async function addAdmin(guildID, userID) {
-  const adminCheck = await database.getEntry(`ServerAdmins`, {guildID, userID});
+async function addAdmin(guild, userID) {
+  const adminCheck = await database.getEntry(`ServerAdmins`, {guildID: guild.id, userID});
 
-  if (adminCheck) {
+  if (adminCheck || guild.ownerID === userID || devs.has(userID)) {
     return `duplicate`;
   } else {
-    const result = await database.createEntry(`ServerAdmins`, {guildID, userID});
+    const result = await database.createEntry(`ServerAdmins`, {guildID: guild.id, userID});
 
     if (result) {
       return true;
@@ -49,8 +49,14 @@ async function removeAdmin(guildID, userID) {
   }
 }
 
-async function getAdmins(guildID) {
-  const admins = await database.getAllEntries(`ServerAdmins`, {guildID});
+async function getAdmins(guild) {
+  const admins = await database.getAllEntries(`ServerAdmins`, {guildID: guild.id});
+
+  admins.push({userID: guild.ownerID});
+
+  devs.forEach((dev) => {
+    admins.push({userID: dev});
+  });
 
   if (admins && admins.length < 1) {
     return `noadmins`;
@@ -62,7 +68,7 @@ async function getAdmins(guildID) {
 }
 
 function checkDev(userID) {
-  if (devs.includes(userID)) {
+  if (devs.has(userID)) {
     return true;
   } else {
     return false;

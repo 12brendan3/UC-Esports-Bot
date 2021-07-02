@@ -19,9 +19,9 @@ async function handle(client, msg) {
   }
 
   try {
-    const isAdmin = await permissions.checkAdmin(msg.guild.id, msg.author.id);
-    if (isAdmin || msg.author.id === msg.guild.id) {
-      await msg.reply(`Crunching numbers now....`);
+    const isAdmin = await permissions.checkAdmin(msg.guild, msg.author.id);
+    if (isAdmin) {
+      await msg.reply(`Crunching numbers now...`);
       const embed = new Discord.MessageEmbed();
 
       embed.setColor(`#00EDCD`);
@@ -65,11 +65,10 @@ async function handle(client, msg) {
 
       msg.channel.send(embed);
     } else {
-      msg.reply(`you're not an admin on this server.`);
+      msg.reply(`You're not an admin on this server.`);
     }
-  } catch (err) {
-    console.log(err);
-    msg.reply(`command timed out, please try again.`);
+  } catch {
+    msg.reply(`Command timed out, please try again.`);
   }
 }
 

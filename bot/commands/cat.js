@@ -9,7 +9,7 @@ function handle(client, msg) {
   try {
     msg.channel.send({files: [{attachment: `https://cataas.com/c`, name: `cat.jpeg`}]});
   } catch (err) {
-    msg.reply(`there was an error running the command.`);
+    msg.reply(`There was an error running the command.`);
     console.error(err);
   }
 

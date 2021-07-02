@@ -5,8 +5,8 @@ const resolvers = require(`../helpers/resolvers`);
 
 const Discord = require(`discord.js`);
 
-// Reactions to detect, in order: ⭐🌟
-const detectedReactions = [`%E2%AD%90`, `%F0%9F%8C%9F`];
+// Starboard reactions to detect in order: ⭐🌟
+const detectedStarboardReactions = [`%E2%AD%90`, `%F0%9F%8C%9F`];
 
 // Regex
 const regexImage = RegExp(`^.+(\\.(jpe?g|png|gif|bmp))$`);
@@ -29,6 +29,8 @@ async function handle(client, reaction, user) {
   detectStarboard(guildSettings, reaction, user);
 
   detectRoleReaction(client, guildSettings, reaction, user);
+
+  detectFlagReaction(guildSettings, reaction, user);
 }
 
 async function detectRoleReaction(client, guildSettings, reaction, user) {
@@ -71,19 +73,63 @@ async function detectRoleReaction(client, guildSettings, reaction, user) {
   }
 }
 
-async function detectStarboard(guildSettings, reaction, user) {
-  if (!detectedReactions.includes(reaction.emoji.identifier) || !guildSettings || !guildSettings.starboardChannelID || reaction.message.channel.id === guildSettings.starboardChannelID || !reaction.message.guild.channels.cache.get(guildSettings.starboardChannelID) || !guildSettings.starboardThreshold) {
+function detectFlagReaction(guildSettings, reaction, user) {
+  // Detects 🚩
+  if (reaction.emoji.identifier !== `%F0%9F%9A%A9` || reaction.count > 1) {
     return;
   }
 
-  if (reaction.emoji.identifier === detectedReactions[0]) {
+  if (!guildSettings || !guildSettings.reportChannelID || (!guildSettings.starboardChannelID && reaction.message.channel.id === guildSettings.starboardChannelID) || (!guildSettings.rolesChannelID && reaction.message.channel.id === guildSettings.rolesChannelID)) {
+    return;
+  }
+
+  reaction.remove();
+
+  const newEmbed = generateReportEmbed(reaction.message, user);
+
+  const repChannel = reaction.message.guild.channels.cache.get(guildSettings.reportChannelID);
+
+  if (guildSettings.reportRoleID) {
+    repChannel.send(`<@&${guildSettings.reportRoleID}>`, newEmbed);
+  } else {
+    repChannel.send(newEmbed);
+  }
+
+  user.send(`Message has been flagged for review by admins.`);
+}
+
+function generateReportEmbed(msg, user) {
+  const embed = new Discord.MessageEmbed();
+
+  embed.setDescription(`A message has been flagged.`);
+  embed.setColor(`#FF0000`);
+  embed.setAuthor(msg.author.tag, msg.author.displayAvatarURL());
+  if (msg.content) {
+    embed.addField(`Message`, msg.content.length > 1000 ? msg.content.substr(0, 1000) : msg.content);
+    if (msg.content.length > 1000) {
+      embed.addField(`*** ***`, msg.content.substr(1000, msg.content.length));
+    }
+  }
+  embed.addField(`Message Link`, `[View Message](${msg.url})`);
+  embed.setFooter(user.tag, user.displayAvatarURL());
+  embed.setTimestamp();
+
+  return embed;
+}
+
+async function detectStarboard(guildSettings, reaction, user) {
+  if (!detectedStarboardReactions.includes(reaction.emoji.identifier) || !guildSettings || !guildSettings.starboardChannelID || reaction.message.channel.id === guildSettings.starboardChannelID || !reaction.message.guild.channels.cache.get(guildSettings.starboardChannelID) || !guildSettings.starboardThreshold) {
+    return;
+  }
+
+  if (reaction.emoji.identifier === detectedStarboardReactions[0]) {
     const exists = await database.getEntry(`Starboard`, {guildID: reaction.message.guild.id, channelID: reaction.message.channel.id, originalMessageID: reaction.message.id});
     checkMessage(reaction, guildSettings, exists, false);
-  } else if (reaction.emoji.identifier === detectedReactions[1]) {
+  } else if (reaction.emoji.identifier === detectedStarboardReactions[1]) {
     const exists = await database.getEntry(`Starboard`, {guildID: reaction.message.guild.id, channelID: reaction.message.channel.id, originalMessageID: reaction.message.id});
-    const admin = await permissions.checkAdmin(reaction.message.guild.id, user.id);
+    const admin = await permissions.checkAdmin(reaction.message.guild, user.id);
 
-    if (exists || admin || reaction.message.guild.ownerID === user.id) {
+    if (exists || admin) {
       checkMessage(reaction, guildSettings, exists, true);
     }
   }
@@ -126,7 +172,7 @@ function buildEmbed(reaction) {
 
   let description = ``;
   reaction.message.reactions.cache.each((rxn) => {
-    if (rxn.emoji.identifier === detectedReactions[1] || rxn.emoji.identifier === detectedReactions[0]) {
+    if (rxn.emoji.identifier === detectedStarboardReactions[1] || rxn.emoji.identifier === detectedStarboardReactions[0]) {
       description += `    ${rxn.emoji} ${rxn.count}`;
     }
   });
@@ -152,11 +198,11 @@ function buildEmbed(reaction) {
   if (reaction.message.content) {
     embed.addField(`Message`, reaction.message.content.length > 1000 ? reaction.message.content.substr(0, 1000) : reaction.message.content);
     if (reaction.message.content.length > 1000) {
-      embed.addField(`Message Continued`, reaction.message.content.substr(1000, reaction.message.content.length));
+      embed.addField(`*** ***`, reaction.message.content.substr(1000, reaction.message.content.length));
     }
   }
 
-  embed.addField(`Message Link`, `[Jump to Message](${reaction.message.url})`);
+  embed.addField(`Message Link`, `[View Message](${reaction.message.url})`);
 
   embed.setTimestamp(reaction.message.createdTimestamp);
 

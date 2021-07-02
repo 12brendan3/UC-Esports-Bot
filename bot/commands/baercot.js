@@ -6,11 +6,12 @@ const help = null;
 
 // Exported functions
 function handle(client, msg) {
-  try {
-    msg.channel.send({files: [{attachment: `https://cataas.com/c/g`, name: `cat.gif`}]});
-  } catch (err) {
+  const baercotEmoji = client.emojis.cache.find((emoji) => emoji.name === `baercot`);
+
+  if (baercotEmoji && !baercotEmoji.deleted) {
+    msg.channel.send(`${baercotEmoji}`);
+  } else {
     msg.reply(`There was an error running the command.`);
-    console.error(err);
   }
 
   if (msg.deletable) {

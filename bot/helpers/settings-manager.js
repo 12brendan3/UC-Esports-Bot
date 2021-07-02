@@ -1,8 +1,8 @@
 const fs = require(`fs`);
 
-const authTemplate = {botToken: `replace me`, weatherToken: `replace me`};
+const authTemplate = {botToken: `replace me`, weatherToken: `replace me`, ytKey: `replace me`, gmailUN: `replace me`, gmailPW: `replace me`};
 const settingsTemplate = {prefix: `bc!`, weatherLatitude: 39.132920, weatherLongitude: -84.514952};
-const version = `v1.0.2`;
+const version = `v1.0.5`;
 
 let auth = {};
 let settings = {};
@@ -51,6 +51,10 @@ function loadSettings() {
     }
 
     fs.writeFileSync(`./storage/settings.json`, JSON.stringify(settingsTemplate, null, 2));
+  }
+
+  if (!fs.existsSync(`./storage/task-files`)) {
+    fs.mkdirSync(`./storage/task-files`);
   }
 }
 

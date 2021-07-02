@@ -25,7 +25,7 @@ function handle(client, msg) {
     if (option.length > 1) {
       testSettings(msg, option[1]);
     } else {
-      msg.reply(`please provide a setting to test.\n${options}`);
+      msg.reply(`Please provide a setting to test.\n${options}`);
     }
   }
 }
@@ -59,7 +59,7 @@ async function testWelcomeMessage(msg) {
     const welcomeMessage = guildSettings.welcomeMessage.replace(`!!newuser!!`, `${msg.member}`);
     msg.channel.send(welcomeMessage);
   } else {
-    msg.reply(`there is no welcome message set up for this guild!`);
+    msg.reply(`There is no welcome message set up for this guild!`);
   }
 }
 
@@ -71,9 +71,9 @@ async function testWelcomeChannel(msg) {
     const welcomeChannel = msg.guild.channels.cache.get(guildSettings.welcomeChannelID);
     welcomeChannel.send(welcomeMessage);
   } else if (guildSettings && guildSettings.welcomeChannelID) {
-    msg.reply(`there is no welcome message set up for this guild!`);
+    msg.reply(`There is no welcome message set up for this guild!`);
   } else {
-    msg.reply(`there is no welcome channel set up for this guild!`);
+    msg.reply(`There is no welcome channel set up for this guild!`);
   }
 }
 
@@ -88,12 +88,12 @@ async function testLogsChannel(msg) {
     embed.setAuthor(msg.member.displayName, msg.author.displayAvatarURL());
     embed.setDescription(`Message was sent by ${msg.author} in ${msg.channel} to test the logs channel.`);
     embed.addField(`Message Content`, `${msg.content}`);
-    embed.addField(`Message Link`, `[Jump to Message](${msg.url})`);
+    embed.addField(`Message Link`, `[View Message](${msg.url})`);
     embed.setTimestamp();
     embed.setFooter(`${msg.author.tag}`);
 
     logsChannel.send(embed);
   } else {
-    msg.reply(`there is no logs channel set up for this guild!`);
+    msg.reply(`There is no logs channel set up for this guild!`);
   }
 }

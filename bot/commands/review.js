@@ -39,7 +39,7 @@ async function sendFeedback(client, msg) {
           user = result[i].userID;
         }
 
-        const link = result[i].messageURL === `Sent via DM` ? `Sent via DM` : `[Jump to Message](${result[i].messageURL})`;
+        const link = result[i].messageURL === `Sent via DM` ? `Sent via DM` : `[View Message](${result[i].messageURL})`;
 
         embed.setColor(`#CC00FF`);
         embed.setAuthor(user, displayURL);
@@ -57,11 +57,11 @@ async function sendFeedback(client, msg) {
         msg.channel.send(embed);
       }
     } else {
-      msg.reply(`there is no feedback.`);
+      msg.reply(`There is no feedback.`);
     }
   } catch (err) {
     console.error(err);
-    msg.reply(`there was an error?`);
+    msg.reply(`There was an error?`);
   }
 }
 

@@ -12,7 +12,7 @@ const help = {
 
 // Exported functions
 async function handle(client, msg) {
-  msg.reply(`thanks for helping improve the bot, send your feedback now (the next message you send will be your message to us).`);
+  msg.reply(`Thanks for helping improve the bot, send your feedback now (the next message you send will be your message to us).`);
 
   try {
     const collected = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
@@ -24,15 +24,15 @@ async function handle(client, msg) {
       const result = await database.createEntry(`Feedback`, {userID: message.author.id, messageURL, message: message.content, time: message.createdTimestamp});
 
       if (result) {
-        msg.reply(`your feedback has been recorded!`);
+        msg.reply(`Your feedback has been recorded!`);
       } else {
-        msg.reply(`there was an error saving your feedback.  Tell the bot developers directly if the issue persists.`);
+        msg.reply(`There was an error saving your feedback.  Tell the bot developers directly if the issue persists.`);
       }
     } else {
-      msg.reply(`no feedback was provided in your message.`);
+      msg.reply(`No feedback was provided in your message.`);
     }
   } catch {
-    msg.reply(`command timed out, please try again.`);
+    msg.reply(`Command timed out, please try again.`);
   }
 }
 

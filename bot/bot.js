@@ -6,6 +6,7 @@ const modules = require(`./helpers/module-manager`);
 const settings = require(`./helpers/settings-manager`);
 const database = require(`./helpers/database-manager`);
 const reactManager = require(`./helpers/role-react-manager-2`);
+const bearcatManager = require(`./helpers/bearcat-manager`);
 
 // Exports
 module.exports = {startBot, stopBot, restartBot};
@@ -15,7 +16,7 @@ async function startBot() {
   client = new Discord.Client({
     partials: ['USER', 'GUILD_MEMBER', 'MESSAGE', 'REACTION'],
     ws: {
-      intents: ['GUILDS', 'GUILD_MEMBERS', 'GUILD_EMOJIS', 'GUILD_PRESENCES', 'GUILD_MESSAGES', 'GUILD_MESSAGE_REACTIONS', 'DIRECT_MESSAGES'],
+      intents: ['GUILDS', 'GUILD_MEMBERS', 'GUILD_EMOJIS', 'GUILD_PRESENCES', 'GUILD_MESSAGES', 'GUILD_MESSAGE_REACTIONS', 'DIRECT_MESSAGES', 'GUILD_VOICE_STATES'],
     },
   });
 
@@ -26,6 +27,8 @@ async function startBot() {
   modules.registerAll(client);
 
   settings.loadAll();
+
+  bearcatManager.prepEmail();
 
   const botToken = settings.getAuth().botToken;
 

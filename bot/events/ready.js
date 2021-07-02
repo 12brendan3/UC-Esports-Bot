@@ -1,19 +1,26 @@
 const weather = require(`../helpers/weather-manager`);
+const taskManger = require(`../helpers/task-manager`);
 
 // Exports
 module.exports = {handle};
 
 // Exported Function
-function handle(client) {
+async function handle(client) {
   console.info(`Bot ready!\nLogged in as: ${client.user.username}`);
 
-  client.guilds.cache.each(async (guild) => {
-    console.info(`Fetching all members from "${guild.name}."`);
+  console.info(`Fetching members from all guilds...`);
 
-    await guild.members.fetch({withPresences: true});
+  const guildFetch = [];
 
-    console.info(`Fetched all members from "${guild.name}."`);
+  client.guilds.cache.each((guild) => {
+    guildFetch.push(guild.members.fetch({withPresences: true}));
   });
+
+  await Promise.all(guildFetch);
+
+  console.info(`Fetched members from all guilds.`);
+
+  taskManger.registerExisting(client);
 
   weather.setBotStatus(client);
 }

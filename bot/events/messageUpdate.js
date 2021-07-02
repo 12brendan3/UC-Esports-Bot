@@ -43,7 +43,7 @@ async function logMessageEdit(msgOld, msgNew) {
         embed.addField(`*** ***`, msgNew.content.substr(1000, msgNew.content.length));
       }
     }
-    embed.addField(`Message Link`, `[Jump to Message](${msgNew.url})`);
+    embed.addField(`Message Link`, `[View Message](${msgNew.url})`);
     embed.setTimestamp();
     embed.setFooter(msgNew.author.tag);
 

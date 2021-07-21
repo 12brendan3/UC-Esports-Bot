@@ -131,6 +131,10 @@ const Guilds = sequelize.define(`Guilds`, {
     type: Sequelize.STRING,
     allowNull: true,
   },
+  timeoutRoleID: {
+    type: Sequelize.STRING,
+    allowNull: true,
+  },
 });
 
 const ServerAdmins = sequelize.define(`ServerAdmins`, {
@@ -258,8 +262,30 @@ const Tasks = sequelize.define(`Tasks`, {
   },
 });
 
+const Timeouts = sequelize.define(`Timeouts`, {
+  ID: {
+    type: Sequelize.UUIDV4,
+    defaultValue: Sequelize.UUIDV4,
+    unique: true,
+    primaryKey: true,
+    allowNull: false,
+  },
+  guildID: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  userID: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  expireTime: {
+    type: Sequelize.INTEGER,
+    allowNull: false,
+  },
+});
+
 // Make object containing tables
-const tables = {Bearcats, XP, Starboard, Guilds, ServerAdmins, Feedback, Roles, RoleCategories, Tasks};
+const tables = {Bearcats, XP, Starboard, Guilds, ServerAdmins, Feedback, Roles, RoleCategories, Tasks, Timeouts};
 
 // Exports
 module.exports = {syncTables, createEntry, getEntry, getOrCreateEntry, updateEntry, updateOrCreateEntry, removeEntry, getAllEntries};
@@ -278,6 +304,7 @@ async function syncTables() {
     Roles.sync(),
     RoleCategories.sync(),
     Tasks.sync(),
+    Timeouts.sync(),
   ]);
   console.info(`Database tables synced.`);
 }

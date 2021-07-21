@@ -1,9 +1,9 @@
 // Regex
-const regexRoleMention = RegExp(`^<@&[0-9]*>$`);
-const regexChannelMention = RegExp(`^<#[0-9]*>$`);
-const regexUserMention = RegExp(`^<@!?[0-9]*>$`);
-const regexUserTag = RegExp(`^.{1,}#[0-9]{4}$`);
-const regexObjectID = RegExp(`^[0-9]*$`);
+const regexRoleMention = new RegExp(`^<@&[0-9]*>$`);
+const regexChannelMention = new RegExp(`^<#[0-9]*>$`);
+const regexUserMention = new RegExp(`^<@!?[0-9]*>$`);
+const regexUserTag = new RegExp(`^.{1,}#[0-9]{4}$`);
+const regexObjectID = new RegExp(`^[0-9]*$`);
 
 // Exports
 module.exports = {resolveChannelID, resolveUserID, resolveRoleID, resolveEmojiID, resolveGuildID};

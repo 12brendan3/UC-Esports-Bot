@@ -6,7 +6,7 @@ const ytsearch = require('youtube-search');
 module.exports = {checkUser, checkChannel};
 
 // Regex
-const regexYT = RegExp(`(^(https?\\:\\/\\/)?(www\\.youtube\\.com|youtu\\.be)\\/(watch\\?v=.{11}|.{11})$)|(^.{11}$)`);
+const regexYT = new RegExp(`(^(https?\\:\\/\\/)?(www\\.youtube\\.com|youtu\\.be)\\/(watch\\?v=.{11}|.{11})$)|(^.{11}$)`);
 
 // Vars
 const players = new Map();

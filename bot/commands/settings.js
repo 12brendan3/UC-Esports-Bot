@@ -7,7 +7,7 @@ const reactManager = require(`../helpers/role-react-manager-2`);
 const settings = require(`../helpers/settings-manager`);
 
 // Vars
-const options = `\n__Valid settings are:__\n\`welcome-message\`, \`welcome-channel\`, \`admin-add\`, \`admin-remove\`, \`admin-list\`, \`logs-channel\`, \`starboard-channel\`, \`starboard-threshold\`, \`streaming-role\`, \`react-channel\`, \`react-add\`, \`react-remove\`, \`react-update\`, \`react-cat-name\`, \`react-cat-info\`, \`react-verify\`, \`verified-role\`, \`report-channel\`, and \`report-role\``;
+const options = `\n__Valid settings are:__\n\`welcome-message\`, \`welcome-channel\`, \`admin-add\`, \`admin-remove\`, \`admin-list\`, \`logs-channel\`, \`starboard-channel\`, \`starboard-threshold\`, \`streaming-role\`, \`react-channel\`, \`react-add\`, \`react-remove\`, \`react-update\`, \`react-cat-name\`, \`react-cat-info\`, \`react-verify\`, \`verified-role\`, \`report-channel\`, \`report-role\`, and \`timeout-role\``;
 let activeChanges = [];
 
 // Exports
@@ -108,6 +108,9 @@ function changeSettings(msg, setting, client) {
       break;
     case `report-role`:
       changeReportRole(msg);
+      break;
+    case `timeout-role`:
+      changeTimeoutRole(msg);
       break;
     default:
       activeChanges = activeChanges.filter((val) => val !== msg.guild.id);
@@ -798,6 +801,40 @@ async function changeReportRole(msg) {
         msg.reply(`Report role has been updated!`);
       } else {
         msg.reply(`There was an error updating the report role.\nTell the bot developers if the issue persists.`);
+      }
+    } else {
+      msg.reply(`That's an invalid role, please try again.`);
+    }
+  } catch {
+    msg.reply(`Command timed out, please try again.`);
+  }
+
+  activeChanges = activeChanges.filter((val) => val !== msg.guild.id);
+}
+
+async function changeTimeoutRole(msg) {
+  msg.reply(`Please provide the name/ID of the role or mention it.\nIf you'd like to disable the timeout role, just send \`disable\`.`);
+
+  try {
+    const collected = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
+
+    const newRoleID = resolvers.resolveRoleID(msg.guild, collected.first().content);
+
+    if (collected.first().content === `disable`) {
+      const result = await database.updateEntry(`Guilds`, {guildID: msg.guild.id}, {timeoutRoleID: null});
+
+      if (result) {
+        msg.reply(`The timeout role has been disabled.`);
+      } else {
+        msg.reply(`There was an error disabling the timeout role.`);
+      }
+    } else if (newRoleID) {
+      const result = await database.updateOrCreateEntry(`Guilds`, {guildID: msg.guild.id}, {timeoutRoleID: newRoleID});
+
+      if (result) {
+        msg.reply(`Timeout role has been updated!`);
+      } else {
+        msg.reply(`There was an error updating the timeout role.\nTell the bot developers if the issue persists.`);
       }
     } else {
       msg.reply(`That's an invalid role, please try again.`);

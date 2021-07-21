@@ -32,6 +32,7 @@
     "discord.js": "^12.5.3",
     "erlpack": "^0.1.3",
     "libsodium-wrappers": "^0.7.9",
+    "node-gyp": "^3.8.0",
     "nodemailer": "^6.6.0",
     "sequelize": "^6.6.2",
     "sqlite3": "^5.0.2",

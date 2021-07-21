@@ -258,8 +258,26 @@ const Tasks = sequelize.define(`Tasks`, {
   },
 });
 
+const SecretCommands = sequelize.define(`SecretCommands`, {
+  ID: {
+    type: Sequelize.UUIDV4,
+    defaultValue: Sequelize.UUIDV4,
+    unique: true,
+    primaryKey: true,
+    allowNull: false,
+  },
+  userID: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  commandName: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+});
+
 // Make object containing tables
-const tables = {Bearcats, XP, Starboard, Guilds, ServerAdmins, Feedback, Roles, RoleCategories, Tasks};
+const tables = {Bearcats, XP, Starboard, Guilds, ServerAdmins, Feedback, Roles, RoleCategories, Tasks, SecretCommands};
 
 // Exports
 module.exports = {syncTables, createEntry, getEntry, getOrCreateEntry, updateEntry, updateOrCreateEntry, removeEntry, getAllEntries};
@@ -278,6 +296,7 @@ async function syncTables() {
     Roles.sync(),
     RoleCategories.sync(),
     Tasks.sync(),
+    SecretCommands.sync(),
   ]);
   console.info(`Database tables synced.`);
 }

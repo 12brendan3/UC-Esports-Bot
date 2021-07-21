@@ -1,11 +1,12 @@
 const fs = require(`fs`);
 const path = require(`path`);
 
-let eventImports = {};
-let commandImports = {};
+let eventImports = new Map();
+let commandImports = new Map();
+let secretCommands = new Set();
 
 // Exports
-module.exports = {registerAll, getCommands, reloadCommands, clearAll, reloadCommand};
+module.exports = {registerAll, getCommands, reloadCommands, clearAll, reloadCommand, getSecretCommands};
 
 // Exported functions
 function registerAll(client) {
@@ -18,28 +19,30 @@ function getCommands() {
 }
 
 function reloadCommands() {
-  const commands = fs.readdirSync(`./bot/commands`);
-
-  for (let i = 0; i < commands.length; i++) {
-    const commandName = path.basename(commands[i], `.js`);
-
-    delete require.cache[require.resolve(`../commands/${commands[i]}`)];
-    delete commandImports[commandName];
-
-    commandImports[commandName] = require(`../commands/${commands[i]}`);
-
-    console.info(`Reloaded command: ${commandName}`);
+  for (const command of commandImports.keys()) {
+    delete require.cache[require.resolve(`../commands/${command}.js`)];
   }
+
+  commandImports = new Map();
+  secretCommands = new Set();
+
+  console.log(`Unloaded commands...`);
+
+  loadCommands();
 }
 
 function clearAll() {
-  eventImports = {};
-  commandImports = {};
-
-  const commands = fs.readdirSync(`./bot/commands`);
-  for (let i = 0; i < commands.length; i++) {
-    delete require.cache[require.resolve(`../commands/${commands[i]}`)];
+  for (const command of commandImports.keys()) {
+    delete require.cache[require.resolve(`../commands/${command}.js`)];
   }
+
+  for (const event of eventImports.keys()) {
+    delete require.cache[require.resolve(`../events/${event}.js`)];
+  }
+
+  eventImports = new Map();
+  commandImports = new Map();
+  secretCommands = new Set();
 }
 
 function reloadCommand(command) {
@@ -47,14 +50,24 @@ function reloadCommand(command) {
 
   if (commands.includes(`${command}.js`)) {
     delete require.cache[require.resolve(`../commands/${command}.js`)];
-    delete commandImports[command];
+    commandImports.delete(command);
+    if (secretCommands.has(command)) {
+      secretCommands = secretCommands.delete(command);
+    }
 
-    commandImports[command] = require(`../commands/${command}.js`);
+    commandImports.set(command, require(`../commands/${command}.js`));
+    if (commandImports.get(command).getHelp() && commandImports.get(command).getHelp().level === `secret`) {
+      secretCommands.add(command);
+    }
 
     console.info(`Reloaded command: ${command}`);
   } else {
     console.info(`No command found for: ${command}`);
   }
+}
+
+function getSecretCommands() {
+  return secretCommands;
 }
 
 // Private functions
@@ -64,7 +77,7 @@ function registerEvents(client) {
   for (let i = 0; i < events.length; i++) {
     const eventName = path.basename(events[i], `.js`);
 
-    eventImports[eventName] = require(`../events/${events[i]}`);
+    eventImports.set(eventName, require(`../events/${events[i]}`));
 
     registerEvent(client, eventName);
 
@@ -90,7 +103,7 @@ function registerEvent(client, eventName) {
       }
     }
 
-    eventImports[eventName].handle(client, eventData, eventData2);
+    eventImports.get(eventName).handle(client, eventData, eventData2);
   });
 }
 
@@ -100,7 +113,11 @@ function loadCommands() {
   for (let i = 0; i < commands.length; i++) {
     const commandName = path.basename(commands[i], `.js`);
 
-    commandImports[commandName] = require(`../commands/${commands[i]}`);
+    commandImports.set(commandName, require(`../commands/${commands[i]}`));
+
+    if (commandImports.get(commandName).getHelp() && commandImports.get(commandName).getHelp().level === `secret`) {
+      secretCommands.add(commandName);
+    }
 
     console.info(`Loaded command: ${commandName}`);
   }

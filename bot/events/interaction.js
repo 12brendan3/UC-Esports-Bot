@@ -20,7 +20,7 @@ function handleCommand(client, interaction) {
 
   const commands = modules.getCommands();
 
-  commands[interaction.commandName].handle(client, interaction);
+  commands.get(interaction.commandName).handle(client, interaction);
 }
 
 function handleButton(client, interaction) {

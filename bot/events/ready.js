@@ -32,16 +32,18 @@ async function registerSlashCommands(client) {
   console.info(`Setting slash commands....`);
 
   const guild = client.guilds.cache.get(`296745121318305794`);
+  const guild2 = client.guilds.cache.get(`145731048892923904`);
 
   const slashCommands = [];
   const commands = modules.getCommands();
-  for (const key of Object.keys(commands)) {
-    const helpInfo = commands[key].getHelp();
+  for (const command of commands.keys()) {
+    const helpInfo = commands.get(command).getHelp();
     if (helpInfo) {
-      slashCommands.push({name: key, description: helpInfo.text, options: helpInfo.options});
+      slashCommands.push({name: command, description: helpInfo.text, options: helpInfo.options});
     }
   }
 
   await guild.commands.set(slashCommands);
+  await guild2.commands.set(slashCommands);
   console.info(`Slash commands set.`);
 }

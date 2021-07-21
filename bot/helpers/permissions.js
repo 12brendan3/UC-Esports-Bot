@@ -2,7 +2,7 @@
 const database = require(`../helpers/database-manager`);
 
 // Exports
-module.exports = {checkAdmin, addAdmin, removeAdmin, getAdmins, checkDev};
+module.exports = {checkAdmin, addAdmin, removeAdmin, getAdmins, checkDev, getDevs};
 
 // Devs are hard-coded
 const devs = new Set([`145730448105013248`, `151079705917915136`]);
@@ -75,4 +75,8 @@ function checkDev(userID) {
   } else {
     return false;
   }
+}
+
+function getDevs() {
+  return devs;
 }

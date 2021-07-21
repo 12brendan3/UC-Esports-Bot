@@ -2,7 +2,10 @@
 module.exports = {handle, getHelp};
 
 // Help command text -- command disabled for now
-const help = null;
+const help = {
+  text: `Sends Malavika's (Mika's) biography.`,
+  level: `secret`,
+};
 
 // Exported functions
 function handle(client, interaction) {

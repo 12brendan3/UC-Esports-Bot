@@ -39,10 +39,10 @@ async function handle(client, interaction) {
     perms.push(`developer`);
   }
 
-  for (const key of Object.keys(commands)) {
-    const helpInfo = commands[key].getHelp();
+  for (const command of commands.keys()) {
+    const helpInfo = commands.get(command).getHelp();
     if (helpInfo && perms.includes(helpInfo.level)) {
-      embed.addField(`__${key}__`, helpInfo.text);
+      embed.addField(`__${command}__`, helpInfo.text);
     }
   }
 

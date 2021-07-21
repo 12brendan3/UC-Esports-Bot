@@ -4,7 +4,7 @@ module.exports = {handle, getHelp};
 // Help command text
 const help = {
   text: `Sends a crab emoji in chat.`,
-  level: `user`,
+  level: `secret`,
 };
 
 // Exported functions

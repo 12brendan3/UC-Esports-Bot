@@ -135,7 +135,7 @@ async function addToQueue(interaction, newItem) {
     interaction.editReply(`Added to queue: ${newItem.title}`);
   } else {
     const connectionplayer = prepConnection(interaction);
-    players.set(interaction.guildID, {textChannel: interaction.channel, voiceChannel: interaction.member.voice.channel, queue: [`filler`, newItem], volume: 0.35, connection: connectionplayer.voiceConnection, audioPlayer: connectionplayer.audioPlayer, resource: null, killed: false});
+    players.set(interaction.guildID, {textChannel: interaction.channel, voiceChannel: interaction.member.voice.channel, queue: [`filler`, newItem], volume: 0.25, connection: connectionplayer.voiceConnection, audioPlayer: connectionplayer.audioPlayer, resource: null, killed: false});
     interaction.editReply(`Connected to voice.`);
     playNext(interaction.guildID);
   }

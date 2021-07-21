@@ -4,7 +4,7 @@ module.exports = {handle, getHelp};
 // Help command text
 const help = {
   text: `Sends a cat picture with the specified text.`,
-  level: `user`,
+  level: `secret`,
   options: [
     {
       name: `text`,

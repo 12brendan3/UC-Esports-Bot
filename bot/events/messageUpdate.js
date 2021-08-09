@@ -24,7 +24,7 @@ function handle(client, msgOld, msgNew) {
 async function logMessageEdit(msgOld, msgNew) {
   const guildSettings = await database.getEntry(`Guilds`, {guildID: msgNew.guild.id});
 
-  if (guildSettings && guildSettings.logsChannelID) {
+  if (guildSettings && guildSettings.logsChannelID && msgOld.content !== msgNew.content) {
     const logsChannel = msgNew.guild.channels.cache.get(guildSettings.logsChannelID);
     const embed = new Discord.MessageEmbed();
 

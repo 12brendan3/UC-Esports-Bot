@@ -6,6 +6,8 @@ const WordFilter = require(`bad-words`);
 
 const filter = new WordFilter();
 
+const profaneWhitelist = new Set([`772589330710659083`]);
+
 // Exports
 module.exports = {handle};
 
@@ -15,9 +17,7 @@ function handle(client, msgOld, msgNew) {
     logMessageEdit(msgOld, msgNew);
   }
 
-  if (msgNew.guild.id === `772589330710659083` && filter.isProfane(msgNew.content) && msgNew.deletable) {
-    msgNew.delete();
-  }
+  checkProfane(msgNew);
 }
 
 // Private function
@@ -48,5 +48,15 @@ async function logMessageEdit(msgOld, msgNew) {
     embed.setFooter(msgNew.author.tag);
 
     logsChannel.send({embeds: [embed]});
+  }
+}
+
+function checkProfane(msg) {
+  if (!msg.guild || !profaneWhitelist.has(msg.guildId)) {
+    return;
+  }
+
+  if (filter.isProfane(msg.content) && msg.deletable) {
+    msg.delete();
   }
 }

@@ -71,7 +71,7 @@ async function handle(client, interaction) {
       return;
     }
   } else {
-    guildID = interaction.guildID;
+    guildID = interaction.guildId;
   }
 
   const guildSettings = await database.getEntry(`Guilds`, {guildID});

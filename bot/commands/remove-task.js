@@ -38,7 +38,7 @@ async function handle(client, interaction) {
     return;
   }
 
-  const existingTasks = await database.getAllEntries(`Tasks`, {guildID: interaction.guildID});
+  const existingTasks = await database.getAllEntries(`Tasks`, {guildID: interaction.guildId});
 
   if (existingTasks.length < 1) {
     interaction.reply({content: `There are no tasks in this server.`, ephemeral: true});
@@ -47,7 +47,7 @@ async function handle(client, interaction) {
 
   const taskID = interaction.options.get(`taskid`).value;
 
-  const result = await database.getEntry(`Tasks`, {ID: taskID, guildID: interaction.guildID});
+  const result = await database.getEntry(`Tasks`, {ID: taskID, guildID: interaction.guildId});
 
   if (!result) {
     interaction.reply({content: `No task with that ID found, try again.`, ephemeral: true});

@@ -69,7 +69,7 @@ async function verifyUser(interaction) {
     if (startedFromDM) {
       interaction.reply({content: `You've already verified, please run this command from a server to get the verified user role.`, ephemeral: true});
     } else {
-      const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildID});
+      const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
       let role = false;
 
       if (guildSettings.verifiedRoleID) {
@@ -156,7 +156,7 @@ async function verifyUser(interaction) {
       // \nIf you'd like to complete your user profile, run the "profile-setup" command.
       interaction.editReply({content: `Success!\nYour email has been saved.\nIn order to get a verified role, run this command again from a server you want a verified role in.  You won't be asked to verify your email again.`, ephemeral: true});
     } else {
-      const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildID});
+      const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
       let role = false;
 
       if (guildSettings && guildSettings.verifiedRoleID) {

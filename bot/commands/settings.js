@@ -334,10 +334,10 @@ async function handle(client, interaction) {
 
   const admin = await permissions.checkAdmin(interaction.guild, interaction.user.id);
 
-  if (admin && activeChanges.has(interaction.guildID)) {
+  if (admin && activeChanges.has(interaction.guildId)) {
     interaction.reply({content: `Only one change can be made at a time.`, ephemeral: true});
   } else if (admin) {
-    activeChanges.add(interaction.guildID);
+    activeChanges.add(interaction.guildId);
     changeSettings(interaction, client);
   } else {
     interaction.reply({content: `You're not an admin on this server.`, ephemeral: true});
@@ -409,7 +409,7 @@ function changeSettings(interaction, client) {
       changeReportRole(interaction);
       break;
     default:
-      activeChanges.delete(interaction.guildID);
+      activeChanges.delete(interaction.guildId);
       console.error(`Somehow an invalid setting was passed, check the slash command settings or add the invalid command.\nInvalid setting: ${interaction.options.first().name}`);
       interaction.reply({content: `There was an internal bot error.`, ephemeral: true});
       break;
@@ -417,7 +417,7 @@ function changeSettings(interaction, client) {
 }
 
 async function changeWelcomeMessage(interaction) {
-  const result = await database.updateOrCreateEntry(`Guilds`, {guildID: interaction.guildID}, {welcomeMessage: interaction.options.first().options.get(`message`).value});
+  const result = await database.updateOrCreateEntry(`Guilds`, {guildID: interaction.guildId}, {welcomeMessage: interaction.options.first().options.get(`message`).value});
 
   if (result) {
     interaction.reply({content: `Join message has been updated!\nUse \`/test Welcome Message\` to test it.`, ephemeral: true});
@@ -425,7 +425,7 @@ async function changeWelcomeMessage(interaction) {
     interaction.reply({content: `There was an error saving the new welcome message.\nTell the bot developers if the issue persists.`, ephemeral: true});
   }
 
-  activeChanges.delete(interaction.guildID);
+  activeChanges.delete(interaction.guildId);
 }
 
 async function changeWelcomeChannel(interaction) {
@@ -438,12 +438,12 @@ async function changeWelcomeChannel(interaction) {
   }
 
   if (options.has(`disable`) && options.get(`disable`).value) {
-    result = await database.updateOrCreateEntry(`Guilds`, {guildID: interaction.guildID}, {welcomeChannelID: null});
+    result = await database.updateOrCreateEntry(`Guilds`, {guildID: interaction.guildId}, {welcomeChannelID: null});
   } else if (options.has(`channel`)) {
-    result = await database.updateOrCreateEntry(`Guilds`, {guildID: interaction.guildID}, {welcomeChannelID: options.get(`channel`).channel.id});
+    result = await database.updateOrCreateEntry(`Guilds`, {guildID: interaction.guildId}, {welcomeChannelID: options.get(`channel`).channel.id});
   } else {
     interaction.reply({content: `Please provide a channel or set disable to true to disable the welcome message.`, ephemeral: true});
-    activeChanges.delete(interaction.guildID);
+    activeChanges.delete(interaction.guildId);
     return;
   }
 
@@ -453,13 +453,13 @@ async function changeWelcomeChannel(interaction) {
     interaction.reply({content: `There was an error updating the welcome message channel.\nTell the bot developers if the issue persists.`, ephemeral: true});
   }
 
-  activeChanges.delete(interaction.guildID);
+  activeChanges.delete(interaction.guildId);
 }
 
 async function addAdmin(interaction) {
   if (interaction.options.first().options.get(`user`).user.bot) {
     interaction.reply({content: `A bot can't be added as an admin!`, ephemeral: true});
-    activeChanges.delete(interaction.guildID);
+    activeChanges.delete(interaction.guildId);
     return;
   }
 
@@ -473,12 +473,12 @@ async function addAdmin(interaction) {
     interaction.reply({content: `There was an error adding the new admin.\nTell the bot developers if the issue persists.`, ephemeral: true});
   }
 
-  activeChanges.delete(interaction.guildID);
+  activeChanges.delete(interaction.guildId);
 }
 
 async function removeAdmin(interaction) {
   const removeUserID = interaction.options.first().options.get(`user`).user.id;
-  const adminCheck = await permissions.removeAdmin(interaction.guildID, removeUserID);
+  const adminCheck = await permissions.removeAdmin(interaction.guildId, removeUserID);
   if (adminCheck && adminCheck === `notadmin`) {
     interaction.reply({content: `That user isn't an admin!`, ephemeral: true});
   } else if (adminCheck) {
@@ -491,7 +491,7 @@ async function removeAdmin(interaction) {
     interaction.reply({content: `There was an error removing the admin.\nTell the bot developers if the issue persists.`, ephemeral: true});
   }
 
-  activeChanges.delete(interaction.guildID);
+  activeChanges.delete(interaction.guildId);
 }
 
 async function sendAdminList(interaction, client) {
@@ -523,7 +523,7 @@ async function sendAdminList(interaction, client) {
 async function listAdmins(interaction, client) {
   await sendAdminList(interaction, client);
 
-  activeChanges.delete(interaction.guildID);
+  activeChanges.delete(interaction.guildId);
 }
 
 async function changeLogsChannel(interaction) {
@@ -536,12 +536,12 @@ async function changeLogsChannel(interaction) {
   }
 
   if (options.has(`disable`) && options.get(`disable`).value) {
-    result = await database.updateEntry(`Guilds`, {guildID: interaction.guildID}, {logsChannelID: null});
+    result = await database.updateEntry(`Guilds`, {guildID: interaction.guildId}, {logsChannelID: null});
   } else if (options.has(`channel`)) {
-    result = await database.updateEntry(`Guilds`, {guildID: interaction.guildID}, {logsChannelID: options.get(`channel`).channel.id});
+    result = await database.updateEntry(`Guilds`, {guildID: interaction.guildId}, {logsChannelID: options.get(`channel`).channel.id});
   } else {
     interaction.reply({content: `Please provide a channel or set disable to true to disable logs.`, ephemeral: true});
-    activeChanges.delete(interaction.guildID);
+    activeChanges.delete(interaction.guildId);
     return;
   }
 
@@ -551,7 +551,7 @@ async function changeLogsChannel(interaction) {
     interaction.reply({content: `There was an error updating the logs channel.\nTell the bot developers if the issue persists.`, ephemeral: true});
   }
 
-  activeChanges.delete(interaction.guildID);
+  activeChanges.delete(interaction.guildId);
 }
 
 async function changeStarboardChannel(interaction) {
@@ -564,12 +564,12 @@ async function changeStarboardChannel(interaction) {
   }
 
   if (options.has(`disable`) && options.get(`disable`).value) {
-    result = await database.updateEntry(`Guilds`, {guildID: interaction.guildID}, {starboardChannelID: null});
+    result = await database.updateEntry(`Guilds`, {guildID: interaction.guildId}, {starboardChannelID: null});
   } else if (options.has(`channel`)) {
-    result = await database.updateEntry(`Guilds`, {guildID: interaction.guildID}, {starboardChannelID: options.get(`channel`).channel.id});
+    result = await database.updateEntry(`Guilds`, {guildID: interaction.guildId}, {starboardChannelID: options.get(`channel`).channel.id});
   } else {
     interaction.reply({content: `Please provide a channel or set disable to true to disable the starboard.`, ephemeral: true});
-    activeChanges.delete(interaction.guildID);
+    activeChanges.delete(interaction.guildId);
     return;
   }
 
@@ -579,7 +579,7 @@ async function changeStarboardChannel(interaction) {
     interaction.reply({content: `There was an error updating the starboard channel.\nTell the bot developers if the issue persists.`, ephemeral: true});
   }
 
-  activeChanges.delete(interaction.guildID);
+  activeChanges.delete(interaction.guildId);
 }
 
 async function changeStarboardThreshold(interaction) {
@@ -587,7 +587,7 @@ async function changeStarboardThreshold(interaction) {
   if (newNum < 1 || newNum > 1000) {
     interaction.reply({content: `That's an invalid number, please try again.`, ephemeral: true});
   } else {
-    const result = await database.updateOrCreateEntry(`Guilds`, {guildID: interaction.guildID}, {starboardThreshold: newNum});
+    const result = await database.updateOrCreateEntry(`Guilds`, {guildID: interaction.guildId}, {starboardThreshold: newNum});
 
     if (result) {
       interaction.reply({content: `Starboard threshold has been updated!\nMake sure you have a starboard channel set!\nUse \`/settings starboard-channel\` to change it.`, ephemeral: true});
@@ -596,7 +596,7 @@ async function changeStarboardThreshold(interaction) {
     }
   }
 
-  activeChanges.delete(interaction.guildID);
+  activeChanges.delete(interaction.guildId);
 }
 
 async function changeStreamingRole(interaction) {
@@ -604,12 +604,12 @@ async function changeStreamingRole(interaction) {
   let result;
 
   if (options.has(`disable`) && options.get(`disable`).value) {
-    result = await database.updateEntry(`Guilds`, {guildID: interaction.guildID}, {streamingRoleID: null});
+    result = await database.updateEntry(`Guilds`, {guildID: interaction.guildId}, {streamingRoleID: null});
   } else if (options.has(`role`)) {
-    result = await database.updateEntry(`Guilds`, {guildID: interaction.guildID}, {streamingRoleID: options.get(`role`).role.id});
+    result = await database.updateEntry(`Guilds`, {guildID: interaction.guildId}, {streamingRoleID: options.get(`role`).role.id});
   } else {
     interaction.reply({content: `Please provide a role or set disable to true to disable the streaming role.`, ephemeral: true});
-    activeChanges.delete(interaction.guildID);
+    activeChanges.delete(interaction.guildId);
     return;
   }
 
@@ -619,7 +619,7 @@ async function changeStreamingRole(interaction) {
     interaction.reply({content: `There was an error updating the streaming role.\nTell the bot developers if the issue persists.`, ephemeral: true});
   }
 
-  activeChanges.delete(interaction.guildID);
+  activeChanges.delete(interaction.guildId);
 }
 
 async function changeRoleChannel(interaction) {
@@ -632,12 +632,12 @@ async function changeRoleChannel(interaction) {
   }
 
   if (options.has(`disable`) && options.get(`disable`).value) {
-    result = await database.updateOrCreateEntry(`Guilds`, {guildID: interaction.guildID}, {rolesChannelID: null});
+    result = await database.updateOrCreateEntry(`Guilds`, {guildID: interaction.guildId}, {rolesChannelID: null});
   } else if (options.has(`role`)) {
-    result = await database.updateOrCreateEntry(`Guilds`, {guildID: interaction.guildID}, {rolesChannelID: options.get(`channel`).channel.id});
+    result = await database.updateOrCreateEntry(`Guilds`, {guildID: interaction.guildId}, {rolesChannelID: options.get(`channel`).channel.id});
   } else {
     interaction.reply({content: `Please provide a channel or set disable to true to disable the reaction role channel.`, ephemeral: true});
-    activeChanges.delete(interaction.guildID);
+    activeChanges.delete(interaction.guildId);
     return;
   }
 
@@ -647,16 +647,16 @@ async function changeRoleChannel(interaction) {
     interaction.reply({content: `There was an error updating the reaction role channel.\nTell the bot developers if the issue persists.`, ephemeral: true});
   }
 
-  activeChanges.delete(interaction.guildID);
+  activeChanges.delete(interaction.guildId);
 }
 
 async function addRoleReaction(interaction, client) {
   try {
-    const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildID});
+    const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
 
     if (!guildSettings || !guildSettings.rolesChannelID) {
       interaction.reply({content: `There isn't a reaction role channel set.\nPlease set one up with \`/settings react-channel\``, ephemeral: true});
-      activeChanges.delete(interaction.guildID);
+      activeChanges.delete(interaction.guildId);
       return;
     }
 
@@ -666,32 +666,32 @@ async function addRoleReaction(interaction, client) {
 
     if (!emojiID) {
       interaction.reply({content: `No emoji found by that name.  Please try again.`, ephemeral: true});
-      activeChanges.delete(interaction.guildID);
+      activeChanges.delete(interaction.guildId);
       return;
     }
 
-    const roleCategory = await database.getEntry(`RoleCategories`, {guildID: interaction.guildID, categoryName: options.get(`category`).value});
+    const roleCategory = await database.getEntry(`RoleCategories`, {guildID: interaction.guildId, categoryName: options.get(`category`).value});
 
     if (roleCategory) {
       const matchingRole = await database.getEntry(`Roles`, {roleCategory: roleCategory.ID, emojiID});
 
       if (matchingRole) {
         interaction.reply({content: `A role in that category is already using that emoji, please try again.`, ephemeral: true});
-        activeChanges.delete(interaction.guildID);
+        activeChanges.delete(interaction.guildId);
         return;
       }
 
-      const totalRoles = await database.getAllEntries(`Roles`, {guildID: interaction.guildID, roleCategory: roleCategory.ID});
+      const totalRoles = await database.getAllEntries(`Roles`, {guildID: interaction.guildId, roleCategory: roleCategory.ID});
 
       if (totalRoles.length > 19) {
         interaction.reply({content: `That category has the maximum amount of roles already, please try again.`, ephemeral: true});
-        activeChanges.delete(interaction.guildID);
+        activeChanges.delete(interaction.guildId);
         return;
       }
 
-      const result = await database.createEntry(`Roles`, {guildID: interaction.guildID, roleID: options.get(`role`).role.id, roleCategory: roleCategory.ID, emojiID});
+      const result = await database.createEntry(`Roles`, {guildID: interaction.guildId, roleID: options.get(`role`).role.id, roleCategory: roleCategory.ID, emojiID});
 
-      await reactManager.addRoleData(client, interaction.guildID, roleCategory.ID, emojiID, options.get(`role`).role.id);
+      await reactManager.addRoleData(client, interaction.guildId, roleCategory.ID, emojiID, options.get(`role`).role.id);
 
       if (result) {
         interaction.reply({content: `The reaction role has been added!`, ephemeral: true});
@@ -701,15 +701,15 @@ async function addRoleReaction(interaction, client) {
     } else {
       if (!options.has(`description`)) {
         interaction.reply({content: `No category description was provided for the new category, try again with one.`, ephemeral: true});
-        activeChanges.delete(interaction.guildID);
+        activeChanges.delete(interaction.guildId);
         return;
       }
 
-      const newRoleCategory = await database.createEntry(`RoleCategories`, {guildID: interaction.guildID, categoryName: options.get(`category`).value, categoryDescription: options.get(`description`).value});
+      const newRoleCategory = await database.createEntry(`RoleCategories`, {guildID: interaction.guildId, categoryName: options.get(`category`).value, categoryDescription: options.get(`description`).value});
 
-      const result = await database.createEntry(`Roles`, {guildID: interaction.guildID, roleID: options.get(`role`).role.id, roleCategory: newRoleCategory.ID, emojiID});
+      const result = await database.createEntry(`Roles`, {guildID: interaction.guildId, roleID: options.get(`role`).role.id, roleCategory: newRoleCategory.ID, emojiID});
 
-      await reactManager.addRoleData(client, interaction.guildID, newRoleCategory.ID, emojiID, options.get(`role`).role.id, options.get(`description`).value, options.get(`category`).value);
+      await reactManager.addRoleData(client, interaction.guildId, newRoleCategory.ID, emojiID, options.get(`role`).role.id, options.get(`description`).value, options.get(`category`).value);
 
       if (result) {
         interaction.reply({content: `The reaction role has been added!`, ephemeral: true});
@@ -721,48 +721,48 @@ async function addRoleReaction(interaction, client) {
     interaction.reply({content: `There was an internal error, please try again.`, ephemeral: true});
   }
 
-  activeChanges.delete(interaction.guildID);
+  activeChanges.delete(interaction.guildId);
 }
 
 async function removeRoleReaction(interaction, client) {
   try {
-    const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildID});
+    const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
 
     if (!guildSettings || !guildSettings.rolesChannelID) {
       interaction.reply({content: `This guild has no reaction role channel, please set one up with \`/settings react-channel\`."`, ephemeral: true});
-      activeChanges.delete(interaction.guildID);
+      activeChanges.delete(interaction.guildId);
       return;
     }
 
-    const roleCategories = await database.getAllEntries(`RoleCategories`, {guildID: interaction.guildID});
+    const roleCategories = await database.getAllEntries(`RoleCategories`, {guildID: interaction.guildId});
 
     if (!roleCategories || roleCategories.length < 1) {
       interaction.reply({content: `There are no reaction roles!`, ephemeral: true});
-      activeChanges.delete(interaction.guildID);
+      activeChanges.delete(interaction.guildId);
       return;
     }
 
     const options = interaction.options.first().options;
 
-    const roleCategory = await database.getEntry(`RoleCategories`, {guildID: interaction.guildID, categoryName: options.get(`category`).value});
+    const roleCategory = await database.getEntry(`RoleCategories`, {guildID: interaction.guildId, categoryName: options.get(`category`).value});
 
     if (!roleCategory) {
       interaction.reply({content: `No role category was found, please try again.`, ephemeral: true});
-      activeChanges.delete(interaction.guildID);
+      activeChanges.delete(interaction.guildId);
       return;
     }
 
-    const oldRole = await database.getEntry(`Roles`, {guildID: interaction.guildID, roleID: options.get(`role`).role.id, roleCategory: roleCategory.ID});
-    const matchingRole = await database.removeEntry(`Roles`, {guildID: interaction.guildID, roleID: options.get(`role`).role.id, roleCategory: roleCategory.ID});
+    const oldRole = await database.getEntry(`Roles`, {guildID: interaction.guildId, roleID: options.get(`role`).role.id, roleCategory: roleCategory.ID});
+    const matchingRole = await database.removeEntry(`Roles`, {guildID: interaction.guildId, roleID: options.get(`role`).role.id, roleCategory: roleCategory.ID});
 
     if (matchingRole && oldRole) {
-      const rolesLeft = await database.getAllEntries(`Roles`, {guildID: interaction.guildID, roleCategory: roleCategory.ID});
+      const rolesLeft = await database.getAllEntries(`Roles`, {guildID: interaction.guildId, roleCategory: roleCategory.ID});
 
       if (!rolesLeft || rolesLeft.length < 1) {
-        await reactManager.removeRoleData(client, interaction.guildID, roleCategory.ID);
-        database.removeEntry(`RoleCategories`, {guildID: interaction.guildID, categoryName: options.get(`category`).value});
+        await reactManager.removeRoleData(client, interaction.guildId, roleCategory.ID);
+        database.removeEntry(`RoleCategories`, {guildID: interaction.guildId, categoryName: options.get(`category`).value});
       } else {
-        await reactManager.removeRoleData(client, interaction.guildID, roleCategory.ID, oldRole.emojiID);
+        await reactManager.removeRoleData(client, interaction.guildId, roleCategory.ID, oldRole.emojiID);
       }
 
       interaction.reply({content: `The role has been removed.`, ephemeral: true});
@@ -773,37 +773,37 @@ async function removeRoleReaction(interaction, client) {
     interaction.reply({content: `There was an internal error, please try again.`, ephemeral: true});
   }
 
-  activeChanges.delete(interaction.guildID);
+  activeChanges.delete(interaction.guildId);
 }
 
 async function updateRoleReactions(interaction, client) {
-  const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildID});
+  const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
 
   if (guildSettings && guildSettings.rolesChannelID) {
-    await reactManager.updateGuildEmbeds(client, interaction.guildID);
+    await reactManager.updateGuildEmbeds(client, interaction.guildId);
 
     interaction.reply({content: `The role reactions have been updated.`, ephemeral: true});
   } else {
     interaction.reply({content: `This guild has no reaction role channel, please set one up with \`/settings react-channel\`."`, ephemeral: true});
   }
 
-  activeChanges.delete(interaction.guildID);
+  activeChanges.delete(interaction.guildId);
 }
 
 async function updateCategoryName(interaction, client) {
   try {
-    const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildID});
+    const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
 
     if (!guildSettings || !guildSettings.rolesChannelID) {
       interaction.reply({content: `This guild has no reaction role channel, please set one up with \`/settings react-channel\`."`, ephemeral: true});
-      activeChanges.delete(interaction.guildID);
+      activeChanges.delete(interaction.guildId);
       return;
     }
 
     const options = interaction.options.first().options;
 
-    const result = await database.updateEntry(`RoleCategories`, {guildID: interaction.guildID, categoryName: options.get(`currentcategory`).value}, {categoryName: options.get(`newcategory`).value});
-    const newResult = await database.getEntry(`RoleCategories`, {guildID: interaction.guildID, categoryName: options.get(`newcategory`).value});
+    const result = await database.updateEntry(`RoleCategories`, {guildID: interaction.guildId, categoryName: options.get(`currentcategory`).value}, {categoryName: options.get(`newcategory`).value});
+    const newResult = await database.getEntry(`RoleCategories`, {guildID: interaction.guildId, categoryName: options.get(`newcategory`).value});
 
     if (result && newResult) {
       await reactManager.updateCategoryData(client, newResult.guildID, newResult.ID, newResult.categoryName);
@@ -815,23 +815,23 @@ async function updateCategoryName(interaction, client) {
     interaction.reply({content: `There was an internal error, please try again.`, ephemeral: true});
   }
 
-  activeChanges.delete(interaction.guildID);
+  activeChanges.delete(interaction.guildId);
 }
 
 async function updateCategoryInfo(interaction, client) {
   try {
-    const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildID});
+    const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
 
     if (!guildSettings || !guildSettings.rolesChannelID) {
       interaction.reply({content: `This guild has no reaction role channel, please set one up with \`/settings react-channel\`.`, ephemeral: true});
-      activeChanges.delete(interaction.guildID);
+      activeChanges.delete(interaction.guildId);
       return;
     }
 
     const options = interaction.options.first().options;
 
-    const result = await database.updateEntry(`RoleCategories`, {guildID: interaction.guildID, categoryName: options.get(`category`).value}, {categoryDescription: options.get(`description`).value});
-    const newResult = await database.getEntry(`RoleCategories`, {guildID: interaction.guildID, categoryName: options.get(`category`).value});
+    const result = await database.updateEntry(`RoleCategories`, {guildID: interaction.guildId, categoryName: options.get(`category`).value}, {categoryDescription: options.get(`description`).value});
+    const newResult = await database.getEntry(`RoleCategories`, {guildID: interaction.guildId, categoryName: options.get(`category`).value});
 
     if (result && newResult) {
       await reactManager.updateCategoryData(client, newResult.guildID, newResult.ID, null, newResult.categoryDescription);
@@ -843,41 +843,41 @@ async function updateCategoryInfo(interaction, client) {
     interaction.reply({content: `There was an internal error, please try again.`, ephemeral: true});
   }
 
-  activeChanges.delete(interaction.guildID);
+  activeChanges.delete(interaction.guildId);
 }
 
 
 async function verifyReactRoles(interaction, client) {
   try {
-    const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildID});
+    const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
 
     if (!guildSettings || !guildSettings.rolesChannelID) {
       interaction.reply({content: `This server doesn't have reaction roles set up.`, ephemeral: true});
-      activeChanges.delete(interaction.guildID);
+      activeChanges.delete(interaction.guildId);
       return;
     }
 
-    const reactionCategories = await database.getAllEntries(`RoleCategories`, {guildID: interaction.guildID});
+    const reactionCategories = await database.getAllEntries(`RoleCategories`, {guildID: interaction.guildId});
     if (!reactionCategories) {
       interaction.reply({content: `This server doesn't have reaction roles set up.`, ephemeral: true});
     }
 
     interaction.reply({content: `Verifying reaction roles...`, ephemeral: true});
     reactionCategories.forEach(async (category) => {
-      const catRoles = await database.getAllEntries(`Roles`, {guildID: interaction.guildID, roleCategory: category.ID});
+      const catRoles = await database.getAllEntries(`Roles`, {guildID: interaction.guildId, roleCategory: category.ID});
       catRoles.forEach(async (role) => {
         if (interaction.guild.roles.cache.get(role.roleID)) {
           return;
         }
         await database.removeEntry(`Roles`, {ID: role.ID});
-        await reactManager.removeRoleData(client, interaction.guildID, category.ID, role.emojiID);
+        await reactManager.removeRoleData(client, interaction.guildId, category.ID, role.emojiID);
       });
 
-      const rolesLeft = await database.getAllEntries(`Roles`, {guildID: interaction.guildID, roleCategory: category.ID});
+      const rolesLeft = await database.getAllEntries(`Roles`, {guildID: interaction.guildId, roleCategory: category.ID});
 
       if (!rolesLeft || rolesLeft.length < 1) {
         await database.removeEntry(`RoleCategories`, {ID: category.ID});
-        await reactManager.removeRoleData(client, interaction.guildID, category.ID);
+        await reactManager.removeRoleData(client, interaction.guildId, category.ID);
       }
     });
     interaction.editReply({content: `Reaction roles have been verified.  Any missing roles have been removed.`, ephemeral: true});
@@ -885,7 +885,7 @@ async function verifyReactRoles(interaction, client) {
     interaction.reply({content: `There was an internal error verifying the reaction roles.`, ephemeral: true});
   }
 
-  activeChanges.delete(interaction.guildID);
+  activeChanges.delete(interaction.guildId);
 }
 
 async function changeVerifiedRole(interaction) {
@@ -893,12 +893,12 @@ async function changeVerifiedRole(interaction) {
   let result;
 
   if (options.has(`disable`) && options.get(`disable`).value) {
-    result = await database.updateEntry(`Guilds`, {guildID: interaction.guildID}, {verifiedRoleID: null});
+    result = await database.updateEntry(`Guilds`, {guildID: interaction.guildId}, {verifiedRoleID: null});
   } else if (options.has(`role`)) {
-    result = await database.updateEntry(`Guilds`, {guildID: interaction.guildID}, {verifiedRoleID: options.get(`role`).role.id});
+    result = await database.updateEntry(`Guilds`, {guildID: interaction.guildId}, {verifiedRoleID: options.get(`role`).role.id});
   } else {
     interaction.reply({content: `Please provide a role or set disable to true to disable the verified role.`, ephemeral: true});
-    activeChanges.delete(interaction.guildID);
+    activeChanges.delete(interaction.guildId);
     return;
   }
 
@@ -908,7 +908,7 @@ async function changeVerifiedRole(interaction) {
     interaction.reply({content: `There was an error updating the verified role.\nTell the bot developers if the issue persists.`, ephemeral: true});
   }
 
-  activeChanges.delete(interaction.guildID);
+  activeChanges.delete(interaction.guildId);
 }
 
 async function changeReportChannel(interaction) {
@@ -921,12 +921,12 @@ async function changeReportChannel(interaction) {
   }
 
   if (options.has(`disable`) && options.get(`disable`).value) {
-    result = await database.updateEntry(`Guilds`, {guildID: interaction.guildID}, {reportChannelID: null});
+    result = await database.updateEntry(`Guilds`, {guildID: interaction.guildId}, {reportChannelID: null});
   } else if (options.has(`role`)) {
-    result = await database.updateEntry(`Guilds`, {guildID: interaction.guildID}, {reportChannelID: options.get(`channel`).channel.id});
+    result = await database.updateEntry(`Guilds`, {guildID: interaction.guildId}, {reportChannelID: options.get(`channel`).channel.id});
   } else {
     interaction.reply({content: `Please provide a channel or set disable to true to disable the report channel.`, ephemeral: true});
-    activeChanges.delete(interaction.guildID);
+    activeChanges.delete(interaction.guildId);
     return;
   }
 
@@ -936,7 +936,7 @@ async function changeReportChannel(interaction) {
     interaction.reply({content: `There was an error updating the report channel.\nTell the bot developers if the issue persists.`, ephemeral: true});
   }
 
-  activeChanges.delete(interaction.guildID);
+  activeChanges.delete(interaction.guildId);
 }
 
 async function changeReportRole(interaction) {
@@ -944,12 +944,12 @@ async function changeReportRole(interaction) {
   let result;
 
   if (options.has(`disable`) && options.get(`disable`).value) {
-    result = await database.updateEntry(`Guilds`, {guildID: interaction.guildID}, {reportRoleID: null});
+    result = await database.updateEntry(`Guilds`, {guildID: interaction.guildId}, {reportRoleID: null});
   } else if (options.has(`role`)) {
-    result = await database.updateEntry(`Guilds`, {guildID: interaction.guildID}, {reportRoleID: options.get(`role`).role.id});
+    result = await database.updateEntry(`Guilds`, {guildID: interaction.guildId}, {reportRoleID: options.get(`role`).role.id});
   } else {
     interaction.reply({content: `Please provide a role or set disable to true to disable the report role.`, ephemeral: true});
-    activeChanges.delete(interaction.guildID);
+    activeChanges.delete(interaction.guildId);
     return;
   }
 
@@ -959,5 +959,5 @@ async function changeReportRole(interaction) {
     interaction.reply({content: `There was an error updating the report role.\nTell the bot developers if the issue persists.`, ephemeral: true});
   }
 
-  activeChanges.delete(interaction.guildID);
+  activeChanges.delete(interaction.guildId);
 }

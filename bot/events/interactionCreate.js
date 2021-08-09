@@ -15,7 +15,7 @@ function handle(client, interaction) {
 function handleCommand(client, interaction) {
   // Ignore report command to keep it as anonymous as possible
   if (interaction.commandName !== `ticket`) {
-    console.info(`${interaction.guildID === null ? `Via DM` : `#${interaction.channel.name}`} <${interaction.user.username}> ${interaction.commandName}`);
+    console.info(`${interaction.guildId === null ? `Via DM` : `#${interaction.channel.name}`} <${interaction.user.username}> ${interaction.commandName}`);
   }
 
   const commands = modules.getCommands();

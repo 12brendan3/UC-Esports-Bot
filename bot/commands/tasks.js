@@ -29,7 +29,7 @@ async function handle(client, interaction) {
     return;
   }
 
-  const existingTasks = await database.getAllEntries(`Tasks`, {guildID: interaction.guildID});
+  const existingTasks = await database.getAllEntries(`Tasks`, {guildID: interaction.guildId});
 
   if (existingTasks.length < 1) {
     interaction.reply(`There are no tasks in this server.`);

@@ -66,7 +66,7 @@ function testSettings(interaction, setting) {
 }
 
 async function testWelcomeMessage(interaction) {
-  const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildID});
+  const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
 
   if (guildSettings && guildSettings.welcomeMessage) {
     const welcomeMessage = guildSettings.welcomeMessage.replace(`!!newuser!!`, `${interaction.user}`);
@@ -77,7 +77,7 @@ async function testWelcomeMessage(interaction) {
 }
 
 async function testWelcomeChannel(interaction) {
-  const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildID});
+  const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
 
   if (guildSettings && guildSettings.welcomeMessage && guildSettings.welcomeChannelID) {
     const welcomeMessage = guildSettings.welcomeMessage.replace(`!!newuser!!`, `${interaction.user}`);
@@ -92,7 +92,7 @@ async function testWelcomeChannel(interaction) {
 }
 
 async function testLogsChannel(interaction) {
-  const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildID});
+  const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
 
   if (guildSettings && guildSettings.logsChannelID) {
     const logsChannel = interaction.guild.channels.cache.get(guildSettings.logsChannelID);

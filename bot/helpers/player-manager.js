@@ -103,41 +103,41 @@ async function checkYT(interaction) {
 }
 
 function pause(interaction) {
-  const player = players.get(interaction.guildID);
+  const player = players.get(interaction.guildId);
   player.audioPlayer.pause();
   interaction.reply(`Audio has been paused.`);
 }
 
 function resume(interaction) {
-  const player = players.get(interaction.guildID);
+  const player = players.get(interaction.guildId);
   player.audioPlayer.unpause();
   interaction.reply(`Audio has been resumed.`);
 }
 
 function skip(interaction) {
-  const player = players.get(interaction.guildID);
+  const player = players.get(interaction.guildId);
   player.audioPlayer.stop();
   interaction.reply(`Skipped!`);
 }
 
 function changeVolume(interaction) {
   const volume = parseInt(interaction.options.get(`volume`).value);
-  const player = players.get(interaction.guildID);
+  const player = players.get(interaction.guildId);
   player.volume = volume / 100;
   player.resource.volume.setVolumeLogarithmic(player.volume);
   interaction.reply(`Changed the volume to ${volume}%.`);
 }
 
 async function addToQueue(interaction, newItem) {
-  const player = players.get(interaction.guildID);
+  const player = players.get(interaction.guildId);
   if (player) {
     player.queue.push(newItem);
     interaction.editReply(`Added to queue: ${newItem.title}`);
   } else {
     const connectionplayer = prepConnection(interaction);
-    players.set(interaction.guildID, {textChannel: interaction.channel, voiceChannel: interaction.member.voice.channel, queue: [`filler`, newItem], volume: 0.25, connection: connectionplayer.voiceConnection, audioPlayer: connectionplayer.audioPlayer, resource: null, killed: false});
+    players.set(interaction.guildId, {textChannel: interaction.channel, voiceChannel: interaction.member.voice.channel, queue: [`filler`, newItem], volume: 0.25, connection: connectionplayer.voiceConnection, audioPlayer: connectionplayer.audioPlayer, resource: null, killed: false});
     interaction.editReply(`Connected to voice.`);
-    playNext(interaction.guildID);
+    playNext(interaction.guildId);
   }
 }
 
@@ -203,7 +203,7 @@ function searchYT(interaction, search) {
 }
 
 function prepConnection(interaction) {
-  const voiceConnection = voice.joinVoiceChannel({channelId: interaction.member.voice.channel.id, guildId: interaction.guildID, adapterCreator: interaction.guild.voiceAdapterCreator});
+  const voiceConnection = voice.joinVoiceChannel({channelId: interaction.member.voice.channel.id, guildId: interaction.guildId, adapterCreator: interaction.guild.voiceAdapterCreator});
 
   voiceConnection.on(`stateChange`, async (_, newState) => {
     if (newState.status === voice.VoiceConnectionStatus.Disconnected) {
@@ -211,22 +211,22 @@ function prepConnection(interaction) {
         try {
           await voice.entersState(voiceConnection, voice.VoiceConnectionStatus.Connecting, 5000);
         } catch {
-          stopPlaying(interaction.guildID);
+          stopPlaying(interaction.guildId);
         }
       } else if (voiceConnection.rejoinAttempts < 5) {
         await wait((voiceConnection.rejoinAttempts + 1) * 5000);
         voiceConnection.rejoin();
       } else {
-        stopPlaying(interaction.guildID);
+        stopPlaying(interaction.guildId);
       }
     } else if (newState.status === voice.VoiceConnectionStatus.Destroyed) {
-      stopPlaying(interaction.guildID);
+      stopPlaying(interaction.guildId);
     } else if (newState.status === voice.VoiceConnectionStatus.Connecting || newState.status === voice.VoiceConnectionStatus.Signalling) {
       try {
         await voice.entersState(voiceConnection, voice.VoiceConnectionStatus.Ready, 20000);
       } catch {
         if (voiceConnection.state.status !== voice.VoiceConnectionStatus.Destroyed) {
-          stopPlaying(interaction.guildID);
+          stopPlaying(interaction.guildId);
         }
       }
     }
@@ -236,7 +236,7 @@ function prepConnection(interaction) {
 
   audioPlayer.on(`stateChange`, (oldState, newState) => {
     if (newState.status === voice.AudioPlayerStatus.Idle && oldState.status !== voice.AudioPlayerStatus.Idle) {
-      playNext(interaction.guildID);
+      playNext(interaction.guildId);
     }
   });
 

@@ -16,7 +16,7 @@ module.exports = {startBot, stopBot, restartBot};
 async function startBot() {
   client = new Discord.Client({
     partials: [`USER`, `GUILD_MEMBER`, `MESSAGE`, `REACTION`],
-    intents: [`GUILDS`, `GUILD_MEMBERS`, `GUILD_EMOJIS`, `GUILD_PRESENCES`, `GUILD_MESSAGES`, `GUILD_MESSAGE_REACTIONS`, `DIRECT_MESSAGES`, `GUILD_VOICE_STATES`],
+    intents: [`GUILDS`, `GUILD_MEMBERS`, `GUILD_EMOJIS_AND_STICKERS`, `GUILD_PRESENCES`, `GUILD_MESSAGES`, `GUILD_MESSAGE_REACTIONS`, `DIRECT_MESSAGES`, `GUILD_VOICE_STATES`],
   });
 
   await database.syncTables();

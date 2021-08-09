@@ -1,7 +1,6 @@
 const Discord = require(`discord.js`);
 
 const database = require(`../helpers/database-manager`);
-const settings = require(`../helpers/settings-manager`);
 
 // Regex
 const regexImage = RegExp(`^.+(\\.(jpe?g|png|gif|bmp))$`);
@@ -21,11 +20,6 @@ async function logMessageDeletion(msg) {
   const guildSettings = await database.getEntry(`Guilds`, {guildID: msg.guild.id});
 
   if (guildSettings && guildSettings.logsChannelID) {
-    // Ignore report command to keep it as anonymous as possible
-    if (msg.content.startsWith(`${settings.getSettings().prefix}ticket`)) {
-      return;
-    }
-
     const logsChannel = msg.guild.channels.cache.get(guildSettings.logsChannelID);
     const embed = new Discord.MessageEmbed();
 

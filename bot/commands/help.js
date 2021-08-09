@@ -1,7 +1,7 @@
 // Imports
 const Discord = require(`discord.js`);
 
-const modules = require(`../helpers/module-manager`);
+const commandManager = require(`../helpers/command-manager`);
 const settings = require(`../helpers/settings-manager`);
 const permissions = require(`../helpers/permissions`);
 
@@ -16,7 +16,7 @@ const help = {
 
 // Exported functions
 async function handle(client, interaction) {
-  const commands = modules.getCommands();
+  const commands = commandManager.getAll();
   const embed = new Discord.MessageEmbed();
 
   embed.setColor(`#FF00CC`);

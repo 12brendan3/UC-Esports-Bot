@@ -350,7 +350,7 @@ function getHelp() {
 
 // Private functions
 function changeSettings(interaction, client) {
-  switch (interaction.options.first().name) {
+  switch (interaction.options.getSubcommand()) {
     case `welcome-message`:
       changeWelcomeMessage(interaction);
       break;
@@ -358,10 +358,10 @@ function changeSettings(interaction, client) {
       changeWelcomeChannel(interaction);
       break;
     case `admin-add`:
-      addAdmin(interaction);
+      addAdmin(client, interaction);
       break;
     case `admin-remove`:
-      removeAdmin(interaction);
+      removeAdmin(client, interaction);
       break;
     case `admin-list`:
       listAdmins(interaction, client);
@@ -410,14 +410,14 @@ function changeSettings(interaction, client) {
       break;
     default:
       activeChanges.delete(interaction.guildId);
-      console.error(`Somehow an invalid setting was passed, check the slash command settings or add the invalid command.\nInvalid setting: ${interaction.options.first().name}`);
+      console.error(`Somehow an invalid setting was passed, check the slash command settings or add the invalid command.\nInvalid setting: ${interaction.options.getSubcommand()}`);
       interaction.reply({content: `There was an internal bot error.`, ephemeral: true});
       break;
   }
 }
 
 async function changeWelcomeMessage(interaction) {
-  const result = await database.updateOrCreateEntry(`Guilds`, {guildID: interaction.guildId}, {welcomeMessage: interaction.options.first().options.get(`message`).value});
+  const result = await database.updateOrCreateEntry(`Guilds`, {guildID: interaction.guildId}, {welcomeMessage: interaction.options.get(`message`).value});
 
   if (result) {
     interaction.reply({content: `Join message has been updated!\nUse \`/test Welcome Message\` to test it.`, ephemeral: true});
@@ -429,7 +429,7 @@ async function changeWelcomeMessage(interaction) {
 }
 
 async function changeWelcomeChannel(interaction) {
-  const options = interaction.options.first().options;
+  const options = interaction.options;
   let result;
 
   if (options.get(`channel`).channel.type !== `text`) {
@@ -456,14 +456,14 @@ async function changeWelcomeChannel(interaction) {
   activeChanges.delete(interaction.guildId);
 }
 
-async function addAdmin(interaction) {
-  if (interaction.options.first().options.get(`user`).user.bot) {
+async function addAdmin(client, interaction) {
+  if (interaction.options.get(`user`).user.bot) {
     interaction.reply({content: `A bot can't be added as an admin!`, ephemeral: true});
     activeChanges.delete(interaction.guildId);
     return;
   }
 
-  const success = await permissions.addAdmin(interaction.guild, interaction.options.first().options.get(`user`).user.id);
+  const success = await permissions.addAdmin(client, interaction.guild, interaction.options.get(`user`).user.id);
 
   if (success && success === `duplicate`) {
     interaction.reply({content: `That user is already an admin!`, ephemeral: true});
@@ -476,9 +476,9 @@ async function addAdmin(interaction) {
   activeChanges.delete(interaction.guildId);
 }
 
-async function removeAdmin(interaction) {
-  const removeUserID = interaction.options.first().options.get(`user`).user.id;
-  const adminCheck = await permissions.removeAdmin(interaction.guildId, removeUserID);
+async function removeAdmin(client, interaction) {
+  const removeUserID = interaction.options.get(`user`).user.id;
+  const adminCheck = await permissions.removeAdmin(client, interaction.guildId, removeUserID);
   if (adminCheck && adminCheck === `notadmin`) {
     interaction.reply({content: `That user isn't an admin!`, ephemeral: true});
   } else if (adminCheck) {
@@ -527,7 +527,7 @@ async function listAdmins(interaction, client) {
 }
 
 async function changeLogsChannel(interaction) {
-  const options = interaction.options.first().options;
+  const options = interaction.options;
   let result;
 
   if (options.get(`channel`).channel.type !== `text`) {
@@ -555,7 +555,7 @@ async function changeLogsChannel(interaction) {
 }
 
 async function changeStarboardChannel(interaction) {
-  const options = interaction.options.first().options;
+  const options = interaction.options;
   let result;
 
   if (options.get(`channel`).channel.type !== `text`) {
@@ -583,7 +583,7 @@ async function changeStarboardChannel(interaction) {
 }
 
 async function changeStarboardThreshold(interaction) {
-  const newNum = interaction.options.first().options.get(`threshold`).value;
+  const newNum = interaction.options.get(`threshold`).value;
   if (newNum < 1 || newNum > 1000) {
     interaction.reply({content: `That's an invalid number, please try again.`, ephemeral: true});
   } else {
@@ -600,7 +600,7 @@ async function changeStarboardThreshold(interaction) {
 }
 
 async function changeStreamingRole(interaction) {
-  const options = interaction.options.first().options;
+  const options = interaction.options;
   let result;
 
   if (options.has(`disable`) && options.get(`disable`).value) {
@@ -623,7 +623,7 @@ async function changeStreamingRole(interaction) {
 }
 
 async function changeRoleChannel(interaction) {
-  const options = interaction.options.first().options;
+  const options = interaction.options;
   let result;
 
   if (options.get(`channel`).channel.type !== `text`) {
@@ -660,7 +660,7 @@ async function addRoleReaction(interaction, client) {
       return;
     }
 
-    const options = interaction.options.first().options;
+    const options = interaction.options;
 
     const emojiID = resolvers.resolveEmojiID(client, options.get(`emoji`).value);
 
@@ -742,7 +742,7 @@ async function removeRoleReaction(interaction, client) {
       return;
     }
 
-    const options = interaction.options.first().options;
+    const options = interaction.options;
 
     const roleCategory = await database.getEntry(`RoleCategories`, {guildID: interaction.guildId, categoryName: options.get(`category`).value});
 
@@ -800,7 +800,7 @@ async function updateCategoryName(interaction, client) {
       return;
     }
 
-    const options = interaction.options.first().options;
+    const options = interaction.options;
 
     const result = await database.updateEntry(`RoleCategories`, {guildID: interaction.guildId, categoryName: options.get(`currentcategory`).value}, {categoryName: options.get(`newcategory`).value});
     const newResult = await database.getEntry(`RoleCategories`, {guildID: interaction.guildId, categoryName: options.get(`newcategory`).value});
@@ -828,7 +828,7 @@ async function updateCategoryInfo(interaction, client) {
       return;
     }
 
-    const options = interaction.options.first().options;
+    const options = interaction.options;
 
     const result = await database.updateEntry(`RoleCategories`, {guildID: interaction.guildId, categoryName: options.get(`category`).value}, {categoryDescription: options.get(`description`).value});
     const newResult = await database.getEntry(`RoleCategories`, {guildID: interaction.guildId, categoryName: options.get(`category`).value});
@@ -889,7 +889,7 @@ async function verifyReactRoles(interaction, client) {
 }
 
 async function changeVerifiedRole(interaction) {
-  const options = interaction.options.first().options;
+  const options = interaction.options;
   let result;
 
   if (options.has(`disable`) && options.get(`disable`).value) {
@@ -912,7 +912,7 @@ async function changeVerifiedRole(interaction) {
 }
 
 async function changeReportChannel(interaction) {
-  const options = interaction.options.first().options;
+  const options = interaction.options;
   let result;
 
   if (options.get(`channel`).channel.type !== `text`) {
@@ -940,7 +940,7 @@ async function changeReportChannel(interaction) {
 }
 
 async function changeReportRole(interaction) {
-  const options = interaction.options.first().options;
+  const options = interaction.options;
   let result;
 
   if (options.has(`disable`) && options.get(`disable`).value) {

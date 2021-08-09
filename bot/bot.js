@@ -2,7 +2,8 @@ const Discord = require(`discord.js`);
 
 let client;
 
-const modules = require(`./helpers/module-manager`);
+const eventManager = require(`./helpers/event-manager`);
+const commandManager = require(`./helpers/command-manager`);
 const settings = require(`./helpers/settings-manager`);
 const database = require(`./helpers/database-manager`);
 const reactManager = require(`./helpers/role-react-manager-2`);
@@ -23,7 +24,9 @@ async function startBot() {
 
   await reactManager.loadRoleData();
 
-  modules.registerAll(client);
+  commandManager.loadAll();
+
+  eventManager.loadAll(client);
 
   settings.loadAll();
 
@@ -49,6 +52,7 @@ function stopBot() {
 function restartBot() {
   stopBot();
   settings.clearAll();
-  modules.clearAll();
+  eventManager.clearAll();
+  commandManager.clearAll();
   startBot();
 }

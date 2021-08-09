@@ -5,19 +5,16 @@ module.exports = {handle, getHelp};
 const help = {
   text: `Sends a cat picture with the specified text.`,
   level: `secret`,
-  options: [
-    {
-      name: `text`,
-      type: `STRING`,
-      description: `The text to put on the image.`,
-      required: true,
-    },
-  ],
 };
 
 // Exported functions
 function handle(client, interaction) {
-  const text = encodeURI(interaction.options.get(`text`).value);
+  if (!interaction.options.get(`option1`)) {
+    interaction.reply({content: `Please provide something for the cat to say.`, ephemeral: true});
+    return;
+  }
+
+  const text = encodeURI(interaction.options.get(`option1`).value);
 
   try {
     interaction.channel.send({files: [{attachment: `https://cataas.com/c/s/${text}`, name: `cat.jpeg`}]});

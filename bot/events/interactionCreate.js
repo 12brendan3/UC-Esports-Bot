@@ -1,4 +1,4 @@
-const modules = require(`../helpers/module-manager`);
+const commandManager = require(`../helpers/command-manager`);
 
 // Exports
 module.exports = {handle};
@@ -18,7 +18,7 @@ function handleCommand(client, interaction) {
     console.info(`${interaction.guildId === null ? `Via DM` : `#${interaction.channel.name}`} <${interaction.user.username}> ${interaction.commandName}`);
   }
 
-  const commands = modules.getCommands();
+  const commands = commandManager.getAll();
 
   commands.get(interaction.commandName).handle(client, interaction);
 }

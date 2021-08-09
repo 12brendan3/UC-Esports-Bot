@@ -2,7 +2,7 @@ const readline = require(`readline`);
 
 const bot = require(`./bot/bot.js`);
 const botStorage = require(`./bot/helpers/settings-manager`);
-const botModules = require(`./bot/helpers/module-manager`);
+const commandManager = require(`./bot/helpers/command-manager`);
 
 const input = readline.createInterface({
   input: process.stdin,
@@ -72,15 +72,15 @@ function reloadSomething(split) {
         botStorage.loadAuth();
         break;
       case `commands`:
-        botModules.reloadCommands();
+        commandManager.reloadAll();
         break;
       case `command`:
-        botModules.reloadCommand(split[2]);
+        commandManager.reloadOne(split[2]);
         break;
       case `all`:
         botStorage.loadSettings();
         botStorage.loadAuth();
-        botModules.reloadCommands();
+        commandManager.reloadAll();
         break;
       default:
         console.info(`Invalid reload option.`);

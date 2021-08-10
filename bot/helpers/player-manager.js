@@ -39,15 +39,15 @@ function checkUser(interaction, type) {
     return;
   }
 
+  if (!players.has(interaction.guildId) && (type !== `play` || !interaction.options.get(`ytsearch`))) {
+    interaction.reply({content: `There is no active queue.`, ephemeral: true});
+    return;
+  }
+
   const player = players.get(interaction.guildId);
 
   if (player && player.voiceChannel.id !== interaction.member.voice.channel.id) {
     interaction.reply({content: `You need to be connected to the active voice channel.`, ephemeral: true});
-    return;
-  }
-
-  if (!player && type !== `play`) {
-    interaction.reply({content: `There is no active queue.`, ephemeral: true});
     return;
   }
 
@@ -66,7 +66,7 @@ function checkUser(interaction, type) {
       break;
     case `leave`:
       stopPlaying(interaction.guildId);
-      interaction.reply(`Disconnected and cleared the queue.`);
+      interaction.reply({content: `Disconnected and cleared the queue.`});
       break;
     default:
       console.error(`If you're seeing this, you incorrectly interacted with the music manager.`);
@@ -75,7 +75,7 @@ function checkUser(interaction, type) {
 }
 
 function play(interaction) {
-  if (interaction.options.has(`ytsearch`)) {
+  if (interaction.options.get(`ytsearch`)) {
     checkYT(interaction);
   } else {
     resume(interaction);
@@ -83,7 +83,7 @@ function play(interaction) {
 }
 
 async function checkYT(interaction) {
-  interaction.reply(`One moment....`);
+  interaction.reply({content: `One moment....`});
   const video = interaction.options.get(`ytsearch`).value;
   if (regexYT.test(video)) {
     try {
@@ -95,7 +95,7 @@ async function checkYT(interaction) {
       };
       addToQueue(interaction, newItem);
     } catch {
-      interaction.reply(`Failed to fetch video information.  Please make sure the video URL/ID is valid and public.`);
+      interaction.reply({content: `Failed to fetch video information.  Please make sure the video URL/ID is valid and public.`});
     }
   } else {
     searchYT(interaction, video);
@@ -105,19 +105,24 @@ async function checkYT(interaction) {
 function pause(interaction) {
   const player = players.get(interaction.guildId);
   player.audioPlayer.pause();
-  interaction.reply(`Audio has been paused.`);
+  interaction.reply({content: `Audio has been paused.`});
 }
 
 function resume(interaction) {
   const player = players.get(interaction.guildId);
-  player.audioPlayer.unpause();
-  interaction.reply(`Audio has been resumed.`);
+  console.log(player.audioPlayer.state);
+  if (player.audioPlayer.state.status === `paused`) {
+    player.audioPlayer.unpause();
+    interaction.reply({content: `Audio has been resumed.`});
+  } else {
+    interaction.reply({content: `Audio isn't currently paused.`, ephemeral: true});
+  }
 }
 
 function skip(interaction) {
   const player = players.get(interaction.guildId);
   player.audioPlayer.stop();
-  interaction.reply(`Skipped!`);
+  interaction.reply({content: `Skipped!`});
 }
 
 function changeVolume(interaction) {
@@ -125,7 +130,7 @@ function changeVolume(interaction) {
   const player = players.get(interaction.guildId);
   player.volume = volume / 100;
   player.resource.volume.setVolumeLogarithmic(player.volume);
-  interaction.reply(`Changed the volume to ${volume}%.`);
+  interaction.reply({content: `Changed the volume to ${volume}%.`});
 }
 
 async function addToQueue(interaction, newItem) {
@@ -166,10 +171,12 @@ function playNext(guildID) {
 
 function stopPlaying(guildID) {
   const player = players.get(guildID);
-  if (player && !player.killed) {
-    player.killed = true;
-    player.audioPlayer.stop(true);
-    player.connection.destroy();
+  if (player) {
+    if (!player.killed) {
+      player.killed = true;
+      player.audioPlayer.stop(true);
+      player.connection.destroy();
+    }
     players.delete(guildID);
   }
 }
@@ -186,7 +193,7 @@ function searchYT(interaction, search) {
   if (ytSearchOpts.key) {
     ytsearch(search, ytSearchOpts, (err, results) => {
       if (err) {
-        interaction.reply(`Failed to search YouTube.`);
+        interaction.reply({content: `Failed to search YouTube.`});
         console.error(err);
       } else {
         const newItem = {
@@ -198,7 +205,7 @@ function searchYT(interaction, search) {
       }
     });
   } else {
-    interaction.reply(`YouTube search is currently disabled.`);
+    interaction.reply({content: `YouTube search is currently disabled.`});
   }
 }
 

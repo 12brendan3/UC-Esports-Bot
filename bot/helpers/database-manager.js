@@ -284,8 +284,67 @@ const Timeouts = sequelize.define(`Timeouts`, {
   },
 });
 
+const Events = sequelize.define(`Events`, {
+  ID: {
+    type: Sequelize.UUIDV4,
+    defaultValue: Sequelize.UUIDV4,
+    unique: true,
+    primaryKey: true,
+    allowNull: false,
+  },
+  startTime: {
+    type: Sequelize.INTEGER,
+    defaultValue: Sequelize.DATE,
+    allowNull: false,
+  },
+  endTime: {
+    type: Sequelize.INTEGER,
+    allowNull: false,
+  },
+  userID: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  eventName: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  eventDescription: {
+    type: Sequelize.STRING,
+    allowNull: true,
+  },
+  signInCode: {
+    type: Sequelize.STRING,
+    allowNull: true,
+  },
+});
+
+const Registrants = sequelize.define(`Registrants`, {
+  ID: {
+    type: Sequelize.UUIDV4,
+    defaultValue: Sequelize.UUIDV4,
+    unique: true,
+    primaryKey: true,
+    allowNull: false,
+  },
+  eventID: {
+    type: Sequelize.UUIDV4,
+    allowNull: false,
+  },
+  userID: {
+    type: Sequelize.STRING,
+    unique: false,
+    allowNull: false,
+  },
+  registrationTime: {
+    type: Sequelize.INTEGER,
+    unique: false,
+    allowNull: false,
+  },
+});
+
 // Make object containing tables
-const tables = {Bearcats, XP, Starboard, Guilds, ServerAdmins, Feedback, Roles, RoleCategories, Tasks, Timeouts};
+const tables = {Bearcats, XP, Starboard, Guilds, ServerAdmins, Feedback, Roles, RoleCategories, Tasks, Timeouts, Events, Registrants};
 
 // Exports
 module.exports = {syncTables, createEntry, getEntry, getOrCreateEntry, updateEntry, updateOrCreateEntry, removeEntry, getAllEntries};
@@ -305,6 +364,8 @@ async function syncTables() {
     RoleCategories.sync(),
     Tasks.sync(),
     Timeouts.sync(),
+    Events.sync(),
+    Registrants.sync(),
   ]);
   console.info(`Database tables synced.`);
 }

@@ -1,6 +1,7 @@
 const weather = require(`../helpers/weather-manager`);
 const taskManger = require(`../helpers/task-manager`);
 const commandManager = require(`../helpers/command-manager`);
+const timeouts = require(`../helpers/timeout-manager`);
 
 // Exports
 module.exports = {handle};
@@ -26,4 +27,6 @@ async function handle(client) {
   weather.setBotStatus(client);
 
   commandManager.setSlashCommands(client);
+
+  timeouts.registerExisting(client);
 }

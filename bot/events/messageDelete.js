@@ -3,7 +3,7 @@ const Discord = require(`discord.js`);
 const database = require(`../helpers/database-manager`);
 
 // Regex
-const regexImage = RegExp(`^.+(\\.(jpe?g|png|gif|bmp))$`);
+const regexImage = new RegExp(`^.+(\\.(jpe?g|png|gif|bmp))$`);
 
 // Exports
 module.exports = {handle};

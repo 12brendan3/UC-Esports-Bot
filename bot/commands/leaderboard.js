@@ -26,32 +26,33 @@ async function sendLeaderboard(client, interaction) {
 
   const list = await getUserList(client);
 
-  embed.addField(`Leaderboard - Top 10`, list);
+  embed.addField(`Leaderboard - Top 20`, list);
 
   interaction.reply({embeds: [embed]});
 }
 
 async function getUserList(client) {
-  const top10 = await database.getAllEntries(`XP`, {}, {limit: 10, order: [[Sequelize.col(`XP`), `DESC`]]});
+  const top20 = await database.getAllEntries(`XP`, {}, {limit: 20, order: [[Sequelize.col(`XP`), `DESC`]]});
 
   let list = `\`\`\`\n`;
-  const invalid = [];
+  // const invalid = [];
 
-  for (let i = 0; i < top10.length; i++) {
-    const user = client.users.cache.get(top10[i].userID);
+  for (let i = 0; i < top20.length; i++) {
+    const user = client.users.cache.get(top20[i].userID);
     if (user) {
-      list += `${i + 1}.${i < 9 ? ` ` : ``} ${user ? user.tag : top10[i].userID} - XP: ${top10[i].XP}\n`;
+      list += `${i + 1}.${i < 9 ? ` ` : ``} ${user.tag} - XP: ${top20[i].XP}\n`;
     } else {
-      invalid.push(top10[i].userID);
+      list += `${i + 1}.${i < 9 ? ` ` : ``} ${top20[i].userID} (Unknown) - XP: ${top20[i].XP}\n`;
+      // invalid.push(top20[i].userID);
     }
   }
 
   list += `\`\`\``;
 
-  if (invalid.length > 0) {
+  /* if (invalid.length > 0) {
     await database.removeEntry(`XP`, {userID: invalid});
     list = await getUserList(client);
-  }
+  }*/
 
   return list;
 }

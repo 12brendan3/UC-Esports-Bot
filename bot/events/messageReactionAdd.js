@@ -9,7 +9,7 @@ const Discord = require(`discord.js`);
 const detectedStarboardReactions = [`%E2%AD%90`, `%F0%9F%8C%9F`];
 
 // Regex
-const regexImage = RegExp(`^.+(\\.(jpe?g|png|gif|bmp))$`);
+const regexImage = new RegExp(`^.+(\\.(jpe?g|png|gif|bmp))$`);
 
 // Exports
 module.exports = {handle};

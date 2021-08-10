@@ -7,7 +7,7 @@ const voice = require(`@discordjs/voice`);
 module.exports = {checkUser, checkChannel, prepKey};
 
 // Regex
-const regexYT = RegExp(`(^(https?\\:\\/\\/)?(www\\.youtube\\.com|youtu\\.be)\\/(watch\\?v=.{11}|.{11})$)`);
+const regexYT = new RegExp(`(^(https?\\:\\/\\/)?(www\\.youtube\\.com|youtu\\.be)\\/(watch\\?v=.{11}|.{11})$)|(^.{11}$)`);
 
 // Vars
 const players = new Map();

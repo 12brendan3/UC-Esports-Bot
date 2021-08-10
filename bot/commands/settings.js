@@ -408,6 +408,9 @@ function changeSettings(interaction, client) {
     case `report-role`:
       changeReportRole(interaction);
       break;
+    case `timeout-role`:
+      changeTimeoutRole(msg);
+      break;
     default:
       activeChanges.delete(interaction.guildId);
       console.error(`Somehow an invalid setting was passed, check the slash command settings or add the invalid command.\nInvalid setting: ${interaction.options.getSubcommand()}`);
@@ -960,4 +963,38 @@ async function changeReportRole(interaction) {
   }
 
   activeChanges.delete(interaction.guildId);
+}
+
+async function changeTimeoutRole(msg) {
+  msg.reply(`Please provide the name/ID of the role or mention it.\nIf you'd like to disable the timeout role, just send \`disable\`.`);
+
+  try {
+    const collected = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
+
+    const newRoleID = resolvers.resolveRoleID(msg.guild, collected.first().content);
+
+    if (collected.first().content === `disable`) {
+      const result = await database.updateEntry(`Guilds`, {guildID: msg.guild.id}, {timeoutRoleID: null});
+
+      if (result) {
+        msg.reply(`The timeout role has been disabled.`);
+      } else {
+        msg.reply(`There was an error disabling the timeout role.`);
+      }
+    } else if (newRoleID) {
+      const result = await database.updateOrCreateEntry(`Guilds`, {guildID: msg.guild.id}, {timeoutRoleID: newRoleID});
+
+      if (result) {
+        msg.reply(`Timeout role has been updated!`);
+      } else {
+        msg.reply(`There was an error updating the timeout role.\nTell the bot developers if the issue persists.`);
+      }
+    } else {
+      msg.reply(`That's an invalid role, please try again.`);
+    }
+  } catch {
+    msg.reply(`Command timed out, please try again.`);
+  }
+
+  activeChanges = activeChanges.filter((val) => val !== msg.guild.id);
 }

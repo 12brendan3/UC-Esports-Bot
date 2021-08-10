@@ -9,6 +9,7 @@ const database = require(`./helpers/database-manager`);
 const reactManager = require(`./helpers/role-react-manager-2`);
 const bearcatManager = require(`./helpers/bearcat-manager`);
 const playerManager = require(`./helpers/player-manager`);
+const timeouts = require(`./helpers/timeout-manager`);
 
 // Exports
 module.exports = {startBot, stopBot, restartBot};
@@ -54,5 +55,6 @@ function restartBot() {
   settings.clearAll();
   eventManager.clearAll();
   commandManager.clearAll();
+  timeouts.clearAll();
   startBot();
 }

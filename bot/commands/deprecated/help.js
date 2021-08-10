@@ -1,9 +1,9 @@
 // Imports
 const Discord = require(`discord.js`);
 
-const commandManager = require(`../helpers/command-manager`);
-const settings = require(`../helpers/settings-manager`);
-const permissions = require(`../helpers/permissions`);
+const commandManager = require(`../../helpers/command-manager`);
+const settings = require(`../../helpers/settings-manager`);
+const permissions = require(`../../helpers/permissions`);
 
 // Exports
 module.exports = {handle, getHelp};

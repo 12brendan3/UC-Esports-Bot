@@ -104,13 +104,16 @@ async function checkYT(interaction) {
 
 function pause(interaction) {
   const player = players.get(interaction.guildId);
-  player.audioPlayer.pause();
-  interaction.reply({content: `Audio has been paused.`});
+  if (player.audioPlayer.state.status !== `paused`) {
+    player.audioPlayer.pause();
+    interaction.reply({content: `Audio has been paused.`});
+  } else {
+    interaction.reply({content: `Audio isn't currently playing.`, ephemeral: true});
+  }
 }
 
 function resume(interaction) {
   const player = players.get(interaction.guildId);
-  console.log(player.audioPlayer.state);
   if (player.audioPlayer.state.status === `paused`) {
     player.audioPlayer.unpause();
     interaction.reply({content: `Audio has been resumed.`});

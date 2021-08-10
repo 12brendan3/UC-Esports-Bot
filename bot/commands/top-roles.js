@@ -7,7 +7,7 @@ module.exports = {handle, getHelp};
 
 // Help command text
 const help = {
-  text: `Gets a list of the server roles ordered by the roles with the most users to the least.`,
+  text: `Allows an admin to get a list of the server roles. Ordered by most users to the least.`,
   level: `admin`,
 };
 

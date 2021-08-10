@@ -5,7 +5,7 @@ module.exports = {handle, getHelp};
 
 // Help command text
 const help = {
-  text: `Allows a user to verify they're a student at UC and grants the verified role in servers.`,
+  text: `Allows students to verify they go to UC and grants the verified role in servers.`,
   level: `user`,
   options: [
     {

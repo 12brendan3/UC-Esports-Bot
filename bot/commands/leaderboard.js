@@ -8,7 +8,7 @@ module.exports = {handle, getHelp};
 
 // Help command text
 const help = {
-  text: `Sends the leaderboard of the top 10 users with the most XP.`,
+  text: `Sends the leaderboard of the top 20 users with the most XP.`,
   level: `user`,
 };
 

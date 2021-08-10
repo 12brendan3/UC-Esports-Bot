@@ -21,7 +21,7 @@ async function handle(client, interaction) {
   try {
     const isAdmin = await permissions.checkAdmin(interaction.guild, interaction.user.id);
     if (isAdmin) {
-      await interaction.defer();
+      await interaction.deferReply();
       const embed = new Discord.MessageEmbed();
 
       embed.setColor(`#00EDCD`);
@@ -67,7 +67,8 @@ async function handle(client, interaction) {
     } else {
       interaction.reply({content: `You're not an admin on this server.`, ephemeral: true});
     }
-  } catch {
+  } catch (err) {
+    console.log(err);
     interaction.reply({content: `Command timed out, please try again.`, ephemeral: true});
   }
 }

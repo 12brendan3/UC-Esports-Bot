@@ -39,7 +39,7 @@ function checkUser(interaction, type) {
     return;
   }
 
-  const player = players.get(interaction.guild.id);
+  const player = players.get(interaction.guildId);
 
   if (player && player.voiceChannel.id !== interaction.member.voice.channel.id) {
     interaction.reply({content: `You need to be connected to the active voice channel.`, ephemeral: true});
@@ -65,7 +65,7 @@ function checkUser(interaction, type) {
       changeVolume(interaction);
       break;
     case `leave`:
-      stopPlaying(interaction.guild.id);
+      stopPlaying(interaction.guildId);
       interaction.reply(`Disconnected and cleared the queue.`);
       break;
     default:

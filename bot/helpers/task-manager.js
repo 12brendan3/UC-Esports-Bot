@@ -40,7 +40,7 @@ function registerTask(taskID, channel, message, file, cronString) {
 }
 
 async function addTask(channel, cronString, taskMessage, taskFile) {
-  const result = await database.createEntry(`Tasks`, {guildID: channel.guild.id, channelID: channel.id, cronString, taskMessage, taskFile});
+  const result = await database.createEntry(`Tasks`, {guildID: channel.guildId, channelID: channel.id, cronString, taskMessage, taskFile});
   if (result) {
     let file = null;
     if (taskFile) {

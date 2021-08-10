@@ -22,7 +22,7 @@ function handle(client, msgOld, msgNew) {
 
 // Private function
 async function logMessageEdit(msgOld, msgNew) {
-  const guildSettings = await database.getEntry(`Guilds`, {guildID: msgNew.guild.id});
+  const guildSettings = await database.getEntry(`Guilds`, {guildID: msgNew.guildId});
 
   if (guildSettings && guildSettings.logsChannelID && msgOld.content !== msgNew.content) {
     const logsChannel = msgNew.guild.channels.cache.get(guildSettings.logsChannelID);

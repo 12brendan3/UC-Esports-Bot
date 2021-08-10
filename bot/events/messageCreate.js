@@ -26,7 +26,7 @@ function handle(client, msg) {
 }
 
 async function awardXP(msg) {
-  if (!xpWhitelist.has(msg.guild.id)) {
+  if (!xpWhitelist.has(msg.guildId)) {
     return;
   }
 
@@ -46,7 +46,7 @@ async function awardXP(msg) {
 }
 
 function checkProfane(msg) {
-  if (!msg.guild || !profaneWhitelist.has(msg.guild.id)) {
+  if (!msg.guild || !profaneWhitelist.has(msg.guildId)) {
     return;
   }
 

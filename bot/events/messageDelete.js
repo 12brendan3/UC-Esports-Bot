@@ -17,7 +17,7 @@ function handle(client, msg) {
 
 // Private function
 async function logMessageDeletion(msg) {
-  const guildSettings = await database.getEntry(`Guilds`, {guildID: msg.guild.id});
+  const guildSettings = await database.getEntry(`Guilds`, {guildID: msg.guildId});
 
   if (guildSettings && guildSettings.logsChannelID) {
     const logsChannel = msg.guild.channels.cache.get(guildSettings.logsChannelID);

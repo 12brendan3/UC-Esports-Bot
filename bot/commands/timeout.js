@@ -12,74 +12,78 @@ module.exports = {handle, getHelp};
 const help = {
   text: `Allows an admin to put a user in timeout.`,
   level: `admin`,
+  options: [
+    {
+      name: `user`,
+      description: `The user to put in timeout.`,
+      type: `USER`,
+      required: true,
+    },
+    {
+      name: `time`,
+      description: `The duration to put the user in timeout. (Format: 1d2h3m)`,
+      type: `STRING`,
+      required: true,
+    },
+  ],
 };
 
 // Exported functions
-async function handle(client, msg) {
-  if (msg.channel.type === `dm`) {
-    msg.reply(`This command has to be used in a server.`);
+async function handle(client, interaction) {
+  if (interaction.channel.type === `dm`) {
+    interaction.reply(`This command has to be used in a server.`);
     return;
   }
 
   let isAdmin = false;
   try {
-    isAdmin = await permissions.checkAdmin(msg.guild, msg.author.id);
+    isAdmin = await permissions.checkAdmin(interaction.guild, interaction.user.id);
   } catch {
-    msg.reply(`Command timed out, please try again.`);
+    interaction.reply(`Command timed out, please try again.`);
     return;
   }
 
   if (!isAdmin) {
-    msg.reply(`You're not an admin on this server.`);
+    interaction.reply(`You're not an admin on this server.`);
     return;
   }
 
-  const guildSettings = await database.getEntry(`Guilds`, {guildID: msg.guild.id});
+  const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
 
   if (!guildSettings || !guildSettings.timeoutRoleID) {
-    msg.reply(`There is no timeout role set up on this server.`);
+    interaction.reply(`There is no timeout role set up on this server.`);
     return;
   }
 
-  const splitMsg = msg.content.split(` `);
-
-  if (!splitMsg[1]) {
-    msg.reply(`Please provide a user to timeout with your command.\nFormat: \`timeout <user> <time>\` - time is in the format: \`1d1h1m\`.`);
-    return;
-  } else if (!splitMsg[2]) {
-    msg.reply(`Please provide a duration to timeout the user for with your command.\nFormat: \`timeout <user> <time>\` - time is in the format: \`1d1h1m\`.`);
-    return;
-  }
-
-  const userID = resolvers.resolveUserID(msg.guild, splitMsg[1]);
+  const userID = resolvers.resolveUserID(interaction.guild, interaction.options.get(`user`).value);
 
   if (!userID) {
-    msg.reply(`Failed to find that user, please try again.`);
+    interaction.reply(`Failed to find that user, please try again.`);
     return;
   }
 
-  const timeout = await database.getEntry(`Timeouts`, {guildID: msg.guild.id, userID});
+  const timeout = await database.getEntry(`Timeouts`, {guildID: interaction.guildId, userID});
 
   if (timeout) {
-    msg.reply(`That user is already in timeout.`);
+    interaction.reply(`That user is already in timeout.`);
     return;
   }
 
-  const time = parseTime(splitMsg[2]);
+  const time = parseTime(interaction.options.get(`time`).value);
 
   if (!time) {
-    msg.reply(`Failed to parse the timeout duration or the timeout is too long (max ~25 days), please try again.`);
+    interaction.reply(`Failed to parse the timeout duration or the timeout is too long (max ~25 days), please try again.`);
     return;
   }
 
-  const result = await timeouts.createOne(time, userID, msg.guild, guildSettings.timeoutRoleID);
+  const result = await timeouts.createOne(time, userID, interaction.guild, guildSettings.timeoutRoleID);
 
   if (result) {
-    msg.reply(result);
+    interaction.reply(result);
     return;
   }
 
-  msg.reply(`<@${userID}> has been put in timeout for ${convertTime(time)}.`);
+  interaction.reply(`<@${userID}> has been put in timeout for ${convertTime(time)}.`);
 }
 
 function parseTime(timeString) {

@@ -65,7 +65,14 @@ async function verifyUser(msg) {
     if (msg.deletable) {
       msg.delete();
     }
-    DMChannel = await msg.author.createDM();
+
+    try {
+      DMChannel = await msg.author.createDM();
+    } catch {
+      msg.reply(`Failed to DM you, please make sure you have DMs enabled for this server and then try again.`);
+      userTimeouts.delete(msg.author.id);
+      return;
+    }
   }
 
   const prevVerified = await database.getEntry(`Bearcats`, {userID: msg.author.id});
@@ -105,6 +112,7 @@ async function verifyUser(msg) {
   } catch {
     userTimeouts.delete(msg.author.id);
     DMChannel.send(`Verification command timed out, please try again.`);
+    return;
   }
 
   const email = emailCollected.first().content;

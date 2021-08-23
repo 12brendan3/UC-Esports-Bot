@@ -36,7 +36,13 @@ async function handle(client, msg) {
       msg.delete();
     }
     guildID = msg.guild.id;
-    DMChannel = await msg.author.createDM();
+    try {
+      DMChannel = await msg.author.createDM();
+    } catch {
+      msg.reply(`Failed to DM you, please make sure you have DMs enabled for this server and then try again.`);
+      userTimeouts.delete(msg.author.id);
+      return;
+    }
   }
 
   if (startedFromDM) {

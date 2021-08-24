@@ -1,5 +1,5 @@
 const database = require(`../helpers/database-manager`);
-const permissions = require(`../helpers/permissions`);
+// const permissions = require(`../helpers/permissions`);
 
 // Exports
 module.exports = {handle, getHelp};

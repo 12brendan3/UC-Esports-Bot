@@ -1,13 +1,14 @@
 const database = require(`../helpers/database-manager`);
 const permissions = require(`../helpers/permissions`);
-const resolvers = require(`../helpers/resolvers`);
+const { MessageEmbed } = require('discord.js');
+// const resolvers = require(`../helpers/resolvers`);
 
 const Crypto = require(`crypto`);
 
 const regexTime = new RegExp(`^([0-9]*d)?([0-9]*h)?([0-9]*m)?$`);
 
 // Exports
-module.exports = {handle, getHelp};
+module.exports = { handle, getHelp };
 
 const help = {
   text: `Allows admins to create a event and collect registrants.`,
@@ -40,7 +41,7 @@ function handle(client, interaction) {
   if (perm) {
     createEvent(interaction);
   } else {
-    interaction.reply({content: `You're not an admin.`, ephemeral: true});
+    interaction.reply({ content: `You're not an admin.`, ephemeral: true });
   }
 }
 
@@ -52,7 +53,7 @@ async function createEvent(client, interaction) {
     if (err) {
       console.error(`There was an error generating a new token:`);
       console.error(err);
-      interaction.reply({content: `Error generating event`});
+      interaction.reply({ content: `Error generating event` });
       return;
     }
 
@@ -60,7 +61,7 @@ async function createEvent(client, interaction) {
   });
 
   if (!time) {
-    interaction.reply({content: `Invalid time format`, ephemeral: true});
+    interaction.reply({ content: `Invalid time format`, ephemeral: true });
     return;
   }
 
@@ -71,8 +72,22 @@ async function createEvent(client, interaction) {
     signInCode: code,
   });
 
+  const eventEmbed = new MessageEmbed()
+    .setTitle(interaction.options.get(`eventName`).value)
+    .setTimestamp()
+    .setColor(`#FF00CC`)
+    .setAuthor(client.user.username, client.user.displayAvatarURL())
+    .setDescription(interaction.options.get(`eventDesc`).value)
+    .addField(`End Time`, interaction.options.get(`endTime`).value);
+
+  const guild = database.getEntry(`Guilds`, {guildID: interaction.channel.guildId});
+
+  const announcementChannel = client.guilds.resolve(guild.guildId).channels.fetch(guild.announcementChannelId);
+
+  announcementChannel.send(eventEmbed);
+
   setTimeout(async () => {
-    await database.updateEntry(`Events`, {ID: newEvent.ID}, {signInCode: null});
+    await database.updateEntry(`Events`, { ID: newEvent.ID }, { signInCode: null });
   }, time);
 
 }

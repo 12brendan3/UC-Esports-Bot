@@ -68,7 +68,6 @@ async function handle(client, interaction) {
       interaction.reply({content: `You're not an admin on this server.`, ephemeral: true});
     }
   } catch (err) {
-    console.log(err);
     interaction.reply({content: `Command timed out, please try again.`, ephemeral: true});
   }
 }

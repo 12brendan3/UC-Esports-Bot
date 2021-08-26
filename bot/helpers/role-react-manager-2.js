@@ -118,8 +118,6 @@ function generateMessage(client, guildID, categoryID) {
     for (const role in roleData[guildID][categoryID].roles) {
       if (Object.prototype.hasOwnProperty.call(roleData[guildID][categoryID].roles, role)) {
         const parsedEmoji = resolvers.resolveEmojiID(client, role);
-        console.log(`Role: ${role}`);
-        console.log(`Parsed: ${parsedEmoji}`);
         const discordRole = client.guilds.cache.get(guildID).roles.cache.get(roleData[guildID][categoryID].roles[role]);
         if (discordRole) {
           buttons.push({
@@ -132,7 +130,6 @@ function generateMessage(client, guildID, categoryID) {
         }
 
         if ((buttonCount % 5) === 0) {
-          console.log(`yeet?`);
           components.push({
             type: `ACTION_ROW`,
             components: buttons,

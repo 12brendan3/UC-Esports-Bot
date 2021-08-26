@@ -26,7 +26,6 @@ function handleCommand(client, interaction) {
 }
 
 async function handleButton(client, interaction) {
-  console.log(interaction);
   if (interaction.user.bot || interaction.message.channel.type === `dm`) {
     return;
   }

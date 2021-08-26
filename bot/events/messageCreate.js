@@ -5,7 +5,7 @@ const WordFilter = require(`bad-words`);
 
 const filter = new WordFilter();
 
-const xpWhitelist = new Set([`313455932896182283`, `772589330710659083`, `403356697327828995`]);
+const xpWhitelist = new Set([`313455932896182283`, `772589330710659083`, `403356697327828995`, `725015061315190864`, `734896597518909610`, `703805091525951509`]);
 const profaneWhitelist = new Set([`772589330710659083`]);
 
 // Exports

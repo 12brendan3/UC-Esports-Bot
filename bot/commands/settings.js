@@ -705,7 +705,7 @@ async function addRoleReaction(interaction, client) {
 
       const totalRoles = await database.getAllEntries(`Roles`, {guildID: interaction.guildId, roleCategory: roleCategory.ID});
 
-      if (totalRoles.length > 19) {
+      if (totalRoles.length > 24) {
         interaction.reply({content: `That category has the maximum amount of roles already, please try again.`, ephemeral: true});
         activeChanges.delete(interaction.guildId);
         return;

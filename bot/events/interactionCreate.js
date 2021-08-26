@@ -1,4 +1,6 @@
 const commandManager = require(`../helpers/command-manager`);
+const database = require(`../helpers/database-manager`);
+const reactManager = require(`../helpers/role-react-manager-2`);
 
 // Exports
 module.exports = {handle};
@@ -23,6 +25,47 @@ function handleCommand(client, interaction) {
   commands.get(interaction.commandName).handle(client, interaction);
 }
 
-function handleButton(client, interaction) {
+async function handleButton(client, interaction) {
   console.log(interaction);
+  if (interaction.user.bot || interaction.message.channel.type === `dm`) {
+    return;
+  }
+
+  const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
+
+  if (!guildSettings || !guildSettings.rolesChannelID) {
+    return;
+  }
+
+  const roleData = reactManager.getRoleData();
+
+  if (!roleData[interaction.guildId]) {
+    return;
+  }
+
+  for (const category in roleData[interaction.guildId]) {
+    if (Object.prototype.hasOwnProperty.call(roleData[interaction.guildId], category) && roleData[interaction.guildId][category].msgID === interaction.message.id) {
+      const emoji = interaction.customId;
+      const roleID = roleData[interaction.guildId][category].roles[emoji];
+
+      if (roleID) {
+        const member = interaction.member;
+        const role = interaction.member.guild.roles.cache.get(roleID);
+
+        try {
+          if (member.roles.cache.get(roleID)) {
+            await member.roles.remove(roleID, `User requested role removal.`);
+            interaction.reply({content: `You no longer have the \`${role.name}\` role.`, ephemeral: true});
+          } else {
+            await member.roles.add(roleID, `User requested role addition.`);
+            interaction.reply({content: `You have been given the \`${role.name}\` role.`, ephemeral: true});
+          }
+        } catch {
+          const message = await interaction.reply({content: `${member}, there was an error giving you the \`${role.name}\` role.\nTell an admin if they don't notice.  There may be a permission issue.\n*This message will self-destruct in 10 seconds.*`, ephemeral: false});
+          setTimeout(() => message.delete(), 10000);
+        }
+        break;
+      }
+    }
+  }
 }

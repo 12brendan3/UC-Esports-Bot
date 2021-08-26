@@ -1,12 +1,10 @@
-const Discord = require(`discord.js`);
-
 const database = require(`./database-manager`);
 const resolvers = require(`./resolvers`);
 
 const roleData = {};
 
 // Exports
-module.exports = {loadRoleData, addRoleData, removeRoleData, updateGuildEmbeds, getRoleData, updateCategoryData};
+module.exports = {loadRoleData, addRoleData, removeRoleData, updateGuildMessages, getRoleData, updateCategoryData};
 
 async function loadRoleData() {
   const categories = await database.getAllEntries(`RoleCategories`);
@@ -75,7 +73,7 @@ async function addRoleData(client, guildID, categoryID, emojiID, roleID, catDesc
 
   roleData[guildID][categoryID].emojis.push(emojiID);
 
-  await updateGuildEmbeds(client, guildID, categoryID);
+  await updateGuildMessages(client, guildID, categoryID);
 }
 
 async function removeRoleData(client, guildID, categoryID, emojiID) {
@@ -87,7 +85,7 @@ async function removeRoleData(client, guildID, categoryID, emojiID) {
     }
 
     roleData[guildID][categoryID].emojis = roleData[guildID][categoryID].emojis.filter((emoji) => emoji !== emojiID);
-    await updateGuildEmbeds(client, guildID, categoryID);
+    await updateGuildMessages(client, guildID, categoryID);
   } else {
     delete roleData[guildID][categoryID];
 
@@ -95,51 +93,74 @@ async function removeRoleData(client, guildID, categoryID, emojiID) {
       delete roleData[guildID];
     }
 
-    await updateGuildEmbeds(client, guildID);
+    await updateGuildMessages(client, guildID);
   }
 }
 
 async function updateCategoryData(client, guildID, categoryID, name, description) {
   if (name) {
     roleData[guildID][categoryID].name = name;
-    await updateGuildEmbeds(client, guildID, categoryID);
+    await updateGuildMessages(client, guildID, categoryID);
   } else if (description) {
     roleData[guildID][categoryID].description = description;
-    await updateGuildEmbeds(client, guildID, categoryID);
+    await updateGuildMessages(client, guildID, categoryID);
   }
 }
 
-function generateEmbed(client, guildID, categoryID) {
-  let embed = false;
+function generateMessage(client, guildID, categoryID) {
+  let components = false;
+  let buttons = [];
+  let buttonCount = 1;
 
   if (roleData[guildID] && roleData[guildID][categoryID]) {
-    embed = new Discord.MessageEmbed();
-
-    embed.setColor(`#FF0000`);
-    embed.setAuthor(`${roleData[guildID][categoryID].name}`);
-    embed.setDescription(roleData[guildID][categoryID].description);
-
-    const fields = [];
+    components = [];
 
     for (const role in roleData[guildID][categoryID].roles) {
       if (Object.prototype.hasOwnProperty.call(roleData[guildID][categoryID].roles, role)) {
-        const emoji = client.emojis.cache.get(role);
+        const parsedEmoji = resolvers.resolveEmojiID(client, role);
+        console.log(`Role: ${role}`);
+        console.log(`Parsed: ${parsedEmoji}`);
         const discordRole = client.guilds.cache.get(guildID).roles.cache.get(roleData[guildID][categoryID].roles[role]);
-        if (emoji && discordRole) {
-          fields.push({name: `${emoji} ${discordRole.name}`, value: `*** ***`, inline: true});
-        } else if (discordRole) {
-          fields.push({name: `${role} ${discordRole.name}`, value: `*** ***`, inline: true});
+        if (discordRole) {
+          buttons.push({
+            type: `BUTTON`,
+            label: discordRole.name,
+            style: `PRIMARY`,
+            custom_id: role,
+            emoji: parsedEmoji ? parsedEmoji : `❓`,
+          });
         }
+
+        if ((buttonCount % 5) === 0) {
+          console.log(`yeet?`);
+          components.push({
+            type: `ACTION_ROW`,
+            components: buttons,
+          });
+          buttons = [];
+        }
+
+        buttonCount++;
       }
     }
-
-    embed.addFields(fields);
   }
 
-  return embed;
+  if (buttons.length > 0) {
+    components.push({
+      type: `ACTION_ROW`,
+      components: buttons,
+    });
+  }
+
+  const newMessage = {
+    content: `**__${roleData[guildID][categoryID].name}__**\n${roleData[guildID][categoryID].description}`,
+    components,
+  };
+
+  return newMessage;
 }
 
-async function updateGuildEmbeds(client, guildID, categoryID) {
+async function updateGuildMessages(client, guildID, categoryID) {
   const guildSettings = await database.getEntry(`Guilds`, {guildID});
 
   if (!guildSettings || !guildSettings.rolesChannelID) {
@@ -147,75 +168,54 @@ async function updateGuildEmbeds(client, guildID, categoryID) {
   }
 
   if (categoryID) {
-    await updateOneEmbed(client, guildID, categoryID, guildSettings);
+    await updateOneMessage(client, guildID, categoryID, guildSettings);
   } else {
-    await updateAllEmbeds(client, guildID, guildSettings);
+    await updateAllMessages(client, guildID, guildSettings);
   }
 }
 
-async function updateOneEmbed(client, guildID, categoryID, guildSettings) {
+async function updateOneMessage(client, guildID, categoryID, guildSettings) {
   const rolesChannel = client.guilds.cache.get(guildID).channels.cache.get(guildSettings.rolesChannelID);
 
-  const newEmbed = generateEmbed(client, guildID, categoryID);
+  const newMessage = generateMessage(client, guildID, categoryID);
 
   if (roleData[guildID][categoryID].msgID) {
     const oldMessage = rolesChannel.messages.cache.get(roleData[guildID][categoryID].msgID);
 
     if (oldMessage) {
-      oldMessage.edit({embeds: [newEmbed]});
+      oldMessage.edit(newMessage);
 
-      const emojis = roleData[guildID][categoryID].emojis;
-
-      oldMessage.reactions.cache.each(async (reaction) => {
-        const reactionEmoji = await resolvers.resolveEmojiID(client, reaction.emoji);
-        if (!emojis.includes(reactionEmoji)) {
-          reaction.remove();
-        }
-      });
-
-      emojis.forEach((emoji) => {
-        const hasEmoji = oldMessage.reactions.cache.get(emoji);
-        if (!hasEmoji) {
-          oldMessage.react(emoji);
-        }
-      });
+      oldMessage.reactions.removeAll();
     } else {
-      await updateAllEmbeds(client, guildID, guildSettings);
+      await updateAllMessages(client, guildID, guildSettings);
     }
   } else {
-    await updateAllEmbeds(client, guildID, guildSettings);
+    await updateAllMessages(client, guildID, guildSettings);
   }
   return true;
 }
 
-async function updateAllEmbeds(client, guildID, guildSettings) {
+async function updateAllMessages(client, guildID, guildSettings) {
   const rolesChannel = client.guilds.cache.get(guildID).channels.cache.get(guildSettings.rolesChannelID);
   let messages = await rolesChannel.messages.fetch();
 
-  rolesChannel.bulkDelete(messages, true);
+  await rolesChannel.bulkDelete(messages, true);
 
   messages = await rolesChannel.messages.fetch();
 
   messages.forEach((msg) => {
     msg.delete();
   });
+
   for (const category in roleData[guildID]) {
     if (Object.prototype.hasOwnProperty.call(roleData[guildID], category)) {
-      const newEmbed = generateEmbed(client, guildID, category);
-      const newMessage = await rolesChannel.send({embeds: [newEmbed]});
+      const newMessage = generateMessage(client, guildID, category);
+      const newMessagePost = await rolesChannel.send(newMessage);
 
       // eslint-disable-next-line require-atomic-updates
-      roleData[guildID][category].msgID = newMessage.id;
+      roleData[guildID][category].msgID = newMessagePost.id;
 
-      const emojis = roleData[guildID][category].emojis;
-
-      if (emojis) {
-        emojis.forEach((emoji) => {
-          newMessage.react(emoji);
-        });
-      }
-
-      database.updateEntry(`RoleCategories`, {ID: category}, {messageID: newMessage.id});
+      database.updateEntry(`RoleCategories`, {ID: category}, {messageID: newMessagePost.id});
     }
   }
 

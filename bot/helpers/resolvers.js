@@ -1,4 +1,4 @@
-const uniEmojiRegexReq = require(`emoji-regex/index.js`);
+const uniEmojiRegexReq = require(`emoji-regex/text.js`);
 
 // Regex
 const regexRoleMention = new RegExp(`^<@&[0-9]*>$`);
@@ -106,7 +106,6 @@ function resolveEmojiID(client, emoji) {
     const emojiSplt = emoji.split(`:`)[2];
     foundEmoji = emojiSplt.substr(0, emojiSplt.length - 1);
   }
-
   return foundEmoji;
 }
 

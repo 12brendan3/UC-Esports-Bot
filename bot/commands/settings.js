@@ -459,9 +459,9 @@ async function changeWelcomeChannel(interaction) {
     return;
   }
 
-  if (options.has(`disable`) && options.get(`disable`).value) {
+  if (options.get(`disable`) && options.get(`disable`).value) {
     result = await database.updateOrCreateEntry(`Guilds`, {guildID: interaction.guildId}, {welcomeChannelID: null});
-  } else if (options.has(`channel`)) {
+  } else if (options.get(`channel`)) {
     result = await database.updateOrCreateEntry(`Guilds`, {guildID: interaction.guildId}, {welcomeChannelID: options.get(`channel`).channel.id});
   } else {
     interaction.reply({content: `Please provide a channel or set disable to true to disable the welcome message.`, ephemeral: true});
@@ -557,9 +557,9 @@ async function changeLogsChannel(interaction) {
     return;
   }
 
-  if (options.has(`disable`) && options.get(`disable`).value) {
+  if (options.get(`disable`) && options.get(`disable`).value) {
     result = await database.updateEntry(`Guilds`, {guildID: interaction.guildId}, {logsChannelID: null});
-  } else if (options.has(`channel`)) {
+  } else if (options.get(`channel`)) {
     result = await database.updateEntry(`Guilds`, {guildID: interaction.guildId}, {logsChannelID: options.get(`channel`).channel.id});
   } else {
     interaction.reply({content: `Please provide a channel or set disable to true to disable logs.`, ephemeral: true});
@@ -585,9 +585,9 @@ async function changeStarboardChannel(interaction) {
     return;
   }
 
-  if (options.has(`disable`) && options.get(`disable`).value) {
+  if (options.get(`disable`) && options.get(`disable`).value) {
     result = await database.updateEntry(`Guilds`, {guildID: interaction.guildId}, {starboardChannelID: null});
-  } else if (options.has(`channel`)) {
+  } else if (options.get(`channel`)) {
     result = await database.updateEntry(`Guilds`, {guildID: interaction.guildId}, {starboardChannelID: options.get(`channel`).channel.id});
   } else {
     interaction.reply({content: `Please provide a channel or set disable to true to disable the starboard.`, ephemeral: true});
@@ -625,9 +625,9 @@ async function changeStreamingRole(interaction) {
   const options = interaction.options;
   let result;
 
-  if (options.has(`disable`) && options.get(`disable`).value) {
+  if (options.get(`disable`) && options.get(`disable`).value) {
     result = await database.updateEntry(`Guilds`, {guildID: interaction.guildId}, {streamingRoleID: null});
-  } else if (options.has(`role`)) {
+  } else if (options.get(`role`)) {
     result = await database.updateEntry(`Guilds`, {guildID: interaction.guildId}, {streamingRoleID: options.get(`role`).role.id});
   } else {
     interaction.reply({content: `Please provide a role or set disable to true to disable the streaming role.`, ephemeral: true});
@@ -653,9 +653,9 @@ async function changeRoleChannel(interaction) {
     return;
   }
 
-  if (options.has(`disable`) && options.get(`disable`).value) {
+  if (options.get(`disable`) && options.get(`disable`).value) {
     result = await database.updateOrCreateEntry(`Guilds`, {guildID: interaction.guildId}, {rolesChannelID: null});
-  } else if (options.has(`role`)) {
+  } else if (options.get(`role`)) {
     result = await database.updateOrCreateEntry(`Guilds`, {guildID: interaction.guildId}, {rolesChannelID: options.get(`channel`).channel.id});
   } else {
     interaction.reply({content: `Please provide a channel or set disable to true to disable the reaction role channel.`, ephemeral: true});
@@ -721,7 +721,7 @@ async function addRoleReaction(interaction, client) {
         interaction.reply({content: `There was an error adding the reaction role.\nTell the bot developers if the issue persists.`, ephemeral: true});
       }
     } else {
-      if (!options.has(`description`)) {
+      if (!options.get(`description`)) {
         interaction.reply({content: `No category description was provided for the new category, try again with one.`, ephemeral: true});
         activeChanges.delete(interaction.guildId);
         return;
@@ -739,7 +739,8 @@ async function addRoleReaction(interaction, client) {
         interaction.reply({content: `There was an error adding the reaction role.\nTell the bot developers if the issue persists.`, ephemeral: true});
       }
     }
-  } catch {
+  } catch (err) {
+    console.error(err);
     interaction.reply({content: `There was an internal error, please try again.`, ephemeral: true});
   }
 
@@ -802,7 +803,7 @@ async function updateRoleReactions(interaction, client) {
   const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
 
   if (guildSettings && guildSettings.rolesChannelID) {
-    await reactManager.updateGuildEmbeds(client, interaction.guildId);
+    await reactManager.updateGuildMessages(client, interaction.guildId);
 
     interaction.reply({content: `The role reactions have been updated.`, ephemeral: true});
   } else {
@@ -914,9 +915,9 @@ async function changeVerifiedRole(interaction) {
   const options = interaction.options;
   let result;
 
-  if (options.has(`disable`) && options.get(`disable`).value) {
+  if (options.get(`disable`) && options.get(`disable`).value) {
     result = await database.updateEntry(`Guilds`, {guildID: interaction.guildId}, {verifiedRoleID: null});
-  } else if (options.has(`role`)) {
+  } else if (options.get(`role`)) {
     result = await database.updateEntry(`Guilds`, {guildID: interaction.guildId}, {verifiedRoleID: options.get(`role`).role.id});
   } else {
     interaction.reply({content: `Please provide a role or set disable to true to disable the verified role.`, ephemeral: true});
@@ -942,9 +943,9 @@ async function changeReportChannel(interaction) {
     return;
   }
 
-  if (options.has(`disable`) && options.get(`disable`).value) {
+  if (options.get(`disable`) && options.get(`disable`).value) {
     result = await database.updateEntry(`Guilds`, {guildID: interaction.guildId}, {reportChannelID: null});
-  } else if (options.has(`role`)) {
+  } else if (options.get(`role`)) {
     result = await database.updateEntry(`Guilds`, {guildID: interaction.guildId}, {reportChannelID: options.get(`channel`).channel.id});
   } else {
     interaction.reply({content: `Please provide a channel or set disable to true to disable the report channel.`, ephemeral: true});
@@ -965,9 +966,9 @@ async function changeReportRole(interaction) {
   const options = interaction.options;
   let result;
 
-  if (options.has(`disable`) && options.get(`disable`).value) {
+  if (options.get(`disable`) && options.get(`disable`).value) {
     result = await database.updateEntry(`Guilds`, {guildID: interaction.guildId}, {reportRoleID: null});
-  } else if (options.has(`role`)) {
+  } else if (options.get(`role`)) {
     result = await database.updateEntry(`Guilds`, {guildID: interaction.guildId}, {reportRoleID: options.get(`role`).role.id});
   } else {
     interaction.reply({content: `Please provide a role or set disable to true to disable the report role.`, ephemeral: true});
@@ -988,9 +989,9 @@ async function changeTimeoutRole(interaction) {
   const options = interaction.options;
   let result;
 
-  if (options.has(`disable`) && options.get(`disable`).value) {
+  if (options.get(`disable`) && options.get(`disable`).value) {
     result = await database.updateEntry(`Guilds`, {guildID: interaction.guildId}, {timeoutRoleID: null});
-  } else if (options.has(`role`)) {
+  } else if (options.get(`role`)) {
     result = await database.updateEntry(`Guilds`, {guildID: interaction.guildId}, {timeoutRoleID: options.get(`role`).role.id});
   } else {
     interaction.reply({content: `Please provide a role or set disable to true to disable the timeout role.`, ephemeral: true});

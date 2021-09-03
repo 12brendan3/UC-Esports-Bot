@@ -48,35 +48,23 @@ const help = {
       ],
     },
     {
-      name: `admin-add`,
+      name: `admin-role`,
       type: `SUB_COMMAND`,
-      description: `Adds an admin to admin list.`,
+      description: `Sets or removes the admin role.`,
       options: [
         {
-          name: `user`,
-          description: `The user to add to the admin list.`,
-          type: `USER`,
+          name: `role`,
+          description: `The role to set as the admin role.`,
+          type: `ROLE`,
           required: true,
         },
-      ],
-    },
-    {
-      name: `admin-remove`,
-      type: `SUB_COMMAND`,
-      description: `Removes an admin from the admin list.`,
-      options: [
         {
-          name: `user`,
-          description: `The user to remove from the admin list.`,
-          type: `USER`,
-          required: true,
+          name: `remove`,
+          description: `Whether or not to remove the admin role.`,
+          type: `BOOLEAN`,
+          required: false,
         },
       ],
-    },
-    {
-      name: `admin-list`,
-      type: `SUB_COMMAND`,
-      description: `Gets and sends the admin list.`,
     },
     {
       name: `logs-channel`,
@@ -376,14 +364,8 @@ function changeSettings(interaction, client) {
     case `welcome-channel`:
       changeWelcomeChannel(interaction);
       break;
-    case `admin-add`:
-      addAdmin(client, interaction);
-      break;
-    case `admin-remove`:
-      removeAdmin(client, interaction);
-      break;
-    case `admin-list`:
-      listAdmins(interaction, client);
+    case `admin-role`:
+      changeAdminRole(client, interaction);
       break;
     case `logs-channel`:
       changeLogsChannel(interaction);
@@ -478,72 +460,29 @@ async function changeWelcomeChannel(interaction) {
   activeChanges.delete(interaction.guildId);
 }
 
-async function addAdmin(client, interaction) {
-  if (interaction.options.get(`user`).user.bot) {
-    interaction.reply({content: `A bot can't be added as an admin!`, ephemeral: true});
+async function changeAdminRole(client, interaction) {
+  if (interaction.options.get(`remove`) && interaction.options.get(`remove`).value === true) {
+    const success = await permissions.removeAdminRole(client, interaction.guild, interaction.options.get(`role`).role.id);
+    if (success && success === `norole`) {
+      interaction.reply({content: `There isn't an admin role!`, ephemeral: true});
+    } else if (success) {
+      interaction.reply({content: `Admin role has been set!`, ephemeral: true});
+    } else {
+      interaction.reply({content: `There was an error setting the new admin role.\nTell the bot developers if the issue persists.`, ephemeral: true});
+    }
     activeChanges.delete(interaction.guildId);
     return;
   }
 
-  const success = await permissions.addAdmin(client, interaction.guild, interaction.options.get(`user`).user.id);
+  const success = await permissions.setAdminRole(client, interaction.guild, interaction.options.get(`role`).role.id);
 
   if (success && success === `duplicate`) {
-    interaction.reply({content: `That user is already an admin!`, ephemeral: true});
+    interaction.reply({content: `That is already the admin role!`, ephemeral: true});
   } else if (success) {
-    interaction.reply({content: `Admin has been added!\nUse \`/settings admin-list\` to see the current admins.`, ephemeral: true});
+    interaction.reply({content: `Admin role has been set!`, ephemeral: true});
   } else {
-    interaction.reply({content: `There was an error adding the new admin.\nTell the bot developers if the issue persists.`, ephemeral: true});
+    interaction.reply({content: `There was an error setting the new admin role.\nTell the bot developers if the issue persists.`, ephemeral: true});
   }
-
-  activeChanges.delete(interaction.guildId);
-}
-
-async function removeAdmin(client, interaction) {
-  const removeUserID = interaction.options.get(`user`).user.id;
-  const adminCheck = await permissions.removeAdmin(client, interaction.guildId, removeUserID);
-  if (adminCheck && adminCheck === `notadmin`) {
-    interaction.reply({content: `That user isn't an admin!`, ephemeral: true});
-  } else if (adminCheck) {
-    if (interaction.user.id === removeUserID) {
-      interaction.reply({content: `Admin has been removed!\n*Not sure why you removed yourself...*`, ephemeral: true});
-    } else {
-      interaction.reply({content: `Admin has been removed!\nUse \`/settings admin-list\` to see the current admins.`, ephemeral: true});
-    }
-  } else {
-    interaction.reply({content: `There was an error removing the admin.\nTell the bot developers if the issue persists.`, ephemeral: true});
-  }
-
-  activeChanges.delete(interaction.guildId);
-}
-
-async function sendAdminList(interaction, client) {
-  const admins = await permissions.getAdmins(interaction.guild);
-
-  if (admins && admins === `noadmins`) {
-    interaction.reply({content: `You're the only admin on this server.`, ephemeral: true});
-    return false;
-  } else if (admins) {
-    let adminList = ``;
-
-    for (let i = 0; i < admins.length; i++) {
-      const adminUser = client.users.cache.get(admins[i].userID);
-      if (adminUser) {
-        adminList += `${adminUser.tag}\n`;
-      } else {
-        adminList += `${admins[i].userID} (Unknown User)\n`;
-      }
-    }
-
-    interaction.reply({content: `Here are the admins:\n\`\`\`${adminList}\`\`\`\nNote: The server owner and developers are always admins.`, ephemeral: true});
-    return true;
-  } else {
-    interaction.reply({content: `There was an error getting the admins.\nTell the bot developers if the issue persists.`, ephemeral: true});
-    return false;
-  }
-}
-
-async function listAdmins(interaction, client) {
-  await sendAdminList(interaction, client);
 
   activeChanges.delete(interaction.guildId);
 }

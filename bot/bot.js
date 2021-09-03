@@ -12,7 +12,7 @@ const playerManager = require(`./helpers/player-manager`);
 const timeouts = require(`./helpers/timeout-manager`);
 
 // Exports
-module.exports = {startBot, stopBot, restartBot};
+module.exports = {startBot, stopBot, restartBot, migrateAdmins};
 
 // Exported functions
 async function startBot() {
@@ -57,4 +57,30 @@ function restartBot() {
   commandManager.clearAll();
   timeouts.clearAll();
   startBot();
+}
+
+function migrateAdmins() {
+  console.log(`Migrating admins, please wait....`);
+
+  client.guilds.cache.forEach(async (guild) => {
+    const admins = await database.getAllEntries(`ServerAdmins`, {guildID: guild.id});
+    if (admins) {
+      const botRole = guild.roles.botRoleFor(client.user.id);
+      const newRole = await guild.roles.create({name: `Popcorn`, position: botRole ? botRole.position : null, color: `#F1CA16`, reason: `New Bearcat Bot admin role.`});
+      await database.updateEntry(`Guilds`, {guildID: guild.id}, {adminRoleID: newRole.id});
+      admins.forEach((admin) => {
+        const user = guild.members.cache.get(admin.userID);
+        if (user) {
+          user.roles.add(newRole, `Bot admin on old system.`);
+        }
+      });
+    }
+  });
+
+  console.info(`Done migrating admins!\nThe bot will exit in 10 seconds.`);
+
+  setTimeout(() => {
+    stopBot();
+    process.exit();
+  }, 10000);
 }

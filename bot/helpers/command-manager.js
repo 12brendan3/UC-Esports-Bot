@@ -4,7 +4,7 @@ const path = require(`path`);
 const database = require(`../helpers/database-manager`);
 
 // Exports
-module.exports = {setSlashCommands, addUserToGuildCommand, removeUserFromGuildCommand, getAll, getAllSecret, reloadAll, clearAll, reloadOne, loadAll};
+module.exports = {setSlashCommands, addRoleToGuildCommand, removeRoleFromGuildCommand, getAll, getAllSecret, reloadAll, clearAll, reloadOne, loadAll};
 
 // Top level vars
 const commandIDs = new Map();
@@ -56,31 +56,36 @@ async function setSlashCommands(client) {
     devPermissions.push({id: dev, type: `USER`, permission: true});
   });
 
-  const adminList = await database.getAllEntries(`ServerAdmins`);
 
-  client.guilds.cache.forEach((rawGuild) => {
-    const ownerPerm = {id: rawGuild.ownerId, type: `USER`, permission: true};
-    adminPermissions.set(rawGuild.id, devPermissions.concat(ownerPerm));
+  const allGuildSettings = await database.getAllEntries(`Guilds`);
+  allGuildSettings.forEach((guildSettings) => {
+    const rawGuild = client.guilds.cache.get(guildSettings.guildID);
+    if (rawGuild) {
+      const ownerPerm = {id: rawGuild.ownerId, type: `USER`, permission: true};
+      if (guildSettings && guildSettings.adminRoleID && rawGuild.roles.cache.get(guildSettings.adminRoleID)) {
+        const adminPerm = {id: guildSettings.adminRoleID, type: `ROLE`, permission: true};
+        adminPermissions.set(rawGuild.id, devPermissions.concat(ownerPerm, adminPerm));
+      } else {
+        adminPermissions.set(rawGuild.id, devPermissions.concat(ownerPerm));
+      }
+    }
   });
-
-  for (let i = 0; i < adminList.length; i++) {
-    const adminPerm = {id: adminList[i].userID, type: `USER`, permission: true};
-    adminPermissions.set(adminList[i].guildID, adminPermissions.get(adminList[i].guildID).concat(adminPerm));
-  }
 
   generatePermissions();
 
   console.info(`Done generating permissions, setting...`);
 
+  const permSet = [];
   permissionData.forEach((commandPermissions, permGuildID) => {
-    client.application.commands.permissions.set({guild: permGuildID, fullPermissions: commandPermissions});
+    permSet.push(client.application.commands.permissions.set({guild: permGuildID, fullPermissions: commandPermissions}));
   });
+  await Promise.all(permSet);
 
   console.info(`Done setting permissions.\nFinished loading slash commands!`);
 }
 
-async function addUserToGuildCommand(client, guildID, userID) {
-  const adminPerm = {id: userID, type: `USER`, permission: true};
+async function addRoleToGuildCommand(client, guildID, roleID) {
+  const adminPerm = {id: roleID, type: `ROLE`, permission: true};
   adminPermissions.set(guildID, adminPermissions.get(guildID).concat(adminPerm));
 
   generatePermissions();
@@ -88,8 +93,8 @@ async function addUserToGuildCommand(client, guildID, userID) {
   client.application.commands.permissions.set({guild: guildID, fullPermissions: permissionData.get(guildID)});
 }
 
-async function removeUserFromGuildCommand(client, guildID, userID) {
-  adminPermissions.set(guildID, adminPermissions.get(guildID).filter(item => item.id !== userID));
+async function removeRoleFromGuildCommand(client, guildID, roleID) {
+  adminPermissions.set(guildID, adminPermissions.get(guildID).filter(item => item.id !== roleID));
 
   generatePermissions();
 
@@ -137,6 +142,10 @@ function clearAll() {
     delete require.cache[require.resolve(`../commands/secret/${command}.js`)];
   }
 
+  commandIDs.clear();
+  adminPermissions.clear();
+  devPermissions.clear();
+  permissionData.clear();
   commandImports.clear();
   secretCommandImports.clear();
 }

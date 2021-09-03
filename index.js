@@ -36,6 +36,9 @@ function handleUserInput(line) {
     case `reload`:
       reloadSomething(split);
       break;
+    case `migrate-admins`:
+      bot.migrateAdmins();
+      break;
     case `help`:
       console.info(help);
       break;

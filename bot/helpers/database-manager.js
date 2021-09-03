@@ -328,7 +328,6 @@ async function getEntry(table, filter) {
     const existingEntry = await tables[table].findOne({where: filter});
     return existingEntry;
   } catch (err) {
-    console.error(err);
     return false;
   }
 }

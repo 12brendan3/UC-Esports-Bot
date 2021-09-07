@@ -29,9 +29,9 @@ async function setSlashCommands(client) {
     const helpInfo = commandModules.get(command).getHelp();
     if (helpInfo) {
       if (helpInfo.level === `user`) {
-        slashCommands.push({name: command, description: helpInfo.text, options: helpInfo.options});
+        slashCommands.push({name: command, description: helpInfo.text, options: helpInfo.options, type: helpInfo.type});
       } else {
-        slashCommands.push({name: command, description: helpInfo.text, options: helpInfo.options, defaultPermission: false});
+        slashCommands.push({name: command, description: helpInfo.text, options: helpInfo.options, type: helpInfo.type, defaultPermission: false});
       }
 
       if (helpInfo.level === `developer`) {

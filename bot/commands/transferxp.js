@@ -1,6 +1,5 @@
 const database = require(`../helpers/database-manager`);
 const collectors = require(`../helpers/collectors`);
-const permissions = require(`../helpers/permissions`);
 
 // Exports
 module.exports = {handle, getHelp};
@@ -27,13 +26,7 @@ const help = {
 
 // Exported functions
 function handle(client, interaction) {
-  const perm = permissions.checkDev(interaction.user.id);
-
-  if (perm) {
-    transferXP(interaction);
-  } else {
-    interaction.reply({content: `You're not a developer.`, ephemeral: true});
-  }
+  transferXP(interaction);
 }
 
 function getHelp() {

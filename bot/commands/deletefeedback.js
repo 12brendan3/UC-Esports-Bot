@@ -1,5 +1,4 @@
 const database = require(`../helpers/database-manager`);
-const permissions = require(`../helpers/permissions`);
 
 // Exports
 module.exports = {handle, getHelp};
@@ -20,13 +19,7 @@ const help = {
 
 // Exported functions
 function handle(client, interaction) {
-  const perm = permissions.checkDev(interaction.user.id);
-
-  if (perm) {
-    removeFeedback(interaction);
-  } else {
-    interaction.reply({content: `You're not a developer.`, ephemeral: true});
-  }
+  removeFeedback(interaction);
 }
 
 async function removeFeedback(interaction) {

@@ -1,4 +1,3 @@
-const permissions = require(`../helpers/permissions`);
 const database = require(`../helpers/database-manager`);
 const taskManager = require(`../helpers/task-manager`);
 
@@ -23,18 +22,6 @@ const help = {
 async function handle(client, interaction) {
   if (interaction.channel.type === `dm`) {
     interaction.reply({content: `This command has to be used in a server.`, ephemeral: true});
-    return;
-  }
-
-  let isAdmin = false;
-  try {
-    isAdmin = await permissions.checkAdmin(interaction.guild, interaction.user.id);
-  } catch {
-    interaction.reply({content: `Command timed out, please try again.`, ephemeral: true});
-  }
-
-  if (!isAdmin) {
-    interaction.reply({content: `You're not an admin on this server.`, ephemeral: true});
     return;
   }
 

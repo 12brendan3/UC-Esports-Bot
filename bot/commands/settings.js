@@ -339,15 +339,11 @@ async function handle(client, interaction) {
     return;
   }
 
-  const admin = await permissions.checkAdmin(interaction.guild, interaction.user.id);
-
-  if (admin && activeChanges.has(interaction.guildId)) {
+  if (activeChanges.has(interaction.guildId)) {
     interaction.reply({content: `Only one change can be made at a time.`, ephemeral: true});
-  } else if (admin) {
+  } else {
     activeChanges.add(interaction.guildId);
     changeSettings(interaction, client);
-  } else {
-    interaction.reply({content: `You're not an admin on this server.`, ephemeral: true});
   }
 }
 

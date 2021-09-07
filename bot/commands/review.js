@@ -1,7 +1,6 @@
 const Discord = require(`discord.js`);
 
 const database = require(`../helpers/database-manager`);
-const permissions = require(`../helpers/permissions`);
 
 // Exports
 module.exports = {handle, getHelp};
@@ -14,11 +13,7 @@ const help = {
 
 // Exported functions
 function handle(client, interaction) {
-  const perm = permissions.checkDev(interaction.user.id);
-
-  if (perm) {
-    sendFeedback(client, interaction);
-  }
+  sendFeedback(client, interaction);
 }
 
 async function sendFeedback(client, interaction) {

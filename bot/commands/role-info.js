@@ -1,7 +1,5 @@
 const Discord = require(`discord.js`);
 
-const permissions = require(`../helpers/permissions`);
-
 // Exports
 module.exports = {handle, getHelp};
 
@@ -27,25 +25,20 @@ async function handle(client, interaction) {
   }
 
   try {
-    const isAdmin = await permissions.checkAdmin(interaction.guild, interaction.user.id);
-    if (isAdmin) {
-      const role = interaction.options.get(`role`).role;
-      const embed = new Discord.MessageEmbed();
+    const role = interaction.options.get(`role`).role;
+    const embed = new Discord.MessageEmbed();
 
-      embed.setColor(role.color);
-      embed.setAuthor(`${role.name} Role Information`, interaction.guild.iconURL());
-      embed.setTimestamp(role.createdTimestamp);
-      embed.setFooter(`Role Created`);
+    embed.setColor(role.color);
+    embed.setAuthor(`${role.name} Role Information`, interaction.guild.iconURL());
+    embed.setTimestamp(role.createdTimestamp);
+    embed.setFooter(`Role Created`);
 
-      embed.addField(`__Total Members__`, `${role.members.size} member${role.members.size > 1 ? `s` : ``}  (${(role.members.size / interaction.guild.memberCount * 100).toFixed(2)}% of all server members)`);
-      embed.addField(`__Color (hex)__`, `\`${role.hexColor}\``);
-      embed.addField(`__Mentionable__`, role.mentionable ? `Yes` : `No`);
-      embed.addField(`__Externally Managed__`, role.managed ? `Yes` : `No`);
+    embed.addField(`__Total Members__`, `${role.members.size} member${role.members.size > 1 ? `s` : ``}  (${(role.members.size / interaction.guild.memberCount * 100).toFixed(2)}% of all server members)`);
+    embed.addField(`__Color (hex)__`, `\`${role.hexColor}\``);
+    embed.addField(`__Mentionable__`, role.mentionable ? `Yes` : `No`);
+    embed.addField(`__Externally Managed__`, role.managed ? `Yes` : `No`);
 
-      interaction.reply({embeds: [embed]});
-    } else {
-      interaction.reply({content: `You're not an admin on this server.`, ephemeral: true});
-    }
+    interaction.reply({embeds: [embed]});
   } catch {
     interaction.reply({content: `Command timed out, please try again.`, ephemeral: true});
   }

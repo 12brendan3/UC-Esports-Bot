@@ -2,6 +2,7 @@ const weather = require(`../helpers/weather-manager`);
 const taskManger = require(`../helpers/task-manager`);
 const commandManager = require(`../helpers/command-manager`);
 const timeouts = require(`../helpers/timeout-manager`);
+const giveaways = require(`../helpers/giveaway-manager`);
 
 // Exports
 module.exports = {handle};
@@ -29,4 +30,6 @@ async function handle(client) {
   commandManager.setSlashCommands(client);
 
   timeouts.registerExisting(client);
+
+  giveaways.registerExisting(client);
 }

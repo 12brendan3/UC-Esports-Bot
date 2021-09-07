@@ -60,7 +60,7 @@ function restartBot() {
 }
 
 function migrateAdmins() {
-  console.log(`Migrating admins, please wait....`);
+  console.info(`Migrating admins, please wait....`);
 
   client.guilds.cache.forEach(async (guild) => {
     const admins = await database.getAllEntries(`ServerAdmins`, {guildID: guild.id});

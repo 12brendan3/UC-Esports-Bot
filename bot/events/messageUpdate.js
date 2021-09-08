@@ -2,9 +2,11 @@ const Discord = require(`discord.js`);
 
 const database = require(`../helpers/database-manager`);
 
-const WordFilter = require('bad-words');
+const WordFilter = require(`bad-words`);
 
 const filter = new WordFilter();
+
+const profaneWhitelist = new Set([`772589330710659083`]);
 
 // Exports
 module.exports = {handle};
@@ -15,16 +17,14 @@ function handle(client, msgOld, msgNew) {
     logMessageEdit(msgOld, msgNew);
   }
 
-  if (msgNew.guild.id === `772589330710659083` && filter.isProfane(msgNew.content) && msgNew.deletable) {
-    msgNew.delete();
-  }
+  checkProfane(msgNew);
 }
 
 // Private function
 async function logMessageEdit(msgOld, msgNew) {
-  const guildSettings = await database.getEntry(`Guilds`, {guildID: msgNew.guild.id});
+  const guildSettings = await database.getEntry(`Guilds`, {guildID: msgNew.guildId});
 
-  if (guildSettings && guildSettings.logsChannelID) {
+  if (guildSettings && guildSettings.logsChannelID && msgOld.content !== msgNew.content) {
     const logsChannel = msgNew.guild.channels.cache.get(guildSettings.logsChannelID);
     const embed = new Discord.MessageEmbed();
 
@@ -47,6 +47,16 @@ async function logMessageEdit(msgOld, msgNew) {
     embed.setTimestamp();
     embed.setFooter(msgNew.author.tag);
 
-    logsChannel.send(embed);
+    logsChannel.send({embeds: [embed]});
+  }
+}
+
+function checkProfane(msg) {
+  if (!msg.guild || !profaneWhitelist.has(msg.guildId)) {
+    return;
+  }
+
+  if (filter.isProfane(msg.content) && msg.deletable) {
+    msg.delete();
   }
 }

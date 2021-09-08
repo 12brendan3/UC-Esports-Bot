@@ -1,6 +1,4 @@
-const permissions = require(`../helpers/permissions`);
 const collectors = require(`../helpers/collectors`);
-const resolvers = require(`../helpers/resolvers`);
 const taskManager = require(`../helpers/task-manager`);
 const axios = require(`axios`);
 const path = require(`path`);
@@ -14,89 +12,100 @@ module.exports = {handle, getHelp};
 const help = {
   text: `Allows an admin to schedule a new task.`,
   level: `admin`,
+  options: [
+    {
+      name: `channel`,
+      type: `CHANNEL`,
+      description: `The channel to send the message and/or image in.`,
+      required: true,
+    },
+    {
+      name: `cron`,
+      type: `STRING`,
+      description: `The cron string for this task.`,
+      required: true,
+    },
+    {
+      name: `image`,
+      type: `BOOLEAN`,
+      description: `Whether or not to attach an image to this task.`,
+      required: true,
+    },
+    {
+      name: `message`,
+      type: `STRING`,
+      description: `The message to send.`,
+      required: false,
+    },
+  ],
 };
 
 // Exported functions
-async function handle(client, msg) {
-  if (msg.channel.type === `dm`) {
-    msg.reply(`This command has to be used in a server.`);
+async function handle(client, interaction) {
+  if (interaction.channel.type === `dm`) {
+    interaction.reply({content: `This command has to be used in a server.`, ephemeral: true});
     return;
   }
 
-  let isAdmin = false;
-  try {
-    isAdmin = await permissions.checkAdmin(msg.guild, msg.author.id);
-  } catch {
-    msg.reply(`Command timed out, please try again.`);
-  }
-
-  if (!isAdmin) {
-    msg.reply(`You're not an admin on this server.`);
+  if (interaction.options.get(`channel`).channel.type !== `text`) {
+    interaction.reply({content: `That's not a valid text channel.`, ephemeral: true});
     return;
   }
 
-  msg.reply(`What channel is this task for?`);
-  let channelMsg;
-  try {
-    channelMsg = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
-  } catch {
-    msg.reply(`Command timed out, please try again.`);
-    return;
-  }
-
-  const channelID = resolvers.resolveChannelID(msg.guild, channelMsg.first().content);
-  const channel = msg.guild.channels.cache.get(channelID);
-
-  if (!channel) {
-    msg.reply(`Couldn't find that channel, please try again.`);
-    return;
-  }
-
-  msg.reply(`What would you like the task to say?\nYou may also or alternatively attach an image.`);
-  let taskMsg;
-  try {
-    taskMsg = await collectors.oneMessageFromUser(msg.channel, msg.author.id, 600000);
-  } catch {
-    msg.reply(`Command timed out, please try again.`);
-    return;
-  }
-
-  const task = taskMsg.first();
-
-  if (task.attachments.size > 0 && verifyImage(task) !== 'valid') {
-    msg.reply(`That isn't a valid image, please try again.`);
-    return;
-  }
-
-  msg.reply(`When should this task trigger?\nCurrently only cron strings are supported.`);
-
-  let cronMsg;
-  try {
-    cronMsg = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
-  } catch {
-    msg.reply(`Command timed out, please try again.`);
-    return;
-  }
-
-  const cronString = cronMsg.first().content;
+  const cronString = interaction.options.get(`cron`).value;
   const cronSplit = cronString.split(` `);
-
   if (!cronos.validate(cronString) || (cronSplit.length > 5 && isNaN(cronSplit[0]))) {
-    msg.reply(`That isn't a valid cron string, please try again.`);
+    interaction.reply({content: `That isn't a valid cron string, please try again.`, ephemeral: true});
     return;
   }
 
-  const result = await taskManager.addTask(channel, cronString, task.content, task.attachments.size > 0 ? path.extname(task.attachments.first().name) : null);
+  let taskImg;
+  let task;
+  if (interaction.options.get(`image`).value) {
+    try {
+      interaction.reply({content: `Please send an image for the task now.`, ephemeral: true});
+      taskImg = await collectors.oneMessageFromUser(interaction.channel, interaction.user.id, 600000);
+    } catch {
+      interaction.followUp({content: `Command timed out, please try again.`, ephemeral: true});
+      return;
+    }
+
+    task = taskImg.first();
+
+    if (task.attachments.size > 0 && verifyImage(task) !== `valid`) {
+      interaction.followUp({content: `That isn't a valid image, please try again.`, ephemeral: true});
+      return;
+    }
+  } else if (!interaction.options.has(`message`)) {
+    interaction.reply({content: `The task needs to at least send something, please try again.`, ephemeral: true});
+    return;
+  }
+
+  const result = await taskManager.addTask(interaction.options.get(`channel`).channel, cronString, interaction.options.has(`message`) ? interaction.options.get(`message`).value : null, task ? path.extname(task.attachments.first().name) : null);
 
   if (result) {
-    if (task.attachments.size > 0) {
-      const res = await axios({method: 'get', url: task.attachments.first().proxyURL, responseType: `stream`});
+    if (task) {
+      const res = await axios({method: `get`, url: task.attachments.first().proxyURL, responseType: `stream`});
       await res.data.pipe(fs.createWriteStream(`./storage/task-files/${result.ID}.${result.taskFile}`));
     }
 
-    msg.reply(`Task added!`);
+    if (interaction.options.get(`image`).value) {
+      if (task.deletable) {
+        task.delete();
+      }
+      interaction.followUp({content: `Task added!`, ephemeral: true});
+      return;
+    }
+    interaction.reply({content: `Task added!`, ephemeral: true});
   } else {
-    msg.reply(`Failed to add task, let the bot devs know if the issue persists.`);
+    if (interaction.options.get(`image`).value) {
+      if (task.deletable) {
+        task.delete();
+      }
+      interaction.followUp({content: `Failed to add task, let the bot devs know if the issue persists.`, ephemeral: true});
+      return;
+    }
+    interaction.reply({content: `Failed to add task, let the bot devs know if the issue persists.`, ephemeral: true});
   }
 }
 
@@ -108,7 +117,7 @@ function verifyImage(msg) {
   const img = msg.attachments.first();
   const fileExt = path.extname(img.name).toLowerCase();
 
-  if (fileExt !== '.png' && fileExt !== '.jpg' && fileExt !== '.jpeg' && fileExt !== '.gif') {
+  if (fileExt !== `.png` && fileExt !== `.jpg` && fileExt !== `.jpeg` && fileExt !== `.gif`) {
     return `That isn't a valid image type, please try again.`;
   }
 
@@ -116,5 +125,5 @@ function verifyImage(msg) {
     return `That image is too large, please try again.`;
   }
 
-  return 'valid';
+  return `valid`;
 }

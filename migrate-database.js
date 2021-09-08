@@ -1,6 +1,6 @@
 const Sequelize = require(`sequelize`);
 const readline = require(`readline`);
-const fs = require('fs');
+const fs = require(`fs`);
 
 const input = readline.createInterface({
   input: process.stdin,
@@ -115,7 +115,6 @@ async function loadNewDB() {
       },
     });
 
-    // eslint-disable-next-line @shopify/prefer-module-scope-constants
     const XP = sequelize.define(`XP`, {
       userID: {
         type: Sequelize.STRING,
@@ -332,7 +331,7 @@ async function loadOldDB() {
       storage: `./storage/olddatabase.sqlite`,
     });
 
-    const oldUsers = oldSequelize.define('users', {
+    const oldUsers = oldSequelize.define(`users`, {
       id: {
         type: Sequelize.STRING,
         unique: true,
@@ -354,7 +353,7 @@ async function loadOldDB() {
       },
     });
 
-    const oldXP = oldSequelize.define('XP', {
+    const oldXP = oldSequelize.define(`XP`, {
       id: {
         type: Sequelize.STRING,
         unique: true,

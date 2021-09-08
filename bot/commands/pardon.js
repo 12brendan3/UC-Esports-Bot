@@ -1,4 +1,3 @@
-const permissions = require(`../helpers/permissions`);
 const timeouts = require(`../helpers/timeout-manager`);
 const resolvers = require(`../helpers/resolvers`);
 const database = require(`../helpers/database-manager`);
@@ -10,71 +9,59 @@ module.exports = {handle, getHelp};
 const help = {
   text: `Allows an admin to remove a user from timeout.`,
   level: `admin`,
+  options: [
+    {
+      name: `user`,
+      description: `The user to put in timeout.`,
+      type: `USER`,
+      required: true,
+    },
+  ],
 };
 
 // Exported functions
-async function handle(client, msg) {
-  if (msg.channel.type === `dm`) {
-    msg.reply(`This command has to be used in a server.`);
+async function handle(client, interaction) {
+  if (interaction.channel.type === `dm`) {
+    interaction.reply(`This command has to be used in a server.`);
     return;
   }
 
-  let isAdmin = false;
-  try {
-    isAdmin = await permissions.checkAdmin(msg.guild, msg.author.id);
-  } catch {
-    msg.reply(`Command timed out, please try again.`);
-    return;
-  }
-
-  if (!isAdmin) {
-    msg.reply(`You're not an admin on this server.`);
-    return;
-  }
-
-  const guildSettings = await database.getEntry(`Guilds`, {guildID: msg.guild.id});
+  const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
 
   if (!guildSettings || !guildSettings.timeoutRoleID) {
-    msg.reply(`There is no timeout role set up on this server.`);
+    interaction.reply(`There is no timeout role set up on this server.`);
     return;
   }
 
-  const splitMsg = msg.content.split(` `);
-
-  if (!splitMsg[1]) {
-    msg.reply(`Please provide a user to pardon with your command.\nFormat: \`pardon <user>\``);
-    return;
-  }
-
-  const userID = resolvers.resolveUserID(msg.guild, splitMsg[1]);
+  const userID = resolvers.resolveUserID(interaction.guild, interaction.options.get(`user`).value);
 
   if (!userID) {
-    msg.reply(`Failed to find that user, please try again.`);
+    interaction.reply(`Failed to find that user, please try again.`);
     return;
   }
 
-  const member = msg.guild.members.cache.get(userID);
+  const member = interaction.guild.members.cache.get(userID);
 
   if (!member) {
-    msg.reply(`Failed to find that user, please try again.`);
+    interaction.reply(`Failed to find that user, please try again.`);
     return;
   }
 
-  const timeout = await database.getEntry(`Timeouts`, {guildID: msg.guild.id, userID});
+  const timeout = await database.getEntry(`Timeouts`, {guildID: interaction.guildId, userID});
 
   if (!timeout) {
-    msg.reply(`That user isn't in timeout.`);
+    interaction.reply(`That user isn't in timeout.`);
     return;
   }
 
   const result = await timeouts.removeOne(timeout.ID, member, guildSettings.timeoutRoleID);
 
   if (!result) {
-    msg.reply(`There was an internal error, let the bot devs know if the error persists.`);
+    interaction.reply(`There was an internal error, let the bot devs know if the error persists.`);
     return;
   }
 
-  msg.reply(`<@${userID}> has been pardoned.`);
+  interaction.reply(`<@${userID}> has been pardoned.`);
 }
 
 function getHelp() {

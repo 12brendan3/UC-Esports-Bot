@@ -135,6 +135,10 @@ const Guilds = sequelize.define(`Guilds`, {
     type: Sequelize.STRING,
     allowNull: true,
   },
+  adminRoleID: {
+    type: Sequelize.STRING,
+    allowNull: true,
+  },
 });
 
 const ServerAdmins = sequelize.define(`ServerAdmins`, {
@@ -284,8 +288,50 @@ const Timeouts = sequelize.define(`Timeouts`, {
   },
 });
 
+const Giveaways = sequelize.define(`Giveaways`, {
+  ID: {
+    type: Sequelize.UUIDV4,
+    defaultValue: Sequelize.UUIDV4,
+    unique: true,
+    primaryKey: true,
+    allowNull: false,
+  },
+  guildID: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  channelID: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  messageID: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  userID: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  expireTime: {
+    type: Sequelize.INTEGER,
+    allowNull: false,
+  },
+  numWinners: {
+    type: Sequelize.INTEGER,
+    allowNull: false,
+  },
+  title: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  description: {
+    type: Sequelize.STRING,
+    allowNull: true,
+  },
+});
+
 // Make object containing tables
-const tables = {Bearcats, XP, Starboard, Guilds, ServerAdmins, Feedback, Roles, RoleCategories, Tasks, Timeouts};
+const tables = {Bearcats, XP, Starboard, Guilds, ServerAdmins, Feedback, Roles, RoleCategories, Tasks, Timeouts, Giveaways};
 
 // Exports
 module.exports = {syncTables, createEntry, getEntry, getOrCreateEntry, updateEntry, updateOrCreateEntry, removeEntry, getAllEntries};
@@ -305,6 +351,7 @@ async function syncTables() {
     RoleCategories.sync(),
     Tasks.sync(),
     Timeouts.sync(),
+    Giveaways.sync(),
   ]);
   console.info(`Database tables synced.`);
 }
@@ -324,7 +371,6 @@ async function getEntry(table, filter) {
     const existingEntry = await tables[table].findOne({where: filter});
     return existingEntry;
   } catch (err) {
-    console.error(err);
     return false;
   }
 }
@@ -366,7 +412,12 @@ async function updateOrCreateEntry(table, filter, newData) {
 
 async function removeEntry(table, filter) {
   try {
-    await tables[table].destroy({where: filter});
+    const result = await tables[table].destroy({where: filter});
+
+    if (result === 0) {
+      return false;
+    }
+
     return true;
   } catch (err) {
     console.error(err);

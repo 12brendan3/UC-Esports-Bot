@@ -1,7 +1,6 @@
 const Discord = require(`discord.js`);
 
 const database = require(`../helpers/database-manager`);
-const settings = require(`../helpers/settings-manager`);
 
 // Regex
 const regexImage = new RegExp(`^.+(\\.(jpe?g|png|gif|bmp))$`);
@@ -18,14 +17,9 @@ function handle(client, msg) {
 
 // Private function
 async function logMessageDeletion(msg) {
-  const guildSettings = await database.getEntry(`Guilds`, {guildID: msg.guild.id});
+  const guildSettings = await database.getEntry(`Guilds`, {guildID: msg.guildId});
 
   if (guildSettings && guildSettings.logsChannelID) {
-    // Ignore report command to keep it as anonymous as possible
-    if (msg.content.startsWith(`${settings.getSettings().prefix}ticket`)) {
-      return;
-    }
-
     const logsChannel = msg.guild.channels.cache.get(guildSettings.logsChannelID);
     const embed = new Discord.MessageEmbed();
 
@@ -53,6 +47,6 @@ async function logMessageDeletion(msg) {
     embed.setTimestamp();
     embed.setFooter(msg.author.tag);
 
-    logsChannel.send(embed);
+    logsChannel.send({embeds: [embed]});
   }
 }

@@ -1,7 +1,5 @@
-const permissions = require(`../helpers/permissions`);
 const database = require(`../helpers/database-manager`);
 const taskManager = require(`../helpers/task-manager`);
-const collectors = require(`../helpers/collectors`);
 
 // Exports
 module.exports = {handle, getHelp};
@@ -10,76 +8,45 @@ module.exports = {handle, getHelp};
 const help = {
   text: `Allows an admin to remove server tasks.`,
   level: `admin`,
+  options: [
+    {
+      name: `taskid`,
+      type: `STRING`,
+      description: `The ID of the task to remove.`,
+      required: true,
+    },
+  ],
 };
 
 // Exported functions
-async function handle(client, msg) {
-  if (msg.channel.type === `dm`) {
-    msg.reply(`This command has to be used in a server.`);
+async function handle(client, interaction) {
+  if (interaction.channel.type === `dm`) {
+    interaction.reply({content: `This command has to be used in a server.`, ephemeral: true});
     return;
   }
 
-  let isAdmin = false;
-  try {
-    isAdmin = await permissions.checkAdmin(msg.guild, msg.author.id);
-  } catch {
-    msg.reply(`Command timed out, please try again.`);
-  }
-
-  if (!isAdmin) {
-    msg.reply(`You're not an admin on this server.`);
-    return;
-  }
-
-  const existingTasks = await database.getAllEntries(`Tasks`, {guildID: msg.guild.id});
+  const existingTasks = await database.getAllEntries(`Tasks`, {guildID: interaction.guildId});
 
   if (existingTasks.length < 1) {
-    msg.reply(`There are no tasks in this server.`);
+    interaction.reply({content: `There are no tasks in this server.`, ephemeral: true});
     return;
   }
 
-  let tasksString = `What task would you like to remove? (Reply with the ID)\n\`\`\`\n`;
+  const taskID = interaction.options.get(`taskid`).value;
 
-  for (let i = 0; i < existingTasks.length; i++) {
-    const channel = msg.guild.channels.cache.get(existingTasks[i].channelID);
-    let hasWhat = `Message + Image`;
-
-    if (!existingTasks[i].taskMessage) {
-      hasWhat = `Image`;
-    } else if (!existingTasks[i].taskFile) {
-      hasWhat = `Message`;
-    }
-
-    tasksString += `Channel: #${channel.name};  Cron: ${existingTasks[i].cronString};  Has: ${hasWhat};  ID: ${existingTasks[i].ID}\n`;
-  }
-
-  tasksString += `\`\`\``;
-
-  msg.reply(tasksString);
-
-  let taskIDMsg;
-  try {
-    taskIDMsg = await collectors.oneMessageFromUser(msg.channel, msg.author.id);
-  } catch {
-    msg.reply(`Command timed out, please try again.`);
-    return;
-  }
-
-  const taskID = taskIDMsg.first().content;
-
-  const result = await database.getEntry(`Tasks`, {ID: taskID, guildID: msg.guild.id});
+  const result = await database.getEntry(`Tasks`, {ID: taskID, guildID: interaction.guildId});
 
   if (!result) {
-    msg.reply(`No task with that ID found, try again.`);
+    interaction.reply({content: `No task with that ID found, try again.`, ephemeral: true});
     return;
   }
 
   const resultRemoval = await taskManager.removeTask(taskID, result.taskFile);
 
   if (resultRemoval) {
-    msg.reply(`Successfully removed the task.`);
+    interaction.reply({content: `Successfully removed the task.`, ephemeral: true});
   } else {
-    msg.reply(`Failed to remove the task, let the bot devs know if the issue persists.`);
+    interaction.reply({content: `Failed to remove the task, let the bot devs know if the issue persists.`, ephemeral: true});
   }
 }
 

@@ -2,9 +2,9 @@ const settings = require(`./settings-manager`);
 const collectors = require(`./collectors`);
 const database = require(`./database-manager`);
 
-const Crypto = require('crypto');
+const Crypto = require(`crypto`);
 
-const nodemailer = require('nodemailer');
+const nodemailer = require(`nodemailer`);
 
 const regexEmail = new RegExp(`^.+@((uc)?mail.)?uc.edu$`);
 
@@ -26,115 +26,97 @@ function prepEmail() {
   }
 
   emailer = nodemailer.createTransport({
-    service: 'gmail',
+    service: `gmail`,
     auth: {
       user: settings.getAuth().gmailUN,
       pass: settings.getAuth().gmailPW,
     },
   });
+
+  console.info(`Email username and password set.`);
 }
 
-async function verifyUser(msg) {
+async function verifyUser(interaction) {
   if (!emailer) {
-    msg.reply(`The email verification system isn't set up on this bot, bug the bot developers to set it up.`);
+    interaction.reply({content: `The email verification system isn't set up on this bot, bug the bot developers to set it up.`, ephemeral: true});
     return;
   }
 
-  const userStatus = userTimeouts.get(msg.author.id);
+  const userStatus = userTimeouts.get(interaction.user.id);
   if (userStatus) {
     if (userStatus.status === `active`) {
-      msg.reply(`You're already attempting verification right now.`);
+      interaction.reply({content: `You're already attempting verification right now.`, ephemeral: true});
       return;
     }
 
     if (userStatus.status === `timeout` && (userStatus.timeout + 300000) > Date.now()) {
-      msg.reply(`You've already tried verification recently, try again later.`);
+      interaction.reply({content: `You've already tried verification recently, try again later.`, ephemeral: true});
       return;
     }
   }
 
-  userTimeouts.set(msg.author.id, {status: `active`});
+  userTimeouts.set(interaction.user.id, {status: `active`});
 
-  let DMChannel;
   let startedFromDM = false;
 
-  if (msg.channel.type === `dm`) {
-    DMChannel = msg.channel;
+  if (interaction.channel.type === `dm`) {
     startedFromDM = true;
-  } else {
-    if (msg.deletable) {
-      msg.delete();
-    }
-
-    try {
-      DMChannel = await msg.author.createDM();
-    } catch {
-      msg.reply(`Failed to DM you, please make sure you have DMs enabled for this server and then try again.`);
-      userTimeouts.delete(msg.author.id);
-      return;
-    }
   }
 
-  const prevVerified = await database.getEntry(`Bearcats`, {userID: msg.author.id});
+  const prevVerified = await database.getEntry(`Bearcats`, {userID: interaction.user.id});
 
   if (prevVerified && prevVerified.email) {
     if (startedFromDM) {
-      msg.reply(`You've already verified, please run this command from a server to get the verified user role.`);
+      interaction.reply({content: `You've already verified, please run this command from a server to get the verified user role.`, ephemeral: true});
     } else {
-      const guildSettings = await database.getEntry(`Guilds`, {guildID: msg.guild.id});
+      const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
       let role = false;
 
       if (guildSettings.verifiedRoleID) {
-        role = msg.guild.roles.cache.get(guildSettings.verifiedRoleID);
+        role = interaction.guild.roles.cache.get(guildSettings.verifiedRoleID);
       }
 
       if (role) {
-        if (msg.member.roles.cache.has(guildSettings.verifiedRoleID)) {
-          DMChannel.send(`You already have the verified user role in ${msg.guild.name}.`);
+        if (interaction.member.roles.cache.has(guildSettings.verifiedRoleID)) {
+          interaction.reply({content: `You already have the verified user role in ${interaction.guild.name}.`, ephemeral: true});
         } else {
-          await msg.member.roles.add(guildSettings.verifiedRoleID, `User has previously passed verification.`);
-          DMChannel.send(`You now have the ${role.name} role in ${msg.guild.name}.`);
+          await interaction.member.roles.add(guildSettings.verifiedRoleID, `User has previously passed verification.`);
+          interaction.reply({content: `You now have the ${role.name} role in ${interaction.guild.name}.`, ephemeral: true});
         }
       } else {
-        DMChannel.send(`This server doesn't have a verified role.\nIf one is added, you can re-run this command to get the role.`);
+        interaction.reply({content: `This server doesn't have a verified role.\nIf one is added, you can re-run this command to get the role.`, ephemeral: true});
       }
     }
 
-    userTimeouts.delete(msg.author.id);
+    userTimeouts.delete(interaction.user.id);
     return;
   }
 
-  DMChannel.send(`This process verifies that you are a student at UC.\nIn order to do so, we email you a verification code to your UC email.\nWith that being said, what is your UC email?`);
-
-  let emailCollected;
-  try {
-    emailCollected = await collectors.oneMessageFromUser(DMChannel, msg.author.id);
-  } catch {
-    userTimeouts.delete(msg.author.id);
-    DMChannel.send(`Verification command timed out, please try again.`);
+  if (!interaction.options.has(`email`)) {
+    interaction.reply({content: `Please run the command again with an email to verify you with.`, ephemeral: true});
+    userTimeouts.delete(interaction.user.id);
     return;
   }
 
-  const email = emailCollected.first().content;
-
-  if (email && regexEmail.test(email)) {
+  const email = interaction.options.get(`email`).value;
+  if (regexEmail.test(email)) {
     const existing = await database.getEntry(`Bearcats`, {email});
 
     if (existing) {
-      DMChannel.send(`That email has already been used to verify another user.\nContact a bot developer if you believe this is an error.`);
-      userTimeouts.set(msg.author.id, {status: `timeout`, timeout: Date.now()});
+      interaction.reply({content: `That email has already been used to verify another user.\nContact a bot developer if you believe this is an error.`, ephemeral: true});
+      userTimeouts.set(interaction.user.id, {status: `timeout`, timeout: Date.now()});
       return;
     }
 
-    DMChannel.send(`Attempting to email you...`);
+    interaction.reply({content: `Attempting to email you...`, ephemeral: true});
 
     const verificationCode = await sendEmail(email);
 
     if (verificationCode) {
-      DMChannel.send(`An email has been sent with a verification code; please reply with the code.\nYou have 5 minutes to reply before this command times out.\nMake sure to check your junk mail!`);
+      interaction.editReply({content: `An email has been sent with a verification code; please reply with the code.\nYou have 5 minutes to reply before this command times out.\nMake sure to check your junk mail!`, ephemeral: true});
     } else {
-      DMChannel.send(`Failed to send a verification code.\nTry again later and let the bot devs know if the issue persists.`);
-      userTimeouts.delete(msg.author.id);
+      interaction.editReply({content: `Failed to send a verification code.\nTry again later and let the bot devs know if the issue persists.`, ephemeral: true});
+      userTimeouts.delete(interaction.user.id);
       return;
     }
 
@@ -144,10 +126,10 @@ async function verifyUser(msg) {
     while (loop) {
       let replyCode;
       try {
-        replyCode = await collectors.oneMessageFromUser(DMChannel, msg.author.id, 300000);
+        replyCode = await collectors.oneMessageFromUser(interaction.channel, interaction.user.id, 300000);
       } catch {
-        userTimeouts.delete(msg.author.id);
-        DMChannel.send(`Verification command timed out, please try again.`);
+        userTimeouts.delete(interaction.user.id);
+        interaction.editReply({content: `Verification command timed out, please try again.`, ephemeral: true});
         return;
       }
 
@@ -155,47 +137,51 @@ async function verifyUser(msg) {
         loop = false;
       } else {
         if (attempts === 1) {
-          DMChannel.send(`Out of attempts, please wait 5 minutes before attempting verification again.`);
-          userTimeouts.set(msg.author.id, {status: `timeout`, timeout: Date.now()});
+          interaction.editReply({content: `Out of attempts, please wait 5 minutes before attempting verification again.`, ephemeral: true});
+          userTimeouts.set(interaction.user.id, {status: `timeout`, timeout: Date.now()});
           return;
         }
         attempts--;
-        DMChannel.send(`That doesn't seem to match, you have ${attempts} more attempts, try again.`);
+        interaction.editReply({content: `That doesn't seem to match, you have ${attempts} more attempts, try again.`, ephemeral: true});
+      }
+
+      if (replyCode.first().deletable) {
+        replyCode.first().delete();
       }
     }
 
-    await database.updateOrCreateEntry(`Bearcats`, {userID: msg.author.id}, {email});
+    await database.updateOrCreateEntry(`Bearcats`, {userID: interaction.user.id}, {email});
 
     if (startedFromDM) {
       // \nIf you'd like to complete your user profile, run the "profile-setup" command.
-      DMChannel.send(`Success!\nYour email has been saved.\nIn order to get a verified role, run this command again from a server you want a verified role in.  You won't be asked to verify your email again.`);
+      interaction.editReply({content: `Success!\nYour email has been saved.\nIn order to get a verified role, run this command again from a server you want a verified role in.  You won't be asked to verify your email again.`, ephemeral: true});
     } else {
-      const guildSettings = await database.getEntry(`Guilds`, {guildID: msg.guild.id});
+      const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
       let role = false;
 
-      if (guildSettings.verifiedRoleID) {
-        role = msg.guild.roles.cache.get(guildSettings.verifiedRoleID);
+      if (guildSettings && guildSettings.verifiedRoleID) {
+        role = interaction.guild.roles.cache.get(guildSettings.verifiedRoleID);
       }
 
       if (role) {
-        if (msg.member.roles.cache.has(guildSettings.verifiedRoleID)) {
+        if (interaction.member.roles.cache.has(guildSettings.verifiedRoleID)) {
           // \nIf you'd like to complete your user profile, run the "profile-setup" command.
-          DMChannel.send(`Success!\nYour email has been saved.`);
+          interaction.editReply({content: `Success!\nYour email has been saved.`, ephemeral: true});
         } else {
-          await msg.member.roles.add(guildSettings.verifiedRoleID, `User passed verification.`);
+          await interaction.member.roles.add(guildSettings.verifiedRoleID, `User passed verification.`);
           // \nIf you'd like to complete your user profile, run the "profile-setup" command.
-          DMChannel.send(`Success!\nYour email has been saved and you now have the ${role.name} role in ${msg.guild.name}.`);
+          interaction.editReply({content: `Success!\nYour email has been saved and you now have the ${role.name} role in ${interaction.guild.name}.`, ephemeral: true});
         }
       } else {
         // \nIf you'd like to complete your user profile, run the "profile-setup" command.
-        DMChannel.send(`Success!\nYour email has been saved.  The server you verified in doesn't have a verified role.\nIf one is added, you can re-run this command to get the role.  You will not be asked to verify your email again.`);
+        interaction.editReply({content: `Success!\nYour email has been saved.  The server you verified in doesn't have a verified role.\nIf one is added, you can re-run this command to get the role.  You will not be asked to verify your email again.`, ephemeral: true});
       }
     }
 
-    userTimeouts.delete(msg.author.id);
+    userTimeouts.delete(interaction.user.id);
   } else {
-    DMChannel.send(`That is not a valid UC email.  Please try again in 5 minutes.`);
-    userTimeouts.set(msg.author.id, {status: `timeout`, timeout: Date.now()});
+    interaction.reply({content: `That is not a valid UC email.  Please try again in 5 minutes.`, ephemeral: true});
+    userTimeouts.set(interaction.user.id, {status: `timeout`, timeout: Date.now()});
   }
 }
 
@@ -213,7 +199,7 @@ function sendEmail(email) {
         resolve(false);
       }
 
-      const token = buffer.toString('hex');
+      const token = buffer.toString(`hex`);
 
       const mailOptions = {
         from: settings.getAuth().gmailUN,
@@ -222,14 +208,14 @@ function sendEmail(email) {
         text: `Your verification code is: ${token.toUpperCase()}\nPlease copy this code and send it to the Bearcat Bot.`,
         html: `${emailHTML1}${token.toUpperCase()}${emailHTML2}`,
         attachments: [{
-          filename: 'header.svg',
-          path: './assets/email/header.svg',
-          cid: 'verHeaderImg',
+          filename: `header.svg`,
+          path: `./assets/email/header.svg`,
+          cid: `verHeaderImg`,
         },
         {
-          filename: 'footer.svg',
-          path: './assets/email/footer.svg',
-          cid: 'verFooterImg',
+          filename: `footer.svg`,
+          path: `./assets/email/footer.svg`,
+          cid: `verFooterImg`,
         }],
       };
 

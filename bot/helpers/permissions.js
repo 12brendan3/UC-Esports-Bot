@@ -1,31 +1,34 @@
 // Imports
 const database = require(`../helpers/database-manager`);
+const commandManager = require(`../helpers/command-manager`);
 
 // Exports
-module.exports = {checkAdmin, addAdmin, removeAdmin, getAdmins, checkDev};
+module.exports = {checkAdmin, setAdminRole, removeAdminRole, checkDev, getDevs};
 
 // Devs are hard-coded
 const devs = new Set([`145730448105013248`, `151079705917915136`]);
 
 // Exported Function
 async function checkAdmin(guild, userID) {
-  const adminCheck = await database.getEntry(`ServerAdmins`, {guildID: guild.id, userID});
-  if (adminCheck || devs.has(userID) || guild.ownerID === userID) {
+  const guildSettings = await database.getEntry(`Guild`, {guildID: guild.id});
+  const userRoles = guild.members.cache.get(userID).roles.cache;
+  if (userRoles.has(guildSettings.adminRoleID) || devs.has(userID) || guild.ownerId === userID) {
     return true;
   } else {
     return false;
   }
 }
 
-async function addAdmin(guild, userID) {
-  const adminCheck = await database.getEntry(`ServerAdmins`, {guildID: guild.id, userID});
+async function setAdminRole(client, guild, roleID) {
+  const guildSettings = await database.getEntry(`Guild`, {guildID: guild.id});
 
-  if (adminCheck || guild.ownerID === userID || devs.has(userID)) {
+  if (guildSettings.adminRoleID === roleID) {
     return `duplicate`;
   } else {
-    const result = await database.createEntry(`ServerAdmins`, {guildID: guild.id, userID});
+    const result = await database.updateOrCreateEntry(`Guild`, {guildID: guild.id}, {adminRoleID: roleID});
 
     if (result) {
+      commandManager.addRoleToGuildCommand(client, guild.id, roleID);
       return true;
     } else {
       return false;
@@ -33,37 +36,20 @@ async function addAdmin(guild, userID) {
   }
 }
 
-async function removeAdmin(guildID, userID) {
-  const adminCheck = await database.getEntry(`ServerAdmins`, {guildID, userID});
+async function removeAdminRole(client, guildID) {
+  const guildSettings = await database.getEntry(`Guild`, {guildID});
 
-  if (adminCheck) {
-    const result = await database.removeEntry(`ServerAdmins`, {guildID, userID});
+  if (guildSettings && guildSettings.adminRoleID) {
+    const result = await database.updateEntry(`Guild`, {guildID}, {adminRoleID: null});
 
     if (result) {
+      commandManager.removeRoleFromGuildCommand(client, guildID, guildSettings.adminRoleID);
       return true;
     } else {
       return false;
     }
   } else {
-    return `notadmin`;
-  }
-}
-
-async function getAdmins(guild) {
-  const admins = await database.getAllEntries(`ServerAdmins`, {guildID: guild.id});
-
-  admins.push({userID: guild.ownerID});
-
-  devs.forEach((dev) => {
-    admins.push({userID: dev});
-  });
-
-  if (admins && admins.length < 1) {
-    return `noadmins`;
-  } else if (admins) {
-    return admins;
-  } else {
-    return false;
+    return `norole`;
   }
 }
 
@@ -73,4 +59,8 @@ function checkDev(userID) {
   } else {
     return false;
   }
+}
+
+function getDevs() {
+  return devs;
 }

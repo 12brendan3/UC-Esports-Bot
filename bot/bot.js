@@ -2,36 +2,42 @@ const Discord = require(`discord.js`);
 
 let client;
 
-const modules = require(`./helpers/module-manager`);
+const eventManager = require(`./helpers/event-manager`);
+const commandManager = require(`./helpers/command-manager`);
 const settings = require(`./helpers/settings-manager`);
 const database = require(`./helpers/database-manager`);
 const reactManager = require(`./helpers/role-react-manager-2`);
 const bearcatManager = require(`./helpers/bearcat-manager`);
+const playerManager = require(`./helpers/player-manager`);
 const timeouts = require(`./helpers/timeout-manager`);
 
 // Exports
-module.exports = {startBot, stopBot, restartBot};
+module.exports = {startBot, stopBot, restartBot, migrateAdmins};
 
 // Exported functions
 async function startBot() {
   client = new Discord.Client({
-    partials: ['USER', 'GUILD_MEMBER', 'MESSAGE', 'REACTION'],
-    ws: {
-      intents: ['GUILDS', 'GUILD_MEMBERS', 'GUILD_EMOJIS', 'GUILD_PRESENCES', 'GUILD_MESSAGES', 'GUILD_MESSAGE_REACTIONS', 'DIRECT_MESSAGES', 'GUILD_VOICE_STATES'],
-    },
+    partials: [`USER`, `GUILD_MEMBER`, `MESSAGE`, `REACTION`],
+    intents: [`GUILDS`, `GUILD_MEMBERS`, `GUILD_EMOJIS_AND_STICKERS`, `GUILD_PRESENCES`, `GUILD_MESSAGES`, `GUILD_MESSAGE_REACTIONS`, `DIRECT_MESSAGES`, `GUILD_VOICE_STATES`],
   });
 
   await database.syncTables();
 
   await reactManager.loadRoleData();
 
-  modules.registerAll(client);
+  commandManager.loadAll();
+
+  eventManager.loadAll(client);
 
   settings.loadAll();
 
   bearcatManager.prepEmail();
 
+  playerManager.prepKey();
+
   const botToken = settings.getAuth().botToken;
+
+  console.info(`Bot token set.`);
 
   if (botToken && botToken !== `replace me`) {
     client.login(botToken);
@@ -47,7 +53,34 @@ function stopBot() {
 function restartBot() {
   stopBot();
   settings.clearAll();
-  modules.clearAll();
+  eventManager.clearAll();
+  commandManager.clearAll();
   timeouts.clearAll();
   startBot();
+}
+
+function migrateAdmins() {
+  console.info(`Migrating admins, please wait....`);
+
+  client.guilds.cache.forEach(async (guild) => {
+    const admins = await database.getAllEntries(`ServerAdmins`, {guildID: guild.id});
+    if (admins) {
+      const botRole = guild.roles.botRoleFor(client.user.id);
+      const newRole = await guild.roles.create({name: `Popcorn`, position: botRole ? botRole.position : null, color: `#F1CA16`, reason: `New Bearcat Bot admin role.`});
+      await database.updateEntry(`Guilds`, {guildID: guild.id}, {adminRoleID: newRole.id});
+      admins.forEach((admin) => {
+        const user = guild.members.cache.get(admin.userID);
+        if (user) {
+          user.roles.add(newRole, `Bot admin on old system.`);
+        }
+      });
+    }
+  });
+
+  console.info(`Done migrating admins!\nThe bot will exit in 10 seconds.`);
+
+  setTimeout(() => {
+    stopBot();
+    process.exit();
+  }, 10000);
 }

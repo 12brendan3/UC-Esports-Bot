@@ -8,8 +8,8 @@ const help = {
 };
 
 // Exported functions
-function handle(client, msg) {
-  msg.reply(`pong! (${client.ws.ping} ms)`);
+function handle(client, interaction) {
+  interaction.reply(`Pong! (${client.ws.ping} ms)`);
 }
 
 function getHelp() {

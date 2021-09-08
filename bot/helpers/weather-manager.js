@@ -3,8 +3,7 @@ const settings = require(`./settings-manager`);
 
 let lastCheck = 0;
 
-// eslint-disable-next-line babel/camelcase
-let currentData = {temp: {value: `...`}, weather_code: {value: `unknown`}};
+let currentData = {temperature: `...`, weatherCode: `unknown`};
 
 // Exports
 module.exports = {setBotStatus, getWeather};
@@ -17,8 +16,8 @@ function getWeather() {
 async function setBotStatus(client) {
   if (settings.getAuth().weatherToken || settings.getAuth().weatherToken === `replace me`) {
     await getWeatherData();
-    const status = `for ${settings.getSettings().prefix}help | ${getEmoji(currentData.weather_code.value)} ${Math.round(currentData.temp.value)}°F`;
-    client.user.setPresence({activity: {name: status, type: `WATCHING`}});
+    const status = `the sky | ${getEmoji(currentData.weatherCode)} ${Math.round(currentData.temperature)}°F`;
+    client.user.setPresence({status: `ONLINE`, afk: false, activities: [{name: status, type: `WATCHING`}]});
 
     setTimeout(() => {
       setBotStatus(client);
@@ -35,27 +34,27 @@ async function getWeatherData() {
   if (currentTime >= lastCheck + 600000) {
     lastCheck = currentTime;
 
-    // lat/lon is somewhere on UC's campus
+    // Eventually re-add sunriseTime,sunsetTime,moonPhase
     const params = {
-      lat: settings.getSettings().weatherLatitude,
-      lon: settings.getSettings().weatherLongitude,
-      // eslint-disable-next-line babel/camelcase
-      unit_system: `us`,
-      fields: `temp,weather_code,sunrise,sunset,moon_phase`,
+      location: `${settings.getSettings().weatherLatitude},${settings.getSettings().weatherLongitude}`,
+      units: `imperial`,
+      fields: `temperature,weatherCode`,
+      timesteps: `current`,
       apikey: settings.getAuth().weatherToken,
     };
 
     try {
-      const newData = await axios.get(`https://api.climacell.co/v3/weather/realtime`, {params});
+      const newData = await axios.get(`https://api.tomorrow.io/v4/timelines`, {params});
 
+      /* Disable sunrise/sunset and moon phase for now
       const sunrise = new Date(newData.data.sunrise.value).getTime();
       const sunset = new Date(newData.data.sunset.value).getTime();
 
       if (sunrise > currentTime || sunset < currentTime) {
         newData.data.weather_code.value = newData.data.moon_phase.value;
-      }
+      } */
 
-      currentData = newData.data;
+      currentData = newData.data.data.timelines[0].intervals[0].values;
     } catch (err) {
       console.error(`There was an error fetching the weather data...`);
       console.error(err);
@@ -65,57 +64,66 @@ async function getWeatherData() {
 
 function getEmoji(value) {
   switch (value) {
-    case `freezing_rain_heavy`:
-    case `freezing_rain`:
-    case `freezing_rain_light`:
-    case `freezing_drizzle`:
+    case 6201:
+    case 6001:
+    case 6200:
+    case 6000:
       return `🥶`;
-    case `ice_pellets_heavy`:
-    case `ice_pellets`:
-    case `ice_pellets_light`:
+    case 7101:
+    case 7000:
+    case 7102:
       return `🧊`;
-    case `snow_heavy`:
+    case 5101:
       return `❄️`;
-    case `snow`:
-    case `snow_light`:
+    case 5000:
+    case 5100:
       return `🌨️`;
-    case `flurries`:
+    case 5001:
       return `🌬️`;
-    case `tstorm`:
+    case 8000:
       return `⛈️`;
-    case `rain_heavy`:
-    case `rain`:
-    case `rain_light`:
-    case `drizzle`:
+    case 4000:
+      return `🌂`;
+    case 4200:
+      return `☔`;
+    case 4001:
       return `🌧️`;
-    case `fog_light`:
-    case `fog`:
+    case 4201:
+      return `⛆`;
+    case 2100:
+    case 2000:
       return `🌁`;
-    case `cloudy`:
+    case 1001:
       return `☁️`;
-    case `mostly_cloudy`:
+    case 1102:
       return `🌥️`;
-    case `partly_cloudy`:
+    case 1101:
       return `⛅`;
-    case `mostly_clear`:
+    case 1100:
       return `🌤️`;
-    case `clear`:
+    case 1000:
       return `☀️`;
-    case `new`:
+    case 3000:
+      return `🎐`;
+    case 3001:
+      return `🍃`;
+    case 3002:
+      return `💨`;
+    case 0:
       return `🌑`;
-    case `waxing_crescent`:
+    case 1:
       return `🌒`;
-    case `first_quarter`:
+    case 2:
       return `🌓`;
-    case `waxing_gibbous`:
+    case 3:
       return `🌔`;
-    case `full`:
+    case 4:
       return `🌕`;
-    case `waning_gibbous`:
+    case 5:
       return `🌖`;
-    case `last_quarter`:
+    case 6:
       return `🌗`;
-    case `waning_crescent`:
+    case 7:
       return `🌘`;
     default:
       return `❔`;

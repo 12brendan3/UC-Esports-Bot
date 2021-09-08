@@ -12,8 +12,8 @@ const help = null;
 }; */
 
 // Exported functions
-function handle(client, msg) {
-  msg.reply(`This feature hasn't been completed yet, check again at a later time.`);
+function handle(client, interaction) {
+  interaction.reply(`This feature hasn't been completed yet, check again at a later time.`);
 }
 
 function getHelp() {

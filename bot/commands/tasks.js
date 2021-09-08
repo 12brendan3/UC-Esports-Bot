@@ -1,4 +1,3 @@
-const permissions = require(`../helpers/permissions`);
 const database = require(`../helpers/database-manager`);
 
 // Exports
@@ -11,35 +10,23 @@ const help = {
 };
 
 // Exported functions
-async function handle(client, msg) {
-  if (msg.channel.type === `dm`) {
-    msg.reply(`This command has to be used in a server.`);
+async function handle(client, interaction) {
+  if (interaction.channel.type === `dm`) {
+    interaction.reply({content: `This command has to be used in a server.`, ephemeral: true});
     return;
   }
 
-  let isAdmin = false;
-  try {
-    isAdmin = await permissions.checkAdmin(msg.guild, msg.author.id);
-  } catch {
-    msg.reply(`Command timed out, please try again.`);
-  }
-
-  if (!isAdmin) {
-    msg.reply(`You're not an admin on this server.`);
-    return;
-  }
-
-  const existingTasks = await database.getAllEntries(`Tasks`, {guildID: msg.guild.id});
+  const existingTasks = await database.getAllEntries(`Tasks`, {guildID: interaction.guildId});
 
   if (existingTasks.length < 1) {
-    msg.reply(`There are no tasks in this server.`);
+    interaction.reply(`There are no tasks in this server.`);
     return;
   }
 
   let tasksString = `The following tasks exist in this server:\n\`\`\`\n`;
 
   for (let i = 0; i < existingTasks.length; i++) {
-    const channel = msg.guild.channels.cache.get(existingTasks[i].channelID);
+    const channel = interaction.guild.channels.cache.get(existingTasks[i].channelID);
     let hasWhat = `Message + Image`;
 
     if (!existingTasks[i].taskMessage) {
@@ -53,7 +40,7 @@ async function handle(client, msg) {
 
   tasksString += `\`\`\``;
 
-  msg.reply(tasksString);
+  interaction.reply(tasksString);
 }
 
 function getHelp() {

@@ -1,6 +1,6 @@
 const database = require(`../helpers/database-manager`);
 const collectors = require(`../helpers/collectors`);
-const resolvers = require("../helpers/resolvers");
+const resolvers = require(`../helpers/resolvers`);
 
 const Discord = require(`discord.js`);
 
@@ -11,56 +11,53 @@ module.exports = {handle, getHelp};
 
 // Help command text
 const help = {
-  text: `Allows a user to submit a ticket for a specific server.`,
+  text: `Submit a ticket for a specific server.`,
   level: `user`,
+  options: [
+    {
+      name: `message`,
+      type: `STRING`,
+      description: `The message on the ticket.`,
+      required: true,
+    },
+    {
+      name: `anonymous`,
+      type: `BOOLEAN`,
+      description: `Whether or not the ticket is anonymous.`,
+      required: true,
+    },
+  ],
 };
 
 // Exported functions
-async function handle(client, msg) {
-  let DMChannel;
+async function handle(client, interaction) {
   let startedFromDM = false;
   let guildID;
 
-  if (activeReports.has(msg.author.id)) {
-    msg.reply(`You already have an active ticket in progress.`);
+  if (activeReports.has(interaction.user.id)) {
+    interaction.reply({content: `You already have an active ticket in progress.`, ephemeral: true});
     return;
   }
 
-  activeReports.add(msg.author.id);
+  activeReports.add(interaction.user.id);
 
-  if (msg.channel.type === `dm`) {
-    DMChannel = msg.channel;
+  if (interaction.channel.type === `dm`) {
     startedFromDM = true;
-  } else {
-    if (msg.deletable) {
-      msg.delete();
-    }
-    guildID = msg.guild.id;
-    try {
-      DMChannel = await msg.author.createDM();
-    } catch {
-      msg.reply(`Failed to DM you, please make sure you have DMs enabled for this server and then try again.`);
-      userTimeouts.delete(msg.author.id);
-      return;
-    }
-  }
-
-  if (startedFromDM) {
-    const guildList = client.guilds.cache.filter((guild) => guild.members.cache.has(msg.author.id));
+    const guildList = client.guilds.cache.filter((guild) => guild.members.cache.has(interaction.user.id));
     let guildString = ``;
 
     guildList.forEach((guild) => {
       guildString += `\`${guild.name}\` `;
     });
 
-    DMChannel.send(`First of all, what server would you like to submit a ticket to?  Servers shared with you are:\n${guildString}`);
+    interaction.reply(`What server would you like to submit this ticket to?  Servers shared with you are:\n${guildString}`);
 
     let guildResponse;
     try {
-      guildResponse = await collectors.oneMessageFromUser(DMChannel, msg.author.id, 60000);
+      guildResponse = await collectors.oneMessageFromUser(interaction.channel, interaction.user.id, 60000);
     } catch {
-      DMChannel.send(`Command timed out, please try again.`);
-      activeReports.delete(msg.author.id);
+      interaction.followUp(`Command timed out, please try again.`);
+      activeReports.delete(interaction.user.id);
       return;
     }
 
@@ -69,68 +66,43 @@ async function handle(client, msg) {
     if (foundGuildID) {
       guildID = foundGuildID;
     } else {
-      DMChannel.send(`Couldn't find that server, please try again.`);
-      activeReports.delete(msg.author.id);
+      interaction.followUp(`Couldn't find that server, please try again.`);
+      activeReports.delete(interaction.user.id);
       return;
     }
+  } else {
+    guildID = interaction.guildId;
   }
 
   const guildSettings = await database.getEntry(`Guilds`, {guildID});
 
   if (guildSettings && guildSettings.reportChannelID) {
-    DMChannel.send(`Would you like this ticket to be anonymous? (yes/no)`);
-
-    let anonResponse;
-
-    try {
-      anonResponse = await collectors.oneMessageFromUser(DMChannel, msg.author.id, 60000);
-    } catch {
-      DMChannel.send(`Command timed out, please try again.`);
-      activeReports.delete(msg.author.id);
-      return;
-    }
-
-    let anonymous = false;
-
-    if (anonResponse.first().content === `yes`) {
-      anonymous = true;
-      DMChannel.send(`The ticket *will* be anonymous.\nWhat would you like to say in the ticket?\nType "cancel" to cancel this ticket.`);
-    } else {
-      DMChannel.send(`The ticket *will not* be anonymous.\nWhat would you like to say in the ticket?\nType "cancel" to cancel this ticket.`);
-    }
-
-    let reportText;
-
-    try {
-      reportText = await collectors.oneMessageFromUser(DMChannel, msg.author.id, 600000);
-    } catch {
-      DMChannel.send(`Command timed out, please try again.`);
-      activeReports.delete(msg.author.id);
-      return;
-    }
-
-    if (reportText.first().content === `cancel`) {
-      DMChannel.send(`Report cancelled.`);
-      activeReports.delete(msg.author.id);
-      return;
-    }
-
-    const reportEmbed = generateReportEmbed(reportText.first().content, msg, anonymous);
+    const reportEmbed = generateReportEmbed(interaction.options.get(`message`).value, interaction, interaction.options.get(`anonymous`).value);
 
     const reportGuild = client.guilds.cache.get(guildID);
     const reportChannel = reportGuild.channels.cache.get(guildSettings.reportChannelID);
 
-    reportChannel.send(reportEmbed);
+    reportChannel.send({embeds: [reportEmbed]});
 
-    DMChannel.send(`The ticket has been sent.`);
-    activeReports.delete(msg.author.id);
+    if (startedFromDM) {
+      interaction.followUp(`The ticket has been sent.`);
+    } else {
+      interaction.reply({content: `The ticket has been sent.`, ephemeral: true});
+    }
+
+    activeReports.delete(interaction.user.id);
   } else {
-    DMChannel.send(`That server doesn't have a ticket channel set up.  Ticket cancelled.`);
-    activeReports.delete(msg.author.id);
+    if (startedFromDM) {
+      interaction.followUp(`The server doesn't have a ticket channel set up.  Ticket cancelled.`);
+    } else {
+      interaction.reply({content: `The server doesn't have a ticket channel set up.  Ticket cancelled.`, ephemeral: true});
+    }
+
+    activeReports.delete(interaction.user.id);
   }
 }
 
-function generateReportEmbed(text, msg, anonymous) {
+function generateReportEmbed(text, interaction, anonymous) {
   const embed = new Discord.MessageEmbed();
 
   embed.setDescription(`A ticket has been submitted.`);
@@ -138,7 +110,7 @@ function generateReportEmbed(text, msg, anonymous) {
   if (anonymous) {
     embed.setAuthor(`Anonymous`);
   } else {
-    embed.setAuthor(msg.author.tag, msg.author.displayAvatarURL());
+    embed.setAuthor(interaction.user.username, interaction.user.displayAvatarURL());
   }
   embed.addField(`Message`, text.length > 1000 ? text.substr(0, 1000) : text);
   if (text.length > 1000) {

@@ -613,7 +613,7 @@ async function addRoleReaction(interaction, client) {
     const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
 
     if (!guildSettings || !guildSettings.rolesChannelID) {
-      interaction.reply({content: `There isn't a reaction role channel set.\nPlease set one up with \`/settings react-channel\``, ephemeral: true});
+      interaction.editReply({content: `There isn't a reaction role channel set.\nPlease set one up with \`/settings react-channel\``, ephemeral: true});
       activeChanges.delete(interaction.guildId);
       return;
     }
@@ -623,7 +623,7 @@ async function addRoleReaction(interaction, client) {
     const emojiID = resolvers.resolveEmojiID(client, options.get(`emoji`).value);
 
     if (!emojiID) {
-      interaction.reply({content: `No emoji found by that name.  Please try again.`, ephemeral: true});
+      interaction.editReply({content: `No emoji found by that name.  Please try again.`, ephemeral: true});
       activeChanges.delete(interaction.guildId);
       return;
     }
@@ -634,7 +634,7 @@ async function addRoleReaction(interaction, client) {
       const matchingRole = await database.getEntry(`Roles`, {roleCategory: roleCategory.ID, emojiID});
 
       if (matchingRole) {
-        interaction.reply({content: `A role in that category is already using that emoji, please try again.`, ephemeral: true});
+        interaction.editReply({content: `A role in that category is already using that emoji, please try again.`, ephemeral: true});
         activeChanges.delete(interaction.guildId);
         return;
       }
@@ -642,7 +642,7 @@ async function addRoleReaction(interaction, client) {
       const totalRoles = await database.getAllEntries(`Roles`, {guildID: interaction.guildId, roleCategory: roleCategory.ID});
 
       if (totalRoles.length > 24) {
-        interaction.reply({content: `That category has the maximum amount of roles already, please try again.`, ephemeral: true});
+        interaction.editReply({content: `That category has the maximum amount of roles already, please try again.`, ephemeral: true});
         activeChanges.delete(interaction.guildId);
         return;
       }
@@ -652,13 +652,13 @@ async function addRoleReaction(interaction, client) {
       await reactManager.addRoleData(client, interaction.guildId, roleCategory.ID, emojiID, options.get(`role`).role.id);
 
       if (result) {
-        interaction.reply({content: `The reaction role has been added!`, ephemeral: true});
+        interaction.editReply({content: `The reaction role has been added!`, ephemeral: true});
       } else {
-        interaction.reply({content: `There was an error adding the reaction role.\nTell the bot developers if the issue persists.`, ephemeral: true});
+        interaction.editReply({content: `There was an error adding the reaction role.\nTell the bot developers if the issue persists.`, ephemeral: true});
       }
     } else {
       if (!options.get(`description`)) {
-        interaction.reply({content: `No category description was provided for the new category, try again with one.`, ephemeral: true});
+        interaction.editReply({content: `No category description was provided for the new category, try again with one.`, ephemeral: true});
         activeChanges.delete(interaction.guildId);
         return;
       }
@@ -670,14 +670,14 @@ async function addRoleReaction(interaction, client) {
       await reactManager.addRoleData(client, interaction.guildId, newRoleCategory.ID, emojiID, options.get(`role`).role.id, options.get(`description`).value, options.get(`category`).value);
 
       if (result) {
-        interaction.reply({content: `The reaction role has been added!`, ephemeral: true});
+        interaction.editReply({content: `The reaction role has been added!`, ephemeral: true});
       } else {
-        interaction.reply({content: `There was an error adding the reaction role.\nTell the bot developers if the issue persists.`, ephemeral: true});
+        interaction.editReply({content: `There was an error adding the reaction role.\nTell the bot developers if the issue persists.`, ephemeral: true});
       }
     }
   } catch (err) {
     console.error(err);
-    interaction.reply({content: `There was an internal error, please try again.`, ephemeral: true});
+    interaction.editReply({content: `There was an internal error, please try again.`, ephemeral: true});
   }
 
   activeChanges.delete(interaction.guildId);
@@ -689,7 +689,7 @@ async function removeRoleReaction(interaction, client) {
     const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
 
     if (!guildSettings || !guildSettings.rolesChannelID) {
-      interaction.reply({content: `This guild has no reaction role channel, please set one up with \`/settings react-channel\`."`, ephemeral: true});
+      interaction.editReply({content: `This guild has no reaction role channel, please set one up with \`/settings react-channel\`."`, ephemeral: true});
       activeChanges.delete(interaction.guildId);
       return;
     }
@@ -697,7 +697,7 @@ async function removeRoleReaction(interaction, client) {
     const roleCategories = await database.getAllEntries(`RoleCategories`, {guildID: interaction.guildId});
 
     if (!roleCategories || roleCategories.length < 1) {
-      interaction.reply({content: `There are no reaction roles!`, ephemeral: true});
+      interaction.editReply({content: `There are no reaction roles!`, ephemeral: true});
       activeChanges.delete(interaction.guildId);
       return;
     }
@@ -707,7 +707,7 @@ async function removeRoleReaction(interaction, client) {
     const roleCategory = await database.getEntry(`RoleCategories`, {guildID: interaction.guildId, categoryName: options.get(`category`).value});
 
     if (!roleCategory) {
-      interaction.reply({content: `No role category was found, please try again.`, ephemeral: true});
+      interaction.editReply({content: `No role category was found, please try again.`, ephemeral: true});
       activeChanges.delete(interaction.guildId);
       return;
     }
@@ -725,12 +725,12 @@ async function removeRoleReaction(interaction, client) {
         await reactManager.removeRoleData(client, interaction.guildId, roleCategory.ID, oldRole.emojiID);
       }
 
-      interaction.reply({content: `The role has been removed.`, ephemeral: true});
+      interaction.editReply({content: `The role has been removed.`, ephemeral: true});
     } else {
-      interaction.reply({content: `No reaction role was found, please try again.`, ephemeral: true});
+      interaction.editReply({content: `No reaction role was found, please try again.`, ephemeral: true});
     }
   } catch {
-    interaction.reply({content: `There was an internal error, please try again.`, ephemeral: true});
+    interaction.editReply({content: `There was an internal error, please try again.`, ephemeral: true});
   }
 
   activeChanges.delete(interaction.guildId);
@@ -743,9 +743,9 @@ async function updateRoleReactions(interaction, client) {
   if (guildSettings && guildSettings.rolesChannelID) {
     await reactManager.updateGuildMessages(client, interaction.guildId);
 
-    interaction.reply({content: `The role reactions have been updated.`, ephemeral: true});
+    interaction.editReply({content: `The role reactions have been updated.`, ephemeral: true});
   } else {
-    interaction.reply({content: `This guild has no reaction role channel, please set one up with \`/settings react-channel\`."`, ephemeral: true});
+    interaction.editReply({content: `This guild has no reaction role channel, please set one up with \`/settings react-channel\`."`, ephemeral: true});
   }
 
   activeChanges.delete(interaction.guildId);
@@ -757,7 +757,7 @@ async function updateCategoryName(interaction, client) {
     const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
 
     if (!guildSettings || !guildSettings.rolesChannelID) {
-      interaction.reply({content: `This guild has no reaction role channel, please set one up with \`/settings react-channel\`."`, ephemeral: true});
+      interaction.editReply({content: `This guild has no reaction role channel, please set one up with \`/settings react-channel\`."`, ephemeral: true});
       activeChanges.delete(interaction.guildId);
       return;
     }
@@ -769,12 +769,12 @@ async function updateCategoryName(interaction, client) {
 
     if (result && newResult) {
       await reactManager.updateCategoryData(client, newResult.guildID, newResult.ID, newResult.categoryName);
-      interaction.reply({content: `The category name was updated.`, ephemeral: true});
+      interaction.editReply({content: `The category name was updated.`, ephemeral: true});
     } else {
-      interaction.reply({content: `Failed to update that category, please try again.`, ephemeral: true});
+      interaction.editReply({content: `Failed to update that category, please try again.`, ephemeral: true});
     }
   } catch {
-    interaction.reply({content: `There was an internal error, please try again.`, ephemeral: true});
+    interaction.editReply({content: `There was an internal error, please try again.`, ephemeral: true});
   }
 
   activeChanges.delete(interaction.guildId);
@@ -786,7 +786,7 @@ async function updateCategoryInfo(interaction, client) {
     const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
 
     if (!guildSettings || !guildSettings.rolesChannelID) {
-      interaction.reply({content: `This guild has no reaction role channel, please set one up with \`/settings react-channel\`.`, ephemeral: true});
+      interaction.editReply({content: `This guild has no reaction role channel, please set one up with \`/settings react-channel\`.`, ephemeral: true});
       activeChanges.delete(interaction.guildId);
       return;
     }
@@ -798,12 +798,12 @@ async function updateCategoryInfo(interaction, client) {
 
     if (result && newResult) {
       await reactManager.updateCategoryData(client, newResult.guildID, newResult.ID, null, newResult.categoryDescription);
-      interaction.reply({content: `The category description was updated.`, ephemeral: true});
+      interaction.editReply({content: `The category description was updated.`, ephemeral: true});
     } else {
-      interaction.reply({content: `Failed to update that category, please try again.`, ephemeral: true});
+      interaction.editReply({content: `Failed to update that category, please try again.`, ephemeral: true});
     }
   } catch {
-    interaction.reply({content: `There was an internal error, please try again.`, ephemeral: true});
+    interaction.editReply({content: `There was an internal error, please try again.`, ephemeral: true});
   }
 
   activeChanges.delete(interaction.guildId);
@@ -816,17 +816,17 @@ async function verifyReactRoles(interaction, client) {
     const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
 
     if (!guildSettings || !guildSettings.rolesChannelID) {
-      interaction.reply({content: `This server doesn't have reaction roles set up.`, ephemeral: true});
+      interaction.editReply({content: `This server doesn't have reaction roles set up.`, ephemeral: true});
       activeChanges.delete(interaction.guildId);
       return;
     }
 
     const reactionCategories = await database.getAllEntries(`RoleCategories`, {guildID: interaction.guildId});
     if (!reactionCategories) {
-      interaction.reply({content: `This server doesn't have reaction roles set up.`, ephemeral: true});
+      interaction.editReply({content: `This server doesn't have reaction roles set up.`, ephemeral: true});
     }
 
-    interaction.reply({content: `Verifying reaction roles...`, ephemeral: true});
+    interaction.editReply({content: `Verifying reaction roles...`, ephemeral: true});
     reactionCategories.forEach(async (category) => {
       const catRoles = await database.getAllEntries(`Roles`, {guildID: interaction.guildId, roleCategory: category.ID});
       catRoles.forEach(async (role) => {
@@ -846,7 +846,7 @@ async function verifyReactRoles(interaction, client) {
     });
     interaction.editReply({content: `Reaction roles have been verified.  Any missing roles have been removed.`, ephemeral: true});
   } catch {
-    interaction.reply({content: `There was an internal error verifying the reaction roles.`, ephemeral: true});
+    interaction.editReply({content: `There was an internal error verifying the reaction roles.`, ephemeral: true});
   }
 
   activeChanges.delete(interaction.guildId);

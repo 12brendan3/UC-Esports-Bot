@@ -608,6 +608,7 @@ async function changeRoleChannel(interaction) {
 }
 
 async function addRoleReaction(interaction, client) {
+  await interaction.deferReply();
   try {
     const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
 
@@ -683,6 +684,7 @@ async function addRoleReaction(interaction, client) {
 }
 
 async function removeRoleReaction(interaction, client) {
+  await interaction.deferReply();
   try {
     const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
 
@@ -735,6 +737,7 @@ async function removeRoleReaction(interaction, client) {
 }
 
 async function updateRoleReactions(interaction, client) {
+  await interaction.deferReply();
   const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
 
   if (guildSettings && guildSettings.rolesChannelID) {
@@ -749,6 +752,7 @@ async function updateRoleReactions(interaction, client) {
 }
 
 async function updateCategoryName(interaction, client) {
+  await interaction.deferReply();
   try {
     const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
 
@@ -777,6 +781,7 @@ async function updateCategoryName(interaction, client) {
 }
 
 async function updateCategoryInfo(interaction, client) {
+  await interaction.deferReply();
   try {
     const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
 
@@ -806,6 +811,7 @@ async function updateCategoryInfo(interaction, client) {
 
 
 async function verifyReactRoles(interaction, client) {
+  await interaction.deferReply();
   try {
     const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
 

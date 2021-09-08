@@ -10,7 +10,7 @@ const devs = new Set([`145730448105013248`, `151079705917915136`]);
 
 // Exported Function
 async function checkAdmin(guild, userID) {
-  const guildSettings = await database.getEntry(`Guild`, {guildID: guild.id});
+  const guildSettings = await database.getEntry(`Guilds`, {guildID: guild.id});
   const userRoles = guild.members.cache.get(userID).roles.cache;
   if (userRoles.has(guildSettings.adminRoleID) || devs.has(userID) || guild.ownerId === userID) {
     return true;
@@ -20,12 +20,12 @@ async function checkAdmin(guild, userID) {
 }
 
 async function setAdminRole(client, guild, roleID) {
-  const guildSettings = await database.getEntry(`Guild`, {guildID: guild.id});
+  const guildSettings = await database.getEntry(`Guilds`, {guildID: guild.id});
 
   if (guildSettings && guildSettings.adminRoleID === roleID) {
     return `duplicate`;
   } else {
-    const result = await database.updateOrCreateEntry(`Guild`, {guildID: guild.id}, {adminRoleID: roleID});
+    const result = await database.updateOrCreateEntry(`Guilds`, {guildID: guild.id}, {adminRoleID: roleID});
 
     if (result) {
       commandManager.addRoleToGuildCommand(client, guild.id, roleID);
@@ -37,10 +37,10 @@ async function setAdminRole(client, guild, roleID) {
 }
 
 async function removeAdminRole(client, guildID) {
-  const guildSettings = await database.getEntry(`Guild`, {guildID});
+  const guildSettings = await database.getEntry(`Guilds`, {guildID});
 
   if (guildSettings && guildSettings.adminRoleID) {
-    const result = await database.updateEntry(`Guild`, {guildID}, {adminRoleID: null});
+    const result = await database.updateEntry(`Guilds`, {guildID}, {adminRoleID: null});
 
     if (result) {
       commandManager.removeRoleFromGuildCommand(client, guildID, guildSettings.adminRoleID);

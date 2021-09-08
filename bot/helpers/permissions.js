@@ -22,7 +22,7 @@ async function checkAdmin(guild, userID) {
 async function setAdminRole(client, guild, roleID) {
   const guildSettings = await database.getEntry(`Guild`, {guildID: guild.id});
 
-  if (guildSettings.adminRoleID === roleID) {
+  if (guildSettings && guildSettings.adminRoleID === roleID) {
     return `duplicate`;
   } else {
     const result = await database.updateOrCreateEntry(`Guild`, {guildID: guild.id}, {adminRoleID: roleID});

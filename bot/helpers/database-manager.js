@@ -405,7 +405,7 @@ async function updateOrCreateEntry(table, filter, newData) {
 
     return existingEntry;
   } catch {
-    const newEntry = createEntry(table, {...filter, ...newData});
+    const newEntry = await createEntry(table, {...filter, ...newData});
     return newEntry;
   }
 }

@@ -462,9 +462,9 @@ async function changeAdminRole(client, interaction) {
     if (success && success === `norole`) {
       interaction.reply({content: `There isn't an admin role!`, ephemeral: true});
     } else if (success) {
-      interaction.reply({content: `Admin role has been set!`, ephemeral: true});
+      interaction.reply({content: `Admin role has been removed!`, ephemeral: true});
     } else {
-      interaction.reply({content: `There was an error setting the new admin role.\nTell the bot developers if the issue persists.`, ephemeral: true});
+      interaction.reply({content: `There was an error removing the admin role.\nTell the bot developers if the issue persists.`, ephemeral: true});
     }
     activeChanges.delete(interaction.guildId);
     return;

@@ -1,5 +1,4 @@
 const database = require(`./database-manager`);
-const resolvers = require(`./resolvers`);
 
 const roleData = {};
 
@@ -117,7 +116,6 @@ function generateMessage(client, guildID, categoryID) {
 
     for (const role in roleData[guildID][categoryID].roles) {
       if (Object.prototype.hasOwnProperty.call(roleData[guildID][categoryID].roles, role)) {
-        const parsedEmoji = resolvers.resolveEmojiID(client, role);
         const discordRole = client.guilds.cache.get(guildID).roles.cache.get(roleData[guildID][categoryID].roles[role]);
         if (discordRole) {
           buttons.push({
@@ -125,7 +123,7 @@ function generateMessage(client, guildID, categoryID) {
             label: discordRole.name,
             style: `PRIMARY`,
             custom_id: role,
-            emoji: parsedEmoji ? parsedEmoji : `❓`,
+            emoji: role,
           });
         }
 

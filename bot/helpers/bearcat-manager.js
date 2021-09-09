@@ -92,7 +92,7 @@ async function verifyUser(interaction) {
     return;
   }
 
-  if (!interaction.options.has(`email`)) {
+  if (!interaction.options.get(`email`)) {
     interaction.reply({content: `Please run the command again with an email to verify you with.`, ephemeral: true});
     userTimeouts.delete(interaction.user.id);
     return;

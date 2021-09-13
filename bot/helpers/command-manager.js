@@ -4,7 +4,7 @@ const path = require(`path`);
 const database = require(`../helpers/database-manager`);
 
 // Exports
-module.exports = {setSlashCommands, addRoleToGuildCommand, removeRoleFromGuildCommand, getAll, getAllSecret, reloadAll, clearAll, reloadOne, loadAll};
+module.exports = {setSlashCommands, addRoleToGuildCommand, removeRoleFromGuildCommand, getAll, getAllSecret, reloadAll, clearAll, reloadOne, loadAll, addOwnerToGuildCommand};
 
 // Top level vars
 const commandIDs = new Map();
@@ -99,6 +99,17 @@ async function removeRoleFromGuildCommand(client, guildID, roleID) {
   generatePermissions();
 
   client.application.commands.permissions.set({guild: guildID, fullPermissions: permissionData.get(guildID)});
+}
+
+async function addOwnerToGuildCommand(client, guild) {
+  const ownerPerm = {id: guild.ownerId, type: `USER`, permission: true};
+  const oldPerms = adminPermissions.get(guild.id);
+
+  adminPermissions.set(guild.id, oldPerms.concat(ownerPerm));
+
+  generatePermissions();
+
+  client.application.commands.permissions.set({guild: guild.id, fullPermissions: permissionData.get(guild.id)});
 }
 
 function generatePermissions() {

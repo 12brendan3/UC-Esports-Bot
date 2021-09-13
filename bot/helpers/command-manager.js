@@ -103,9 +103,8 @@ async function removeRoleFromGuildCommand(client, guildID, roleID) {
 
 async function addOwnerToGuildCommand(client, guild) {
   const ownerPerm = {id: guild.ownerId, type: `USER`, permission: true};
-  const oldPerms = adminPermissions.get(guild.id);
 
-  adminPermissions.set(guild.id, oldPerms.concat(ownerPerm));
+  adminPermissions.set(guild.id, [ownerPerm]);
 
   generatePermissions();
 

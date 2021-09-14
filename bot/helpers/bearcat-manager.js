@@ -59,7 +59,7 @@ async function verifyUser(interaction) {
 
   let startedFromDM = false;
 
-  if (interaction.channel.type === `dm`) {
+  if (!interaction.isGuild()) {
     startedFromDM = true;
   }
 

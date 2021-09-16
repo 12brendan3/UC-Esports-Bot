@@ -5,6 +5,7 @@ module.exports = {oneMessageFromUser, oneReactionFromUser};
 async function oneMessageFromUser(channel, authorID, time) {
   const filter = (message) => message.author.id === authorID;
 
+  // Borked in d.js v13?
   const collected = await channel.awaitMessages(filter, {max: 1, time: time || 60000, errors: [`time`]});
 
   return collected;

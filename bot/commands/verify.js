@@ -14,6 +14,12 @@ const help = {
       description: `The UC email to link and send a verification code to.`,
       required: false,
     },
+    {
+      name: `code`,
+      type: `STRING`,
+      description: `The verification code sent to your UC email.`,
+      required: false,
+    },
   ],
 };
 

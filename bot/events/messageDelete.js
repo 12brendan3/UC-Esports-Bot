@@ -24,8 +24,19 @@ async function logMessageDeletion(msg) {
     const embed = new Discord.MessageEmbed();
 
     embed.setColor(`#FF0000`);
-    embed.setAuthor(msg.member.displayName, msg.author.displayAvatarURL());
-    embed.setDescription(`Message sent by ${msg.author} was deleted in ${msg.channel}.`);
+    if (msg.member && msg.author) {
+      embed.setAuthor(msg.member.displayName, msg.author.displayAvatarURL());
+      embed.setDescription(`Message sent by ${msg.author} was deleted in ${msg.channel}.`);
+      embed.setFooter(msg.author.tag);
+    } else if (msg.author) {
+      embed.setAuthor(msg.author.tag, msg.author.displayAvatarURL());
+      embed.setDescription(`Message sent by ${msg.author} was deleted in ${msg.channel}.`);
+      embed.setFooter(msg.author.id);
+    } else {
+      embed.setAuthor(`Unknown User`);
+      embed.setDescription(`Message was deleted in ${msg.channel}.`);
+      embed.setFooter(`Unknown User`);
+    }
 
     if (msg.content) {
       embed.addField(`Message`, msg.content.length > 1000 ? msg.content.substr(0, 1000) : msg.content);
@@ -45,7 +56,6 @@ async function logMessageDeletion(msg) {
     }
 
     embed.setTimestamp();
-    embed.setFooter(msg.author.tag);
 
     logsChannel.send({embeds: [embed]});
   }

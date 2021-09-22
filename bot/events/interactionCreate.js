@@ -1,6 +1,7 @@
 const commandManager = require(`../helpers/command-manager`);
 const database = require(`../helpers/database-manager`);
 const reactManager = require(`../helpers/role-react-manager-2`);
+const replyHelper = require(`./interaction-helper`);
 
 // Exports
 module.exports = {handle};

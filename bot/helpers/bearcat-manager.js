@@ -1,6 +1,6 @@
 const settings = require(`./settings-manager`);
 const database = require(`./database-manager`);
-const replyHelper = require(`../helpers/reply-helper`);
+const replyHelper = require(`./interaction-helper`);
 
 const Crypto = require(`crypto`);
 
@@ -175,7 +175,7 @@ async function verifyUser(interaction) {
     const verificationCode = await sendEmail(email);
 
     if (verificationCode) {
-      interaction.editReply({content: `An email has been sent with a verification code; please use \`/verify code:yourcode\`.\nYou have 5 minutes to verify your code.\nMake sure to check your junk mail!`, ephemeral: true});
+      replyHelper.interactionEdit(interaction, {content: `An email has been sent with a verification code; please use \`/verify code:yourcode\`.\nYou have 5 minutes to verify your code.\nMake sure to check your junk mail!`, ephemeral: true});
       userStatus.email = email;
       userStatus.code = verificationCode;
       userStatus.timeout = setTimeout(() => {
@@ -184,7 +184,7 @@ async function verifyUser(interaction) {
         userStatus.timer = Date.now();
       }, 300000);
     } else {
-      interaction.editReply({content: `Failed to send a verification code.\nTry again later and let the bot devs know if the issue persists.`, ephemeral: true});
+      replyHelper.interactionEdit(interaction, {content: `Failed to send a verification code.\nTry again later and let the bot devs know if the issue persists.`, ephemeral: true});
       userStatuses.delete(interaction.user.id);
     }
     return;

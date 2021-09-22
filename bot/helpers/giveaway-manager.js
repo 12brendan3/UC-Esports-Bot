@@ -1,7 +1,7 @@
 const Discord = require(`discord.js`);
 const Sequelize = require(`sequelize`);
 const database = require(`./database-manager`);
-const replyHelper = require(`../helpers/reply-helper`);
+const replyHelper = require(`./interaction-helper`);
 
 // Exports
 module.exports = {addOne, endOne, registerExisting};

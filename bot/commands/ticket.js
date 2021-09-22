@@ -1,7 +1,7 @@
 const database = require(`../helpers/database-manager`);
 const collectors = require(`../helpers/collectors`);
 const resolvers = require(`../helpers/resolvers`);
-const replyHelper = require(`../helpers/reply-helper`);
+const replyHelper = require(`../helpers/interaction-helper`);
 
 const Discord = require(`discord.js`);
 

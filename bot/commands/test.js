@@ -1,6 +1,6 @@
 // Imports
 const database = require(`../helpers/database-manager`);
-const replyHelper = require(`../helpers/reply-helper`);
+const replyHelper = require(`../helpers/interaction-helper`);
 
 const Discord = require(`discord.js`);
 

@@ -4,7 +4,7 @@ const Discord = require(`discord.js`);
 const commandManager = require(`../../helpers/command-manager`);
 const settings = require(`../../helpers/settings-manager`);
 const permissions = require(`../../helpers/permissions`);
-const replyHelper = require(`../../helpers/reply-helper`);
+const replyHelper = require(`../../helpers/interaction-helper`);
 
 // Exports
 module.exports = {handle, getHelp};

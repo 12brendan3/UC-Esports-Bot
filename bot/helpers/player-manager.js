@@ -2,7 +2,7 @@ const settings = require(`../helpers/settings-manager`);
 const ytdl = require(`ytdl-core`);
 const ytsearch = require(`youtube-search`);
 const voice = require(`@discordjs/voice`);
-const replyHelper = require(`../helpers/reply-helper`);
+const replyHelper = require(`./interaction-helper`);
 
 // Exports
 module.exports = {checkUser, checkChannel, prepKey};
@@ -96,7 +96,7 @@ async function checkYT(interaction) {
       };
       addToQueue(interaction, newItem);
     } catch {
-      replyHelper.interactionReply(interaction, {content: `Failed to fetch video information.  Please make sure the video URL/ID is valid and public.`});
+      replyHelper.interactionEdit(interaction, {content: `Failed to fetch video information.  Please make sure the video URL/ID is valid and public.`});
     }
   } else {
     searchYT(interaction, video);
@@ -141,11 +141,11 @@ async function addToQueue(interaction, newItem) {
   const player = players.get(interaction.guildId);
   if (player) {
     player.queue.push(newItem);
-    interaction.editReply(`Added to queue: ${newItem.title}`);
+    replyHelper.interactionEdit(interaction, `Added to queue: ${newItem.title}`);
   } else {
     const connectionplayer = prepConnection(interaction);
     players.set(interaction.guildId, {textChannel: interaction.channel, voiceChannel: interaction.member.voice.channel, queue: [`filler`, newItem], volume: 0.25, connection: connectionplayer.voiceConnection, audioPlayer: connectionplayer.audioPlayer, resource: null, killed: false});
-    interaction.editReply(`Connected to voice.`);
+    replyHelper.interactionEdit(interaction, `Connected to voice.`);
     playNext(interaction.guildId);
   }
 }

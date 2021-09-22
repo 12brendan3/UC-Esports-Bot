@@ -1,7 +1,7 @@
 const timeouts = require(`../helpers/timeout-manager`);
 const resolvers = require(`../helpers/resolvers`);
 const database = require(`../helpers/database-manager`);
-const replyHelper = require(`../helpers/reply-helper`);
+const replyHelper = require(`../helpers/interaction-helper`);
 
 const regexTime = new RegExp(`^([0-9]*d)?([0-9]*h)?([0-9]*m)?$`);
 

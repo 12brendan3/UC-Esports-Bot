@@ -4,7 +4,7 @@ const axios = require(`axios`);
 const path = require(`path`);
 const cronos = require(`cronosjs`);
 const fs = require(`fs`);
-const replyHelper = require(`../helpers/reply-helper`);
+const replyHelper = require(`../helpers/interaction-helper`);
 
 // Exports
 module.exports = {handle, getHelp};

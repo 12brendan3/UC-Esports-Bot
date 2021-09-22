@@ -1,6 +1,6 @@
 const database = require(`../helpers/database-manager`);
 const taskManager = require(`../helpers/task-manager`);
-const replyHelper = require(`../helpers/reply-helper`);
+const replyHelper = require(`../helpers/interaction-helper`);
 
 // Exports
 module.exports = {handle, getHelp};

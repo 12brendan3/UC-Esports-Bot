@@ -1,6 +1,6 @@
 // Imports
 const commandManager = require(`../helpers/command-manager`);
-const replyHelper = require(`../helpers/reply-helper`);
+const replyHelper = require(`../helpers/interaction-helper`);
 
 // Exports
 module.exports = {handle, getHelp};

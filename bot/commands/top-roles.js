@@ -1,5 +1,5 @@
 const Discord = require(`discord.js`);
-const replyHelper = require(`../helpers/reply-helper`);
+const replyHelper = require(`../helpers/interaction-helper`);
 
 // Exports
 module.exports = {handle, getHelp};
@@ -61,7 +61,7 @@ async function handle(client, interaction) {
       embed.addField(`*** ***`, lists[x]);
     }
 
-    interaction.editReply({embeds: [embed]});
+    replyHelper.interactionEdit(interaction, {embeds: [embed]});
   } catch (err) {
     replyHelper.interactionReply(interaction, {content: `Command timed out, please try again.`, ephemeral: true});
   }

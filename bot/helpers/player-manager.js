@@ -84,7 +84,7 @@ function play(interaction) {
 }
 
 async function checkYT(interaction) {
-  replyHelper.interactionReply(interaction, {content: `One moment....`});
+  await interaction.deferReply();
   const video = interaction.options.get(`ytsearch`).value;
   if (regexYT.test(video)) {
     try {

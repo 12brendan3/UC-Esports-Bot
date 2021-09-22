@@ -1,4 +1,5 @@
 const database = require(`../helpers/database-manager`);
+const replyHelper = require(`../helpers/reply-helper`);
 
 // Exports
 module.exports = {handle, getHelp};
@@ -12,14 +13,14 @@ const help = {
 // Exported functions
 async function handle(client, interaction) {
   if (interaction.channel.type === `dm`) {
-    interaction.reply({content: `This command has to be used in a server.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, {content: `This command has to be used in a server.`, ephemeral: true});
     return;
   }
 
   const existingTasks = await database.getAllEntries(`Tasks`, {guildID: interaction.guildId});
 
   if (existingTasks.length < 1) {
-    interaction.reply(`There are no tasks in this server.`);
+    replyHelper.interactionReply(interaction, `There are no tasks in this server.`);
     return;
   }
 
@@ -40,7 +41,7 @@ async function handle(client, interaction) {
 
   tasksString += `\`\`\``;
 
-  interaction.reply(tasksString);
+  replyHelper.interactionReply(interaction, tasksString);
 }
 
 function getHelp() {

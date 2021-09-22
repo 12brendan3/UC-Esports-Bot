@@ -1,5 +1,6 @@
 const settings = require(`./settings-manager`);
 const database = require(`./database-manager`);
+const replyHelper = require(`../helpers/reply-helper`);
 
 const Crypto = require(`crypto`);
 
@@ -37,7 +38,7 @@ function prepEmail() {
 
 async function verifyUser(interaction) {
   if (!emailer) {
-    interaction.reply({content: `The email verification system isn't set up on this bot, bug the bot developers to set it up.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, {content: `The email verification system isn't set up on this bot, bug the bot developers to set it up.`, ephemeral: true});
     return;
   }
 
@@ -57,9 +58,9 @@ async function verifyUser(interaction) {
         if (subCode.toLowerCase() !== userStatus.code.toLowerCase()) {
           userStatus.attempts--;
           if (userStatus.attempts > 0) {
-            interaction.reply({content: `That code is incorrect, please try again.\nYou have ${userStatus.attempts} more attempt(s).`, ephemeral: true});
+            replyHelper.interactionReply(interaction, {content: `That code is incorrect, please try again.\nYou have ${userStatus.attempts} more attempt(s).`, ephemeral: true});
           } else {
-            interaction.reply({content: `That code is incorrect, you have no more attempts.\nPlease try again later.`, ephemeral: true});
+            replyHelper.interactionReply(interaction, {content: `That code is incorrect, you have no more attempts.\nPlease try again later.`, ephemeral: true});
             userStatus.code = null;
             userStatus.status = `timeout`;
             userStatus.timer = Date.now();
@@ -74,7 +75,7 @@ async function verifyUser(interaction) {
 
         if (startedFromDM) {
           // \nIf you'd like to complete your user profile, run the "profile-setup" command.
-          interaction.reply({content: `Success!\nYour email has been saved.\nIn order to get a verified role, run \`/verify\` in a server you want the verified role in.  You won't be asked to verify your email again.`, ephemeral: true});
+          replyHelper.interactionReply(interaction, {content: `Success!\nYour email has been saved.\nIn order to get a verified role, run \`/verify\` in a server you want the verified role in.  You won't be asked to verify your email again.`, ephemeral: true});
         } else {
           const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
           let role = false;
@@ -86,15 +87,15 @@ async function verifyUser(interaction) {
           if (role) {
             if (interaction.member.roles.cache.has(guildSettings.verifiedRoleID)) {
               // \nIf you'd like to complete your user profile, run the "profile-setup" command.
-              interaction.reply({content: `Success!\nYour email has been saved.`, ephemeral: true});
+              replyHelper.interactionReply(interaction, {content: `Success!\nYour email has been saved.`, ephemeral: true});
             } else {
               await interaction.member.roles.add(guildSettings.verifiedRoleID, `User passed verification.`);
               // \nIf you'd like to complete your user profile, run the "profile-setup" command.
-              interaction.reply({content: `Success!\nYour email has been saved and you now have the ${role.name} role in ${interaction.guild.name}.`, ephemeral: true});
+              replyHelper.interactionReply(interaction, {content: `Success!\nYour email has been saved and you now have the ${role.name} role in ${interaction.guild.name}.`, ephemeral: true});
             }
           } else {
             // \nIf you'd like to complete your user profile, run the "profile-setup" command.
-            interaction.reply({content: `Success!\nYour email has been saved.  The server you verified in doesn't have a verified role.\nIf one is added, you can re-run this command to get the role.  You will not be asked to verify your email again.`, ephemeral: true});
+            replyHelper.interactionReply(interaction, {content: `Success!\nYour email has been saved.  The server you verified in doesn't have a verified role.\nIf one is added, you can re-run this command to get the role.  You will not be asked to verify your email again.`, ephemeral: true});
           }
         }
 
@@ -104,17 +105,17 @@ async function verifyUser(interaction) {
 
         userStatuses.delete(interaction.user.id);
       } else {
-        interaction.reply({content: `Please provide a verification code.`, ephemeral: true});
+        replyHelper.interactionReply(interaction, {content: `Please provide a verification code.`, ephemeral: true});
         return;
       }
     } else {
       if (userStatus.status === `active`) {
-        interaction.reply({content: `You're already attempting verification right now.`, ephemeral: true});
+        replyHelper.interactionReply(interaction, {content: `You're already attempting verification right now.`, ephemeral: true});
         return;
       }
 
       if (userStatus.status === `timeout` && (userStatus.timer + 300000) > Date.now()) {
-        interaction.reply({content: `You've already tried verification recently, try again later.`, ephemeral: true});
+        replyHelper.interactionReply(interaction, {content: `You've already tried verification recently, try again later.`, ephemeral: true});
         return;
       }
     }
@@ -127,7 +128,7 @@ async function verifyUser(interaction) {
 
   if (prevVerified && prevVerified.email) {
     if (startedFromDM) {
-      interaction.reply({content: `You've already verified, please run this command from a server to get the verified user role.`, ephemeral: true});
+      replyHelper.interactionReply(interaction, {content: `You've already verified, please run this command from a server to get the verified user role.`, ephemeral: true});
     } else {
       const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
       let role = false;
@@ -138,13 +139,13 @@ async function verifyUser(interaction) {
 
       if (role) {
         if (interaction.member.roles.cache.has(guildSettings.verifiedRoleID)) {
-          interaction.reply({content: `You already have the verified user role in ${interaction.guild.name}.`, ephemeral: true});
+          replyHelper.interactionReply(interaction, {content: `You already have the verified user role in ${interaction.guild.name}.`, ephemeral: true});
         } else {
           await interaction.member.roles.add(guildSettings.verifiedRoleID, `User has previously passed verification.`);
-          interaction.reply({content: `You now have the ${role.name} role in ${interaction.guild.name}.`, ephemeral: true});
+          replyHelper.interactionReply(interaction, {content: `You now have the ${role.name} role in ${interaction.guild.name}.`, ephemeral: true});
         }
       } else {
-        interaction.reply({content: `This server doesn't have a verified role.\nIf one is added, you can re-run this command to get the role.`, ephemeral: true});
+        replyHelper.interactionReply(interaction, {content: `This server doesn't have a verified role.\nIf one is added, you can re-run this command to get the role.`, ephemeral: true});
       }
     }
 
@@ -153,7 +154,7 @@ async function verifyUser(interaction) {
   }
 
   if (!interaction.options.get(`email`)) {
-    interaction.reply({content: `Please run the command again with an email to verify you with.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, {content: `Please run the command again with an email to verify you with.`, ephemeral: true});
     userStatuses.delete(interaction.user.id);
     return;
   }
@@ -163,13 +164,13 @@ async function verifyUser(interaction) {
     const existing = await database.getEntry(`Bearcats`, {email});
 
     if (existing) {
-      interaction.reply({content: `That email has already been used to verify another user.\nContact a bot developer if you believe this is an error.`, ephemeral: true});
+      replyHelper.interactionReply(interaction, {content: `That email has already been used to verify another user.\nContact a bot developer if you believe this is an error.`, ephemeral: true});
       userStatus.status = `timeout`;
       userStatus.timer = Date.now();
       return;
     }
 
-    interaction.reply({content: `Attempting to email you...`, ephemeral: true});
+    replyHelper.interactionReply(interaction, {content: `Attempting to email you...`, ephemeral: true});
 
     const verificationCode = await sendEmail(email);
 
@@ -188,7 +189,7 @@ async function verifyUser(interaction) {
     }
     return;
   } else {
-    interaction.reply({content: `That is not a valid UC email.  Please try again in 5 minutes.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, {content: `That is not a valid UC email.  Please try again in 5 minutes.`, ephemeral: true});
     userStatus.status = `timeout`;
     userStatus.timer = Date.now();
   }

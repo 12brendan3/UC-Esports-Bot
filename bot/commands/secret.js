@@ -1,5 +1,6 @@
 // Imports
 const commandManager = require(`../helpers/command-manager`);
+const replyHelper = require(`../helpers/reply-helper`);
 
 // Exports
 module.exports = {handle, getHelp};
@@ -32,7 +33,7 @@ function handle(client, interaction) {
   if (commands.has(commandName)) {
     commands.get(commandName).handle(client, interaction);
   } else {
-    interaction.reply({content: `Sorry, that's not a valid secret command.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, {content: `Sorry, that's not a valid secret command.`, ephemeral: true});
   }
 }
 

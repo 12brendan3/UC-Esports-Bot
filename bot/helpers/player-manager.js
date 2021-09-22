@@ -2,6 +2,7 @@ const settings = require(`../helpers/settings-manager`);
 const ytdl = require(`ytdl-core`);
 const ytsearch = require(`youtube-search`);
 const voice = require(`@discordjs/voice`);
+const replyHelper = require(`../helpers/reply-helper`);
 
 // Exports
 module.exports = {checkUser, checkChannel, prepKey};
@@ -30,24 +31,24 @@ function prepKey() {
 
 function checkUser(interaction, type) {
   if (interaction.guild === null) {
-    interaction.reply({content: `This command only works in a server.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, {content: `This command only works in a server.`, ephemeral: true});
     return;
   }
 
   if (!interaction.member.voice.channel) {
-    interaction.reply({content: `You need to be connected to a voice channel.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, {content: `You need to be connected to a voice channel.`, ephemeral: true});
     return;
   }
 
   if (!players.has(interaction.guildId) && (type !== `play` || !interaction.options.get(`ytsearch`))) {
-    interaction.reply({content: `There is no active queue.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, {content: `There is no active queue.`, ephemeral: true});
     return;
   }
 
   const player = players.get(interaction.guildId);
 
   if (player && player.voiceChannel.id !== interaction.member.voice.channel.id) {
-    interaction.reply({content: `You need to be connected to the active voice channel.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, {content: `You need to be connected to the active voice channel.`, ephemeral: true});
     return;
   }
 
@@ -66,7 +67,7 @@ function checkUser(interaction, type) {
       break;
     case `leave`:
       stopPlaying(interaction.guildId);
-      interaction.reply({content: `Disconnected and cleared the queue.`});
+      replyHelper.interactionReply(interaction, {content: `Disconnected and cleared the queue.`});
       break;
     default:
       console.error(`If you're seeing this, you incorrectly interacted with the music manager.`);
@@ -83,7 +84,7 @@ function play(interaction) {
 }
 
 async function checkYT(interaction) {
-  interaction.reply({content: `One moment....`});
+  replyHelper.interactionReply(interaction, {content: `One moment....`});
   const video = interaction.options.get(`ytsearch`).value;
   if (regexYT.test(video)) {
     try {
@@ -95,7 +96,7 @@ async function checkYT(interaction) {
       };
       addToQueue(interaction, newItem);
     } catch {
-      interaction.reply({content: `Failed to fetch video information.  Please make sure the video URL/ID is valid and public.`});
+      replyHelper.interactionReply(interaction, {content: `Failed to fetch video information.  Please make sure the video URL/ID is valid and public.`});
     }
   } else {
     searchYT(interaction, video);
@@ -106,9 +107,9 @@ function pause(interaction) {
   const player = players.get(interaction.guildId);
   if (player.audioPlayer.state.status !== `paused`) {
     player.audioPlayer.pause();
-    interaction.reply({content: `Audio has been paused.`});
+    replyHelper.interactionReply(interaction, {content: `Audio has been paused.`});
   } else {
-    interaction.reply({content: `Audio isn't currently playing.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, {content: `Audio isn't currently playing.`, ephemeral: true});
   }
 }
 
@@ -116,16 +117,16 @@ function resume(interaction) {
   const player = players.get(interaction.guildId);
   if (player.audioPlayer.state.status === `paused`) {
     player.audioPlayer.unpause();
-    interaction.reply({content: `Audio has been resumed.`});
+    replyHelper.interactionReply(interaction, {content: `Audio has been resumed.`});
   } else {
-    interaction.reply({content: `Audio isn't currently paused.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, {content: `Audio isn't currently paused.`, ephemeral: true});
   }
 }
 
 function skip(interaction) {
   const player = players.get(interaction.guildId);
   player.audioPlayer.stop();
-  interaction.reply({content: `Skipped!`});
+  replyHelper.interactionReply(interaction, {content: `Skipped!`});
 }
 
 function changeVolume(interaction) {
@@ -133,7 +134,7 @@ function changeVolume(interaction) {
   const player = players.get(interaction.guildId);
   player.volume = volume / 100;
   player.resource.volume.setVolumeLogarithmic(player.volume);
-  interaction.reply({content: `Changed the volume to ${volume}%.`});
+  replyHelper.interactionReply(interaction, {content: `Changed the volume to ${volume}%.`});
 }
 
 async function addToQueue(interaction, newItem) {
@@ -196,7 +197,7 @@ function searchYT(interaction, search) {
   if (ytSearchOpts.key) {
     ytsearch(search, ytSearchOpts, (err, results) => {
       if (err) {
-        interaction.reply({content: `Failed to search YouTube.`});
+        replyHelper.interactionReply(interaction, {content: `Failed to search YouTube.`});
         console.error(err);
       } else {
         const newItem = {
@@ -208,7 +209,7 @@ function searchYT(interaction, search) {
       }
     });
   } else {
-    interaction.reply({content: `YouTube search is currently disabled.`});
+    replyHelper.interactionReply(interaction, {content: `YouTube search is currently disabled.`});
   }
 }
 

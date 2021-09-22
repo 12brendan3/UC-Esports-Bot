@@ -1,6 +1,7 @@
 const Discord = require(`discord.js`);
 
 const database = require(`../helpers/database-manager`);
+const replyHelper = require(`../helpers/reply-helper`);
 
 // Exports
 module.exports = {handle, getHelp};
@@ -35,7 +36,7 @@ async function handle(client, interaction) {
     repChannel.send({embeds: [newEmbed]});
   }
 
-  interaction.reply({content: `Message has been flagged for review by admins.`, ephemeral: true});
+  replyHelper.interactionReply(interaction, {content: `Message has been flagged for review by admins.`, ephemeral: true});
 }
 
 function generateReportEmbed(msg, user) {

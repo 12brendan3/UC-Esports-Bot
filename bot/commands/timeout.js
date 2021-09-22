@@ -1,6 +1,7 @@
 const timeouts = require(`../helpers/timeout-manager`);
 const resolvers = require(`../helpers/resolvers`);
 const database = require(`../helpers/database-manager`);
+const replyHelper = require(`../helpers/reply-helper`);
 
 const regexTime = new RegExp(`^([0-9]*d)?([0-9]*h)?([0-9]*m)?$`);
 
@@ -30,46 +31,46 @@ const help = {
 // Exported functions
 async function handle(client, interaction) {
   if (interaction.channel.type === `dm`) {
-    interaction.reply(`This command has to be used in a server.`);
+    replyHelper.interactionReply(interaction, `This command has to be used in a server.`);
     return;
   }
 
   const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
 
   if (!guildSettings || !guildSettings.timeoutRoleID) {
-    interaction.reply(`There is no timeout role set up on this server.`);
+    replyHelper.interactionReply(interaction, `There is no timeout role set up on this server.`);
     return;
   }
 
   const userID = resolvers.resolveUserID(interaction.guild, interaction.options.get(`user`).value);
 
   if (!userID) {
-    interaction.reply(`Failed to find that user, please try again.`);
+    replyHelper.interactionReply(interaction, `Failed to find that user, please try again.`);
     return;
   }
 
   const timeout = await database.getEntry(`Timeouts`, {guildID: interaction.guildId, userID});
 
   if (timeout) {
-    interaction.reply(`That user is already in timeout.`);
+    replyHelper.interactionReply(interaction, `That user is already in timeout.`);
     return;
   }
 
   const time = parseTime(interaction.options.get(`time`).value);
 
   if (!time) {
-    interaction.reply(`Failed to parse the timeout duration or the timeout is too long (max ~25 days), please try again.`);
+    replyHelper.interactionReply(interaction, `Failed to parse the timeout duration or the timeout is too long (max ~25 days), please try again.`);
     return;
   }
 
   const result = await timeouts.createOne(time, userID, interaction.guild, guildSettings.timeoutRoleID);
 
   if (result) {
-    interaction.reply(result);
+    replyHelper.interactionReply(interaction, result);
     return;
   }
 
-  interaction.reply(`<@${userID}> has been put in timeout for ${convertTime(time)}.`);
+  replyHelper.interactionReply(interaction, `<@${userID}> has been put in timeout for ${convertTime(time)}.`);
 }
 
 function parseTime(timeString) {

@@ -1,3 +1,5 @@
+const replyHelper = require(`../../helpers/reply-helper`);
+
 // Exports
 module.exports = {handle, getHelp};
 
@@ -10,7 +12,7 @@ const help = {
 // Exported functions
 function handle(client, interaction) {
   if (!interaction.options.get(`option1`)) {
-    interaction.reply({content: `Please provide something for the cat to say.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, {content: `Please provide something for the cat to say.`, ephemeral: true});
     return;
   }
 
@@ -18,9 +20,9 @@ function handle(client, interaction) {
 
   try {
     interaction.channel.send({files: [{attachment: `https://cataas.com/c/s/${text}`, name: `cat.jpeg`}]});
-    interaction.reply({content: `Sent!`, ephemeral: true});
+    replyHelper.interactionReply(interaction, {content: `Sent!`, ephemeral: true});
   } catch (err) {
-    interaction.reply({content: `There was an error running the command.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, {content: `There was an error running the command.`, ephemeral: true});
     console.error(err);
   }
 }

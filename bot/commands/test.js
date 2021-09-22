@@ -1,5 +1,6 @@
 // Imports
 const database = require(`../helpers/database-manager`);
+const replyHelper = require(`../helpers/reply-helper`);
 
 const Discord = require(`discord.js`);
 
@@ -37,7 +38,7 @@ const help = {
 // Exported functions
 function handle(client, interaction) {
   if (interaction.channel.type === `dm`) {
-    interaction.reply({content: `This command has to be used in a server.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, {content: `This command has to be used in a server.`, ephemeral: true});
   } else {
     testSettings(interaction, interaction.options.get(`test`).value);
   }
@@ -60,7 +61,7 @@ function testSettings(interaction, setting) {
       testLogsChannel(interaction);
       break;
     default:
-      interaction.reply(`Invalid option.`);
+      replyHelper.interactionReply(interaction, `Invalid option.`);
       break;
   }
 }
@@ -70,9 +71,9 @@ async function testWelcomeMessage(interaction) {
 
   if (guildSettings && guildSettings.welcomeMessage) {
     const welcomeMessage = guildSettings.welcomeMessage.replace(`!!newuser!!`, `${interaction.user}`);
-    interaction.reply({content: welcomeMessage, ephemeral: true});
+    replyHelper.interactionReply(interaction, {content: welcomeMessage, ephemeral: true});
   } else {
-    interaction.reply({content: `There is no welcome message set up for this guild!`, ephemeral: true});
+    replyHelper.interactionReply(interaction, {content: `There is no welcome message set up for this guild!`, ephemeral: true});
   }
 }
 
@@ -83,11 +84,11 @@ async function testWelcomeChannel(interaction) {
     const welcomeMessage = guildSettings.welcomeMessage.replace(`!!newuser!!`, `${interaction.user}`);
     const welcomeChannel = interaction.guild.channels.cache.get(guildSettings.welcomeChannelID);
     welcomeChannel.send(welcomeMessage);
-    interaction.reply({content: `Check the welcome channel! (${welcomeChannel})`, ephemeral: true});
+    replyHelper.interactionReply(interaction, {content: `Check the welcome channel! (${welcomeChannel})`, ephemeral: true});
   } else if (guildSettings && guildSettings.welcomeChannelID) {
-    interaction.reply({content: `There is no welcome message set up for this guild!`, ephemeral: true});
+    replyHelper.interactionReply(interaction, {content: `There is no welcome message set up for this guild!`, ephemeral: true});
   } else {
-    interaction.reply({content: `There is no welcome channel set up for this guild!`, ephemeral: true});
+    replyHelper.interactionReply(interaction, {content: `There is no welcome channel set up for this guild!`, ephemeral: true});
   }
 }
 
@@ -107,8 +108,8 @@ async function testLogsChannel(interaction) {
     embed.setFooter(`${interaction.user.tag}`);
 
     logsChannel.send({embeds: [embed]});
-    interaction.reply({content: `Check the logs channel! (${logsChannel})`, ephemeral: true});
+    replyHelper.interactionReply(interaction, {content: `Check the logs channel! (${logsChannel})`, ephemeral: true});
   } else {
-    interaction.reply({content: `There is no logs channel set up for this guild!`, ephemeral: true});
+    replyHelper.interactionReply(interaction, {content: `There is no logs channel set up for this guild!`, ephemeral: true});
   }
 }

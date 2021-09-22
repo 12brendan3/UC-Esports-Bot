@@ -1,6 +1,7 @@
 const Discord = require(`discord.js`);
 
 const database = require(`../helpers/database-manager`);
+const replyHelper = require(`../helpers/reply-helper`);
 
 // Exports
 module.exports = {handle, getHelp};
@@ -21,7 +22,7 @@ async function sendFeedback(client, interaction) {
     const result = await database.getAllEntries(`Feedback`);
 
     if (result && result.length < 1) {
-      interaction.reply(`There is no feedback.`);
+      replyHelper.interactionReply(interaction, `There is no feedback.`);
       return;
     }
 
@@ -63,10 +64,10 @@ async function sendFeedback(client, interaction) {
       embeds.push(embed);
     }
 
-    interaction.reply({embeds});
+    replyHelper.interactionReply(interaction, {embeds});
   } catch (err) {
     console.error(err);
-    interaction.reply(`There was an error.`);
+    replyHelper.interactionReply(interaction, `There was an error.`);
   }
 }
 

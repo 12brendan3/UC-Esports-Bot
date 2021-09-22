@@ -4,6 +4,7 @@ const Discord = require(`discord.js`);
 const commandManager = require(`../../helpers/command-manager`);
 const settings = require(`../../helpers/settings-manager`);
 const permissions = require(`../../helpers/permissions`);
+const replyHelper = require(`../../helpers/reply-helper`);
 
 // Exports
 module.exports = {handle, getHelp};
@@ -46,7 +47,7 @@ async function handle(client, interaction) {
     }
   }
 
-  interaction.reply({embeds: [embed], ephemeral: true});
+  replyHelper.interactionReply(interaction, {embeds: [embed], ephemeral: true});
 }
 
 function getHelp() {

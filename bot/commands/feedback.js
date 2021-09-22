@@ -1,4 +1,5 @@
 const database = require(`../helpers/database-manager`);
+const replyHelper = require(`../helpers/reply-helper`);
 
 // Exports
 module.exports = {handle, getHelp};
@@ -25,12 +26,12 @@ async function handle(client, interaction) {
     const result = await database.createEntry(`Feedback`, {userID: interaction.user.id, messageURL, message: interaction.options.get(`feedback`).value, time: interaction.createdTimestamp});
 
     if (result) {
-      interaction.reply({content: `Your feedback has been recorded!`, ephemeral: true});
+      replyHelper.interactionReply(interaction, {content: `Your feedback has been recorded!`, ephemeral: true});
     } else {
-      interaction.reply({content: `There was an error saving your feedback.  Tell the bot developers directly if the issue persists.`, ephemeral: true});
+      replyHelper.interactionReply(interaction, {content: `There was an error saving your feedback.  Tell the bot developers directly if the issue persists.`, ephemeral: true});
     }
   } catch {
-    interaction.reply({content: `Command timed out, please try again.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, {content: `Command timed out, please try again.`, ephemeral: true});
   }
 }
 

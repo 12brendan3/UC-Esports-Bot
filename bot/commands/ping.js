@@ -1,3 +1,5 @@
+const replyHelper = require(`../helpers/reply-helper`);
+
 // Exports
 module.exports = {handle, getHelp};
 
@@ -9,7 +11,7 @@ const help = {
 
 // Exported functions
 function handle(client, interaction) {
-  interaction.reply(`Pong! (${client.ws.ping} ms)`);
+  replyHelper.interactionReply(interaction, `Pong! (${client.ws.ping} ms)`);
 }
 
 function getHelp() {

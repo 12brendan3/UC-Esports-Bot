@@ -1,4 +1,5 @@
 // const bearcatManager = require(`../helpers/bearcat-manager`);
+const replyHelper = require(`../helpers/reply-helper`);
 
 // Exports
 module.exports = {handle, getHelp};
@@ -13,7 +14,7 @@ const help = null;
 
 // Exported functions
 function handle(client, interaction) {
-  interaction.reply(`This feature hasn't been completed yet, check again at a later time.`);
+  replyHelper.interactionReply(interaction, `This feature hasn't been completed yet, check again at a later time.`);
 }
 
 function getHelp() {

@@ -1,3 +1,5 @@
+const replyHelper = require(`../../helpers/reply-helper`);
+
 // Exports
 module.exports = {handle, getHelp};
 
@@ -10,7 +12,7 @@ const help = {
 // Exported functions
 function handle(client, interaction) {
   interaction.channel.send(`🦀`);
-  interaction.reply({content: `Sent!`, ephemeral: true});
+  replyHelper.interactionReply(interaction, {content: `Sent!`, ephemeral: true});
 }
 
 function getHelp() {

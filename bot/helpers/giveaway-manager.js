@@ -1,6 +1,7 @@
 const Discord = require(`discord.js`);
 const Sequelize = require(`sequelize`);
 const database = require(`./database-manager`);
+const replyHelper = require(`../helpers/reply-helper`);
 
 // Exports
 module.exports = {addOne, endOne, registerExisting};
@@ -22,7 +23,7 @@ async function addOne(client, interaction) {
 
   const embed = generateGiveawayEmbed(title, description, endTime, interaction.member, numWinners);
 
-  await interaction.reply({embeds:[embed]});
+  await replyHelper.interactionReply(interaction, {embeds:[embed]});
   const reply = await interaction.fetchReply();
 
   let result;
@@ -54,12 +55,12 @@ async function endOne(client, interaction) {
   try {
     result = await database.getEntry(`Giveaways`, {guildID: interaction.guild.id, channelID: interaction.channel.id, title, expireTime: {[Sequelize.Op.ne]: 0}});
   } catch {
-    interaction.reply({content: `There was an internal error, please try again.\nLet the bot devs know if the issue persists.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, {content: `There was an internal error, please try again.\nLet the bot devs know if the issue persists.`, ephemeral: true});
     return;
   }
 
   if (!result) {
-    interaction.reply({content: `There was no giveaway found by that name. (Are you using this command in the same channel as the giveaway and typing the exact name?)`, ephemeral: true});
+    replyHelper.interactionReply(interaction, {content: `There was no giveaway found by that name. (Are you using this command in the same channel as the giveaway and typing the exact name?)`, ephemeral: true});
     return;
   }
 
@@ -70,7 +71,7 @@ async function endOne(client, interaction) {
 
   activeGiveaways.delete(result.ID);
 
-  await interaction.reply({content: `The giveaway has been ended.`, ephemeral: true});
+  await replyHelper.interactionReply(interaction, {content: `The giveaway has been ended.`, ephemeral: true});
 }
 
 function registerGiveaway(client, reply, member, reaction, entry) {

@@ -1,4 +1,5 @@
 const database = require(`../helpers/database-manager`);
+const replyHelper = require(`../helpers/reply-helper`);
 
 // Exports
 module.exports = {handle, getHelp};
@@ -26,13 +27,13 @@ async function removeFeedback(interaction) {
   try {
     const result = await database.removeEntry(`Feedback`, {ID: interaction.options.get(`entryid`).value});
     if (result) {
-      interaction.reply({content: `The feedback entry was removed.`, ephemeral: true});
+      replyHelper.interactionReply(interaction, {content: `The feedback entry was removed.`, ephemeral: true});
     } else {
-      interaction.reply({content: `No feedback with that ID was found.`, ephemeral: true});
+      replyHelper.interactionReply(interaction, {content: `No feedback with that ID was found.`, ephemeral: true});
     }
   } catch (err) {
     console.error(err);
-    interaction.reply({content: `There was an error.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, {content: `There was an error.`, ephemeral: true});
   }
 }
 

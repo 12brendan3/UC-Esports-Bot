@@ -1,5 +1,6 @@
 // Imports
 const giveawayManager = require(`../helpers/giveaway-manager`);
+const replyHelper = require(`../helpers/reply-helper`);
 
 // Exports
 module.exports = {handle, getHelp};
@@ -27,7 +28,7 @@ const help = {
 // Exported Functions
 async function handle(client, interaction) {
   if (interaction.channel.type === `dm`) {
-    interaction.reply(`This command has to be used in a server.`);
+    replyHelper.interactionReply(interaction, `This command has to be used in a server.`);
     return;
   }
 

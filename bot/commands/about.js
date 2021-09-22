@@ -2,6 +2,7 @@ const Discord = require(`discord.js`);
 
 const settings = require(`../helpers/settings-manager`);
 const formatters = require(`../helpers/formatters`);
+const replyHelper = require(`../helpers/reply-helper`);
 
 // Exports
 module.exports = {handle, getHelp};
@@ -27,7 +28,7 @@ function handle(client, interaction) {
 
   embed.setFooter(settings.version);
 
-  interaction.reply({embeds: [embed]});
+  replyHelper.interactionReply(interaction, {embeds: [embed]});
 }
 
 function getHelp() {

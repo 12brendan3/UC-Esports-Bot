@@ -1,6 +1,7 @@
 const Discord = require(`discord.js`);
 
 const database = require(`../helpers/database-manager`);
+const replyHelper = require(`../helpers/reply-helper`);
 
 // Exports
 module.exports = {handle, getHelp};
@@ -24,12 +25,12 @@ async function handle(client, interaction) {
       embed.setTimestamp();
       embed.setDescription(`XP: ${result.XP}`);
 
-      interaction.reply({embeds: [embed]});
+      replyHelper.interactionReply(interaction, {embeds: [embed]});
     } else {
-      interaction.reply(`You don't have any XP.`);
+      replyHelper.interactionReply(interaction, `You don't have any XP.`);
     }
   } catch {
-    interaction.reply({content: `There was an error fetching your XP.  Tell the bot devs if the issue persists.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, {content: `There was an error fetching your XP.  Tell the bot devs if the issue persists.`, ephemeral: true});
   }
 }
 

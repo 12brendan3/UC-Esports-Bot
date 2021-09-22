@@ -1,6 +1,7 @@
 const timeouts = require(`../helpers/timeout-manager`);
 const resolvers = require(`../helpers/resolvers`);
 const database = require(`../helpers/database-manager`);
+const replyHelper = require(`../helpers/reply-helper`);
 
 // Exports
 module.exports = {handle, getHelp};
@@ -22,46 +23,46 @@ const help = {
 // Exported functions
 async function handle(client, interaction) {
   if (interaction.channel.type === `dm`) {
-    interaction.reply(`This command has to be used in a server.`);
+    replyHelper.interactionReply(interaction, `This command has to be used in a server.`);
     return;
   }
 
   const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
 
   if (!guildSettings || !guildSettings.timeoutRoleID) {
-    interaction.reply(`There is no timeout role set up on this server.`);
+    replyHelper.interactionReply(interaction, `There is no timeout role set up on this server.`);
     return;
   }
 
   const userID = resolvers.resolveUserID(interaction.guild, interaction.options.get(`user`).value);
 
   if (!userID) {
-    interaction.reply(`Failed to find that user, please try again.`);
+    replyHelper.interactionReply(interaction, `Failed to find that user, please try again.`);
     return;
   }
 
   const member = interaction.guild.members.cache.get(userID);
 
   if (!member) {
-    interaction.reply(`Failed to find that user, please try again.`);
+    replyHelper.interactionReply(interaction, `Failed to find that user, please try again.`);
     return;
   }
 
   const timeout = await database.getEntry(`Timeouts`, {guildID: interaction.guildId, userID});
 
   if (!timeout) {
-    interaction.reply(`That user isn't in timeout.`);
+    replyHelper.interactionReply(interaction, `That user isn't in timeout.`);
     return;
   }
 
   const result = await timeouts.removeOne(timeout.ID, member, guildSettings.timeoutRoleID);
 
   if (!result) {
-    interaction.reply(`There was an internal error, let the bot devs know if the error persists.`);
+    replyHelper.interactionReply(interaction, `There was an internal error, let the bot devs know if the error persists.`);
     return;
   }
 
-  interaction.reply(`<@${userID}> has been pardoned.`);
+  replyHelper.interactionReply(interaction, `<@${userID}> has been pardoned.`);
 }
 
 function getHelp() {

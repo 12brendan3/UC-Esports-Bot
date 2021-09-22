@@ -2,6 +2,7 @@ const Discord = require(`discord.js`);
 const Sequelize = require(`sequelize`);
 
 const database = require(`../helpers/database-manager`);
+const replyHelper = require(`../helpers/reply-helper`);
 
 // Exports
 module.exports = {handle, getHelp};
@@ -28,7 +29,7 @@ async function sendLeaderboard(client, interaction) {
 
   embed.addField(`Leaderboard - Top 20`, list);
 
-  interaction.reply({embeds: [embed]});
+  replyHelper.interactionReply(interaction, {embeds: [embed]});
 }
 
 async function getUserList(client) {

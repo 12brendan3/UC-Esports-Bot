@@ -1,5 +1,6 @@
 const database = require(`../helpers/database-manager`);
 const collectors = require(`../helpers/collectors`);
+const replyHelper = require(`../helpers/reply-helper`);
 
 // Exports
 module.exports = {handle, getHelp};
@@ -47,11 +48,11 @@ async function transferXP(interaction) {
     if (resultFrom && resultFrom.XP) {
       newXP += resultFrom.XP;
     } else {
-      interaction.reply({content: `${interaction.options.get(`userfrom`).user} has no XP!`, ephemeral: true});
+      replyHelper.interactionReply(interaction, {content: `${interaction.options.get(`userfrom`).user} has no XP!`, ephemeral: true});
       return;
     }
 
-    interaction.reply(`This will transfer all XP from ${interaction.options.get(`userfrom`).user} to ${interaction.options.get(`userto`).user}.\nPlease type "confirm" to confirm.`);
+    replyHelper.interactionReply(interaction, `This will transfer all XP from ${interaction.options.get(`userfrom`).user} to ${interaction.options.get(`userto`).user}.\nPlease type "confirm" to confirm.`);
 
     const confirmation = await collectors.oneMessageFromUser(interaction.channel, interaction.user.id);
 
@@ -65,6 +66,6 @@ async function transferXP(interaction) {
     }
   } catch (err) {
     console.error(err);
-    interaction.reply({content: `Process canceled, there was an error.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, {content: `Process canceled, there was an error.`, ephemeral: true});
   }
 }

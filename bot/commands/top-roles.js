@@ -1,4 +1,5 @@
 const Discord = require(`discord.js`);
+const replyHelper = require(`../helpers/reply-helper`);
 
 // Exports
 module.exports = {handle, getHelp};
@@ -12,7 +13,7 @@ const help = {
 // Exported functions
 async function handle(client, interaction) {
   if (interaction.channel.type === `dm`) {
-    interaction.reply({content: `This command has to be used in a server.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, {content: `This command has to be used in a server.`, ephemeral: true});
     return;
   }
 
@@ -62,7 +63,7 @@ async function handle(client, interaction) {
 
     interaction.editReply({embeds: [embed]});
   } catch (err) {
-    interaction.reply({content: `Command timed out, please try again.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, {content: `Command timed out, please try again.`, ephemeral: true});
   }
 }
 

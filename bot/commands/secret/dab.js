@@ -1,3 +1,5 @@
+const replyHelper = require(`../../helpers/reply-helper`);
+
 // Exports
 module.exports = {handle, getHelp};
 
@@ -22,9 +24,9 @@ function handle(client, interaction) {
 
   if (dabEmoji && !dabEmoji.deleted) {
     interaction.channel.send(`${dabEmoji}`);
-    interaction.reply({content: `Sent!`, ephemeral: true});
+    replyHelper.interactionReply(interaction, {content: `Sent!`, ephemeral: true});
   } else {
-    interaction.reply({content: `There was an error running the command.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, {content: `There was an error running the command.`, ephemeral: true});
   }
 }
 

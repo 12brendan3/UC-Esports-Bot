@@ -1,6 +1,7 @@
 const database = require(`../helpers/database-manager`);
 const collectors = require(`../helpers/collectors`);
 const resolvers = require(`../helpers/resolvers`);
+const replyHelper = require(`../helpers/reply-helper`);
 
 const Discord = require(`discord.js`);
 
@@ -35,7 +36,7 @@ async function handle(client, interaction) {
   let guildID;
 
   if (activeReports.has(interaction.user.id)) {
-    interaction.reply({content: `You already have an active ticket in progress.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, {content: `You already have an active ticket in progress.`, ephemeral: true});
     return;
   }
 
@@ -50,7 +51,7 @@ async function handle(client, interaction) {
       guildString += `\`${guild.name}\` `;
     });
 
-    interaction.reply(`What server would you like to submit this ticket to?  Servers shared with you are:\n${guildString}`);
+    replyHelper.interactionReply(interaction, `What server would you like to submit this ticket to?  Servers shared with you are:\n${guildString}`);
 
     let guildResponse;
     try {
@@ -87,7 +88,7 @@ async function handle(client, interaction) {
     if (startedFromDM) {
       interaction.followUp(`The ticket has been sent.`);
     } else {
-      interaction.reply({content: `The ticket has been sent.`, ephemeral: true});
+      replyHelper.interactionReply(interaction, {content: `The ticket has been sent.`, ephemeral: true});
     }
 
     activeReports.delete(interaction.user.id);
@@ -95,7 +96,7 @@ async function handle(client, interaction) {
     if (startedFromDM) {
       interaction.followUp(`The server doesn't have a ticket channel set up.  Ticket cancelled.`);
     } else {
-      interaction.reply({content: `The server doesn't have a ticket channel set up.  Ticket cancelled.`, ephemeral: true});
+      replyHelper.interactionReply(interaction, {content: `The server doesn't have a ticket channel set up.  Ticket cancelled.`, ephemeral: true});
     }
 
     activeReports.delete(interaction.user.id);

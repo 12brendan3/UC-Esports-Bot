@@ -26,7 +26,7 @@ async function handle(client, interaction) {
 
   const perms = [`user`];
 
-  if (interaction.channel.type === `dm`) {
+  if (interaction.channel.type === `DM`) {
     perms.push(`admin`);
   } else {
     const isAdmin = await permissions.checkAdmin(interaction.guild, interaction.user.id);

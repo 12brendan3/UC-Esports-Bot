@@ -13,7 +13,7 @@ module.exports = {handle};
 
 // Exported function
 function handle(client, msgOld, msgNew) {
-  if (msgNew.channel.type !== `dm` && !msgNew.author.bot) {
+  if (msgNew.channel.type !== `DM` && !msgNew.author.bot) {
     logMessageEdit(msgOld, msgNew);
   }
 

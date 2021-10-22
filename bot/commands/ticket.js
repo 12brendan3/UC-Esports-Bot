@@ -42,7 +42,7 @@ async function handle(client, interaction) {
 
   activeReports.add(interaction.user.id);
 
-  if (interaction.channel.type === `dm`) {
+  if (interaction.channel.type === `DM`) {
     startedFromDM = true;
     const guildList = client.guilds.cache.filter((guild) => guild.members.cache.has(interaction.user.id));
     let guildString = ``;

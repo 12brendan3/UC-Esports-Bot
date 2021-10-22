@@ -10,7 +10,7 @@ module.exports = {handle};
 
 // Exported function
 function handle(client, msg) {
-  if (msg.channel.type !== `dm` && !msg.author.bot) {
+  if (msg.channel.type !== `DM` && !msg.author.bot) {
     logMessageDeletion(msg);
   }
 }

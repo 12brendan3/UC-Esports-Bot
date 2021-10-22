@@ -12,7 +12,7 @@ const help = {
 
 // Exported functions
 async function handle(client, interaction) {
-  if (interaction.channel.type === `dm`) {
+  if (interaction.channel.type === `DM`) {
     replyHelper.interactionReply(interaction, {content: `This command has to be used in a server.`, ephemeral: true});
     return;
   }

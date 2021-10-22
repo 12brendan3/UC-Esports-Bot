@@ -16,7 +16,7 @@ module.exports = {handle};
 
 // Exported function
 async function handle(client, reaction, user) {
-  if (user.bot || reaction.message.channel.type === `dm`) {
+  if (user.bot || reaction.message.channel.type === `DM`) {
     return;
   }
 

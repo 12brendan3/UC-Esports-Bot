@@ -20,7 +20,7 @@ function handle(client, msg) {
     return;
   }
 
-  if (!msg.author.bot && msg.channel.type !== `dm`) {
+  if (!msg.author.bot && msg.channel.type !== `DM`) {
     awardXP(msg);
   }
 }

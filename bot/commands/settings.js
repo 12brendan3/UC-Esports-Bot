@@ -335,7 +335,7 @@ const help = {
 
 // Exported functions
 async function handle(client, interaction) {
-  if (interaction.channel.type === `dm`) {
+  if (interaction.channel.type === `DM`) {
     replyHelper.interactionReply(interaction, {content: `That command has to be used in a server.`, ephemeral: true});
     return;
   }
@@ -433,8 +433,9 @@ async function changeWelcomeChannel(interaction) {
   const options = interaction.options;
   let result;
 
-  if (options.get(`channel`).channel.type !== `text`) {
+  if (options.get(`channel`).channel.type !== `GUILD_TEXT`) {
     replyHelper.interactionReply(interaction, {content: `That's not a valid text channel.`, ephemeral: true});
+    activeChanges.delete(interaction.guildId);
     return;
   }
 
@@ -488,8 +489,9 @@ async function changeLogsChannel(interaction) {
   const options = interaction.options;
   let result;
 
-  if (options.get(`channel`).channel.type !== `text`) {
+  if (options.get(`channel`).channel.type !== `GUILD_TEXT`) {
     replyHelper.interactionReply(interaction, {content: `That's not a valid text channel.`, ephemeral: true});
+    activeChanges.delete(interaction.guildId);
     return;
   }
 
@@ -516,8 +518,9 @@ async function changeStarboardChannel(interaction) {
   const options = interaction.options;
   let result;
 
-  if (options.get(`channel`).channel.type !== `text`) {
+  if (options.get(`channel`).channel.type !== `GUILD_TEXT`) {
     replyHelper.interactionReply(interaction, {content: `That's not a valid text channel.`, ephemeral: true});
+    activeChanges.delete(interaction.guildId);
     return;
   }
 
@@ -580,18 +583,19 @@ async function changeStreamingRole(interaction) {
   activeChanges.delete(interaction.guildId);
 }
 
-async function changeRoleChannel(interaction) {
+async function changeRoleChannel(interaction, client) {
   const options = interaction.options;
   let result;
 
-  if (options.get(`channel`).channel.type !== `text`) {
+  if (options.get(`channel`).channel.type !== `GUILD_TEXT`) {
     replyHelper.interactionReply(interaction, {content: `That's not a valid text channel.`, ephemeral: true});
+    activeChanges.delete(interaction.guildId);
     return;
   }
 
   if (options.get(`disable`) && options.get(`disable`).value) {
     result = await database.updateOrCreateEntry(`Guilds`, {guildID: interaction.guildId}, {rolesChannelID: null});
-  } else if (options.get(`role`)) {
+  } else if (options.get(`channel`)) {
     result = await database.updateOrCreateEntry(`Guilds`, {guildID: interaction.guildId}, {rolesChannelID: options.get(`channel`).channel.id});
   } else {
     replyHelper.interactionReply(interaction, {content: `Please provide a channel or set disable to true to disable the reaction role channel.`, ephemeral: true});
@@ -600,7 +604,9 @@ async function changeRoleChannel(interaction) {
   }
 
   if (result) {
-    replyHelper.interactionReply(interaction, {content: `Reaction role channel has been updated!`, ephemeral: true});
+    await interaction.deferReply();
+    await reactManager.updateGuildMessages(client, interaction.guildId);
+    replyHelper.interactionEdit(interaction, {content: `Reaction role channel has been updated!`, ephemeral: true});
   } else {
     replyHelper.interactionReply(interaction, {content: `There was an error updating the reaction role channel.\nTell the bot developers if the issue persists.`, ephemeral: true});
   }
@@ -880,8 +886,9 @@ async function changeReportChannel(interaction) {
   const options = interaction.options;
   let result;
 
-  if (options.get(`channel`).channel.type !== `text`) {
+  if (options.get(`channel`).channel.type !== `GUILD_TEXT`) {
     replyHelper.interactionReply(interaction, {content: `That's not a valid text channel.`, ephemeral: true});
+    activeChanges.delete(interaction.guildId);
     return;
   }
 

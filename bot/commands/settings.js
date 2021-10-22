@@ -377,7 +377,7 @@ function changeSettings(interaction, client) {
       changeStreamingRole(interaction);
       break;
     case `react-channel`:
-      changeRoleChannel(interaction);
+      changeRoleChannel(interaction, client);
       break;
     case `react-add`:
       addRoleReaction(interaction, client);

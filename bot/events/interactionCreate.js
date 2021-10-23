@@ -61,7 +61,7 @@ async function handleButton(client, interaction) {
             replyHelper.interactionReply(interaction, {content: `You have been given the \`${role.name}\` role.`, ephemeral: true});
           }
         } catch {
-          const message = await replyHelper.interactionReply(interaction, {content: `${member}, there was an error giving you the \`${role.name}\` role.\nTell an admin if they don't notice.  There may be a permission issue.\n*This message will self-destruct in 10 seconds.*`, ephemeral: false});
+          const message = await replyHelper.interactionReply(interaction, {content: `${member}, there was an error giving you the \`${role.name}\` role.\nTell an admin if they don't notice.  There may be a permission issue.`, ephemeral: false});
           setTimeout(() => message.delete(), 10000);
         }
         break;

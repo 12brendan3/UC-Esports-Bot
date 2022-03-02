@@ -15,7 +15,7 @@ const commandImports = new Map();
 const secretCommandImports = new Map();
 
 // Devs are hard-coded
-const devs = new Set([`145730448105013248`, `151079705917915136`]);
+const devs = new Set([`145730448105013248`, `316272031022841856`]);
 
 // Exported Functions
 async function setSlashCommands(client) {

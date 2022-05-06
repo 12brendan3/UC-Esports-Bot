@@ -23,7 +23,7 @@ async function handle(client, interaction) {
     const embed = new Discord.MessageEmbed();
 
     embed.setColor(`#00EDCD`);
-    embed.setAuthor(interaction.guild.name, interaction.guild.iconURL());
+    embed.setAuthor({text: interaction.guild.name, iconURL: interaction.guild.iconURL()});
     embed.setTimestamp();
 
     const roles = interaction.guild.roles.cache.sort((role1, role2) => role2.members.size - role1.members.size);

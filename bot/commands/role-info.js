@@ -30,9 +30,9 @@ async function handle(client, interaction) {
     const embed = new Discord.MessageEmbed();
 
     embed.setColor(role.color);
-    embed.setAuthor(`${role.name} Role Information`, interaction.guild.iconURL());
+    embed.setAuthor({text: `${role.name} Role Information`, iconURL: interaction.guild.iconURL()});
     embed.setTimestamp(role.createdTimestamp);
-    embed.setFooter(`Role Created`);
+    embed.setFooter({text: `Role Created`});
 
     embed.addField(`__Total Members__`, `${role.members.size} member${role.members.size > 1 ? `s` : ``}  (${(role.members.size / interaction.guild.memberCount * 100).toFixed(2)}% of all server members)`);
     embed.addField(`__Color (hex)__`, `\`${role.hexColor}\``);

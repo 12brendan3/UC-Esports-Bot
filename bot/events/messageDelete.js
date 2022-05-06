@@ -25,17 +25,17 @@ async function logMessageDeletion(msg) {
 
     embed.setColor(`#FF0000`);
     if (msg.member && msg.author) {
-      embed.setAuthor(msg.member.displayName, msg.author.displayAvatarURL());
+      embed.setAuthor({text: msg.member.displayName, iconURL: msg.author.displayAvatarURL()});
       embed.setDescription(`Message sent by ${msg.author} was deleted in ${msg.channel}.`);
       embed.setFooter(msg.author.tag);
     } else if (msg.author) {
-      embed.setAuthor(msg.author.tag, msg.author.displayAvatarURL());
+      embed.setAuthor({text: msg.author.tag, iconURL: msg.author.displayAvatarURL()});
       embed.setDescription(`Message sent by ${msg.author} was deleted in ${msg.channel}.`);
       embed.setFooter(msg.author.id);
     } else {
-      embed.setAuthor(`Unknown User`);
+      embed.setAuthor({text: `Unknown User`});
       embed.setDescription(`Message was deleted in ${msg.channel}.`);
-      embed.setFooter(`Unknown User`);
+      embed.setFooter({text: `Unknown User`});
     }
 
     if (msg.content) {

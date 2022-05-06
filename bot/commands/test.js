@@ -100,12 +100,12 @@ async function testLogsChannel(interaction) {
     const embed = new Discord.MessageEmbed();
 
     embed.setColor(`#00FF1A`);
-    embed.setAuthor(interaction.user.username, interaction.user.displayAvatarURL());
+    embed.setAuthor({text: interaction.user.username, iconURL: interaction.user.displayAvatarURL()});
     embed.setDescription(`Message was sent by ${interaction.user} in ${interaction.channel} to test the logs channel.`);
     embed.addField(`Message Content`, `Example content.`);
     embed.addField(`Message Link`, `${interaction.channel}`);
     embed.setTimestamp();
-    embed.setFooter(`${interaction.user.tag}`);
+    embed.setFooter({text: `${interaction.user.tag}`});
 
     logsChannel.send({embeds: [embed]});
     replyHelper.interactionReply(interaction, {content: `Check the logs channel! (${logsChannel})`, ephemeral: true});

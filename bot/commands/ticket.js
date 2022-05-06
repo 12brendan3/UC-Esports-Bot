@@ -109,9 +109,9 @@ function generateReportEmbed(text, interaction, anonymous) {
   embed.setDescription(`A ticket has been submitted.`);
   embed.setColor(`#FFFB1F`);
   if (anonymous) {
-    embed.setAuthor(`Anonymous`);
+    embed.setAuthor({text: `Anonymous`});
   } else {
-    embed.setAuthor(interaction.user.username, interaction.user.displayAvatarURL());
+    embed.setAuthor({text: interaction.user.username, iconURL: interaction.user.displayAvatarURL()});
   }
   embed.addField(`Message`, text.length > 1000 ? text.substr(0, 1000) : text);
   if (text.length > 1000) {

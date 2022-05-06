@@ -21,7 +21,7 @@ async function handle(client, interaction) {
       const embed = new Discord.MessageEmbed();
 
       embed.setColor(`#CC00FF`);
-      embed.setAuthor(interaction.user.username, interaction.user.displayAvatarURL());
+      embed.setAuthor({text: interaction.user.username, iconURL: interaction.user.displayAvatarURL()});
       embed.setTimestamp();
       embed.setDescription(`XP: ${result.XP}`);
 

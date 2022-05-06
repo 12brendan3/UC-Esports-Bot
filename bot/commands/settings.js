@@ -1,7 +1,6 @@
 // Imports
 const database = require(`../helpers/database-manager`);
 const resolvers = require(`../helpers/resolvers`);
-const permissions = require(`../helpers/permissions`);
 const reactManager = require(`../helpers/role-react-manager-2`);
 const replyHelper = require(`../helpers/interaction-helper`);
 
@@ -15,6 +14,7 @@ module.exports = {handle, getHelp};
 const help = {
   text: `Allows a server admin to change bot settings.`,
   level: `admin`,
+  allowDM: false,
   options: [
     {
       name: `welcome-message`,
@@ -43,25 +43,6 @@ const help = {
         {
           name: `disable`,
           description: `Whether or not to disable the welcome channel.`,
-          type: `BOOLEAN`,
-          required: false,
-        },
-      ],
-    },
-    {
-      name: `admin-role`,
-      type: `SUB_COMMAND`,
-      description: `Sets or removes the admin role.`,
-      options: [
-        {
-          name: `role`,
-          description: `The role to set as the admin role.`,
-          type: `ROLE`,
-          required: true,
-        },
-        {
-          name: `remove`,
-          description: `Whether or not to remove the admin role.`,
           type: `BOOLEAN`,
           required: false,
         },
@@ -361,9 +342,6 @@ function changeSettings(interaction, client) {
     case `welcome-channel`:
       changeWelcomeChannel(interaction);
       break;
-    case `admin-role`:
-      changeAdminRole(client, interaction);
-      break;
     case `logs-channel`:
       changeLogsChannel(interaction);
       break;
@@ -453,33 +431,6 @@ async function changeWelcomeChannel(interaction) {
     replyHelper.interactionReply(interaction, {content: `Welcome message channel has been updated!\nUse \`/test Welcome Channel\` to test it.`, ephemeral: true});
   } else {
     replyHelper.interactionReply(interaction, {content: `There was an error updating the welcome message channel.\nTell the bot developers if the issue persists.`, ephemeral: true});
-  }
-
-  activeChanges.delete(interaction.guildId);
-}
-
-async function changeAdminRole(client, interaction) {
-  if (interaction.options.get(`remove`) && interaction.options.get(`remove`).value === true) {
-    const success = await permissions.removeAdminRole(client, interaction.guild, interaction.options.get(`role`).role.id);
-    if (success && success === `norole`) {
-      replyHelper.interactionReply(interaction, {content: `There isn't an admin role!`, ephemeral: true});
-    } else if (success) {
-      replyHelper.interactionReply(interaction, {content: `Admin role has been removed!`, ephemeral: true});
-    } else {
-      replyHelper.interactionReply(interaction, {content: `There was an error removing the admin role.\nTell the bot developers if the issue persists.`, ephemeral: true});
-    }
-    activeChanges.delete(interaction.guildId);
-    return;
-  }
-
-  const success = await permissions.setAdminRole(client, interaction.guild, interaction.options.get(`role`).role.id);
-
-  if (success && success === `duplicate`) {
-    replyHelper.interactionReply(interaction, {content: `That is already the admin role!`, ephemeral: true});
-  } else if (success) {
-    replyHelper.interactionReply(interaction, {content: `Admin role has been set!`, ephemeral: true});
-  } else {
-    replyHelper.interactionReply(interaction, {content: `There was an error setting the new admin role.\nTell the bot developers if the issue persists.`, ephemeral: true});
   }
 
   activeChanges.delete(interaction.guildId);

@@ -8,6 +8,7 @@ module.exports = {handle, getHelp};
 const help = {
   text: `Provide feedback directly to the bot developers.  Use this command for improvements, bugs, etc.`,
   level: `user`,
+  allowDM: true,
   options: [
     {
       name: `feedback`,

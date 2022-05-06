@@ -8,6 +8,7 @@ module.exports = {handle, getHelp};
 const help = {
   text: `Skips the currently playing audio.`,
   level: `user`,
+  allowDM: false,
 };
 
 // Exported functions

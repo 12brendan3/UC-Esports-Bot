@@ -13,6 +13,7 @@ module.exports = {handle, getHelp};
 const help = {
   text: `Allows an admin to schedule a new task.`,
   level: `admin`,
+  allowDM: false,
   options: [
     {
       name: `channel`,

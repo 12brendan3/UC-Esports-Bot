@@ -8,6 +8,7 @@ module.exports = {handle, getHelp};
 const help = {
   text: `Allows a server admin to get information about a role in the server.`,
   level: `admin`,
+  allowDM: false,
   options: [
     {
       name: `role`,

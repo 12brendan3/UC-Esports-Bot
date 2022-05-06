@@ -8,6 +8,7 @@ module.exports = {handle, getHelp};
 const help = {
   text: `Allows an admin to view server tasks.`,
   level: `admin`,
+  allowDM: false,
 };
 
 // Exported functions

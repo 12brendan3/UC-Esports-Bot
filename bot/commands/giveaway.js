@@ -9,6 +9,7 @@ module.exports = {handle, getHelp};
 const help = {
   text: `Runs a giveaway`,
   level: `admin`,
+  allowDM: false,
   options: [
     {
       name: `name`,

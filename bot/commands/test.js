@@ -11,6 +11,7 @@ module.exports = {handle, getHelp};
 const help = {
   text: `Allows a server admin to test bot settings.`,
   level: `admin`,
+  allowDM: false,
   options: [
     {
       name: `test`,

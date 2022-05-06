@@ -7,6 +7,7 @@ module.exports = {handle, getHelp};
 const help = {
   text: `Replies with "pong!" ...and the bot's actual ping.`,
   level: `user`,
+  allowDM: true,
 };
 
 // Exported functions

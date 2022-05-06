@@ -10,6 +10,7 @@ module.exports = {handle, getHelp};
 const help = {
   text: `Replies with your current XP.`,
   level: `user`,
+  allowDM: true,
 };
 
 // Exported functions

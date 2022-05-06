@@ -11,6 +11,7 @@ module.exports = {handle, getHelp};
 const help = {
   text: `Provides information about the bot.`,
   level: `user`,
+  allowDM: true,
 };
 
 // Exported functions

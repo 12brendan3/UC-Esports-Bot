@@ -11,6 +11,7 @@ module.exports = {handle, getHelp};
 const help = {
   text: `Sends the leaderboard of the top 20 users with the most XP.`,
   level: `user`,
+  allowDM: true,
 };
 
 // Exported functions

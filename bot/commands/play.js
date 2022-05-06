@@ -8,6 +8,7 @@ module.exports = {handle, getHelp};
 const help = {
   text: `Plays audio from YouTube.  Adds to queue or resumes paused audio.`,
   level: `user`,
+  allowDM: false,
   options: [
     {
       name: `ytsearch`,

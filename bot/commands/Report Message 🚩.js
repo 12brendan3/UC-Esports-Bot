@@ -10,6 +10,7 @@ module.exports = {handle, getHelp};
 const help = {
   level: `user`,
   type: `MESSAGE`,
+  allowDM: false,
 };
 
 // Exported functions

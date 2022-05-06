@@ -10,6 +10,7 @@ module.exports = {handle, getHelp};
 const help = {
   text: `Allows an admin to remove a user from timeout.`,
   level: `admin`,
+  allowDM: false,
   options: [
     {
       name: `user`,

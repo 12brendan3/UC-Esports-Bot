@@ -9,6 +9,7 @@ module.exports = {handle, getHelp};
 const help = {
   text: `Ends a giveaway early, effectively cancelling it. Doesn't roll winners by default.`,
   level: `admin`,
+  allowDM: false,
   options: [
     {
       name: `name`,

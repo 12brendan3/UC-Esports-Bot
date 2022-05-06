@@ -8,6 +8,7 @@ module.exports = {handle, getHelp};
 const help = {
   text: `Allows an admin to get a list of the server roles. Ordered by most users to the least.`,
   level: `admin`,
+  allowDM: false,
 };
 
 // Exported functions

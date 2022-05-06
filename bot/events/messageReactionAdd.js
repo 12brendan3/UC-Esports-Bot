@@ -1,5 +1,4 @@
 const database = require(`../helpers/database-manager`);
-const permissions = require(`../helpers/permissions`);
 const reactManager = require(`../helpers/role-react-manager-2`);
 const resolvers = require(`../helpers/resolvers`);
 
@@ -127,9 +126,9 @@ async function detectStarboard(guildSettings, reaction, user) {
     checkMessage(reaction, guildSettings, exists, false);
   } else if (reaction.emoji.identifier === detectedStarboardReactions[1]) {
     const exists = await database.getEntry(`Starboard`, {guildID: reaction.message.guildId, channelID: reaction.message.channel.id, originalMessageID: reaction.message.id});
-    const admin = await permissions.checkAdmin(reaction.message.guild, user.id);
+    const owner = reaction.message.guild.ownerId === user.id;
 
-    if (exists || admin) {
+    if (exists || owner) {
       checkMessage(reaction, guildSettings, exists, true);
     }
   }

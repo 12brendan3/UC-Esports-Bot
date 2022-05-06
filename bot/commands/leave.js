@@ -8,6 +8,7 @@ module.exports = {handle, getHelp};
 const help = {
   text: `Stops audio playback, clears the queue, and leaves the channel.`,
   level: `user`,
+  allowDM: false,
 };
 
 // Exported functions

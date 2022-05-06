@@ -8,6 +8,7 @@ module.exports = {handle, getHelp};
 const help = {
   text: `Pauses playing audio.`,
   level: `user`,
+  allowDM: false,
 };
 
 // Exported functions

@@ -14,6 +14,7 @@ module.exports = {handle, getHelp};
 const help = {
   text: `Submit a ticket for a specific server.`,
   level: `user`,
+  allowDM: true,
   options: [
     {
       name: `message`,

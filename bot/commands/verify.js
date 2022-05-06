@@ -7,6 +7,7 @@ module.exports = {handle, getHelp};
 const help = {
   text: `Allows students to verify they go to UC and grants the verified role in servers.`,
   level: `user`,
+  allowDM: true,
   options: [
     {
       name: `email`,

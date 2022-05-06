@@ -8,6 +8,7 @@ module.exports = {handle, getHelp};
 const help = {
   text: `Change the playing audio's volume.`,
   level: `user`,
+  allowDM: false,
   options: [
     {
       name: `volume`,

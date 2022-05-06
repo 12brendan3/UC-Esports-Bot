@@ -9,6 +9,7 @@ module.exports = {handle, getHelp};
 const help = {
   text: `Allows an admin to remove server tasks.`,
   level: `admin`,
+  allowDM: false,
   options: [
     {
       name: `taskid`,

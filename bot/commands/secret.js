@@ -9,6 +9,7 @@ module.exports = {handle, getHelp};
 const help = {
   text: `Use a secret command... if you know the name of it.`,
   level: `user`,
+  allowDM: true,
   options: [
     {
       name: `command`,

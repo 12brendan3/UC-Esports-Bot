@@ -31,7 +31,7 @@ async function handle(client, interaction) {
     const embed = new Discord.MessageEmbed();
 
     embed.setColor(role.color);
-    embed.setAuthor({text: `${role.name} Role Information`, iconURL: interaction.guild.iconURL()});
+    embed.setAuthor({name: `${role.name} Role Information`, iconURL: interaction.guild.iconURL()});
     embed.setTimestamp(role.createdTimestamp);
     embed.setFooter({text: `Role Created`});
 

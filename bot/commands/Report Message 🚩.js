@@ -45,7 +45,7 @@ function generateReportEmbed(msg, user) {
 
   embed.setDescription(`A message has been flagged.`);
   embed.setColor(`#FF0000`);
-  embed.setAuthor({text: msg.author.tag, iconURL: msg.author.displayAvatarURL()});
+  embed.setAuthor({name: msg.author.tag, iconURL: msg.author.displayAvatarURL()});
   if (msg.content) {
     embed.addField(`Message`, msg.content.length > 1000 ? msg.content.substr(0, 1000) : msg.content);
     if (msg.content.length > 1000) {

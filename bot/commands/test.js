@@ -101,7 +101,7 @@ async function testLogsChannel(interaction) {
     const embed = new Discord.MessageEmbed();
 
     embed.setColor(`#00FF1A`);
-    embed.setAuthor({text: interaction.user.username, iconURL: interaction.user.displayAvatarURL()});
+    embed.setAuthor({name: interaction.user.username, iconURL: interaction.user.displayAvatarURL()});
     embed.setDescription(`Message was sent by ${interaction.user} in ${interaction.channel} to test the logs channel.`);
     embed.addField(`Message Content`, `Example content.`);
     embed.addField(`Message Link`, `${interaction.channel}`);

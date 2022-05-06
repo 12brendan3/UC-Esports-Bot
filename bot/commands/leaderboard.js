@@ -23,7 +23,7 @@ async function sendLeaderboard(client, interaction) {
   const embed = new Discord.MessageEmbed();
 
   embed.setColor(`#CC00FF`);
-  embed.setAuthor({text: client.user.username, iconURL: client.user.displayAvatarURL()});
+  embed.setAuthor({name: client.user.username, iconURL: client.user.displayAvatarURL()});
   embed.setTimestamp();
 
   const list = await getUserList(client);

@@ -18,7 +18,7 @@ function handle(client, interaction) {
 function handleCommand(client, interaction) {
   // Ignore report command to keep it as anonymous as possible
   if (interaction.commandName !== `ticket`) {
-    console.info(`${interaction.channel.type === `DM` ? `Via DM` : `#${interaction.channel.name}`} <${interaction.user.username}> ${interaction.commandName}`);
+    console.info(`${interaction.channel ? `#${interaction.channel.name}` : `Via DM`} <${interaction.user.username}> ${interaction.commandName}`);
   }
 
   const commands = commandManager.getAll();

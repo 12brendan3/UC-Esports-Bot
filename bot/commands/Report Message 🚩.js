@@ -22,6 +22,7 @@ async function handle(client, interaction) {
   const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
 
   if (!guildSettings || !guildSettings.reportChannelID || (!guildSettings.starboardChannelID && interaction.channelId === guildSettings.starboardChannelID) || (!guildSettings.rolesChannelID && interaction.channelId === guildSettings.rolesChannelID)) {
+    replyHelper.interactionReply(interaction, {content: `Failed to report message.  Is a report channel set up?`, ephemeral: true});
     return;
   }
 

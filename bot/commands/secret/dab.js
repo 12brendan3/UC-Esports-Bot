@@ -22,7 +22,7 @@ function handle(client, interaction) {
 
   const dabEmoji = client.emojis.cache.find((emoji) => emoji.name === emojiName);
 
-  if (dabEmoji && !dabEmoji.deleted) {
+  if (dabEmoji) {
     interaction.channel.send(`${dabEmoji}`);
     replyHelper.interactionReply(interaction, {content: `Sent!`, ephemeral: true});
   } else {

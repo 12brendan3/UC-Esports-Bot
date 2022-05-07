@@ -13,7 +13,7 @@ const help = {
 function handle(client, interaction) {
   const baercotEmoji = client.emojis.cache.find((emoji) => emoji.name === `baercot`);
 
-  if (baercotEmoji && !baercotEmoji.deleted) {
+  if (baercotEmoji) {
     interaction.channel.send(`${baercotEmoji}`);
     replyHelper.interactionReply(interaction, {content: `Sent!`, ephemeral: true});
   } else {

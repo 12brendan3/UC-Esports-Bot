@@ -27,7 +27,7 @@ function handleCommand(client, interaction) {
 }
 
 async function handleButton(client, interaction) {
-  if (interaction.user.bot || interaction.channel.type === `DM`) {
+  if (interaction.user.bot || !interaction.channel) {
     return;
   }
 

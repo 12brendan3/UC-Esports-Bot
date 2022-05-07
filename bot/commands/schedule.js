@@ -44,12 +44,12 @@ const help = {
 
 // Exported functions
 async function handle(client, interaction) {
-  if (interaction.channel.type === `DM`) {
+  if (!interaction.channel) {
     replyHelper.interactionReply(interaction, {content: `This command has to be used in a server.`, ephemeral: true});
     return;
   }
 
-  if (interaction.options.get(`channel`).channel.type !== `GUILD_TEXT`) {
+  if (!interaction.options.get(`channel`).channel || interaction.options.get(`channel`).channel.type !== `GUILD_TEXT`) {
     replyHelper.interactionReply(interaction, {content: `That's not a valid text channel.`, ephemeral: true});
     return;
   }

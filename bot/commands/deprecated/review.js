@@ -49,7 +49,7 @@ async function sendFeedback(client, interaction) {
       }
 
       embed.setColor(`#CC00FF`);
-      embed.setAuthor(user, displayURL);
+      embed.setAuthor({name: user, iconURL: displayURL});
       embed.setTimestamp(result[i].time);
 
       embed.addField(`Entry ID`, result[i].ID);

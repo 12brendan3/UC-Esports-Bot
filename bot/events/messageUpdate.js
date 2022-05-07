@@ -13,7 +13,7 @@ module.exports = {handle};
 
 // Exported function
 function handle(client, msgOld, msgNew) {
-  if (msgNew.channel.type !== `DM` && !msgNew.author.bot) {
+  if (msgNew.channel && !msgNew.author.bot) {
     logMessageEdit(msgOld, msgNew);
   }
 
@@ -29,7 +29,7 @@ async function logMessageEdit(msgOld, msgNew) {
     const embed = new Discord.MessageEmbed();
 
     embed.setColor(`#00DDFF`);
-    embed.setAuthor(msgNew.member.displayName, msgNew.author.displayAvatarURL());
+    embed.setAuthor({name: msgNew.member.displayName, iconURL: msgNew.author.displayAvatarURL()});
     embed.setDescription(`Message sent by ${msgNew.author} in ${msgNew.channel} was edited.`);
     if (msgOld.content) {
       embed.addField(`Before`, msgOld.content.length > 1000 ? msgOld.content.substr(0, 1000) : msgOld.content);
@@ -45,7 +45,7 @@ async function logMessageEdit(msgOld, msgNew) {
     }
     embed.addField(`Message Link`, `[View Message](${msgNew.url})`);
     embed.setTimestamp();
-    embed.setFooter(msgNew.author.tag);
+    embed.setFooter({text: msgNew.author.tag});
 
     logsChannel.send({embeds: [embed]});
   }

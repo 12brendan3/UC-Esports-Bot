@@ -23,7 +23,7 @@ const help = {
 
 // Exported functions
 async function handle(client, interaction) {
-  if (interaction.channel.type === `DM`) {
+  if (!interaction.channel) {
     replyHelper.interactionReply(interaction, `This command has to be used in a server.`);
     return;
   }

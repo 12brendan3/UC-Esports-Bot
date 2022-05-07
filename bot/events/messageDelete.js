@@ -10,7 +10,7 @@ module.exports = {handle};
 
 // Exported function
 function handle(client, msg) {
-  if (msg.channel.type !== `DM` && !msg.author.bot) {
+  if (msg.channel && !msg.author.bot) {
     logMessageDeletion(msg);
   }
 }
@@ -27,11 +27,11 @@ async function logMessageDeletion(msg) {
     if (msg.member && msg.author) {
       embed.setAuthor({name: msg.member.displayName, iconURL: msg.author.displayAvatarURL()});
       embed.setDescription(`Message sent by ${msg.author} was deleted in ${msg.channel}.`);
-      embed.setFooter(msg.author.tag);
+      embed.setFooter({text: msg.author.tag});
     } else if (msg.author) {
       embed.setAuthor({name: msg.author.tag, iconURL: msg.author.displayAvatarURL()});
       embed.setDescription(`Message sent by ${msg.author} was deleted in ${msg.channel}.`);
-      embed.setFooter(msg.author.id);
+      embed.setFooter({text: msg.author.id});
     } else {
       embed.setAuthor({name: `Unknown User`});
       embed.setDescription(`Message was deleted in ${msg.channel}.`);

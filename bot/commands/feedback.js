@@ -22,7 +22,7 @@ const help = {
 // Exported functions
 async function handle(client, interaction) {
   try {
-    const messageURL = interaction.channel.type === `DM` ? `Sent via DM` : interaction.channel.id;
+    const messageURL = interaction.channel ? interaction.channel.id : `Sent via DM`;
 
     const result = await database.createEntry(`Feedback`, {userID: interaction.user.id, messageURL, message: interaction.options.get(`feedback`).value, time: interaction.createdTimestamp});
 

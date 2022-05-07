@@ -316,7 +316,7 @@ const help = {
 
 // Exported functions
 async function handle(client, interaction) {
-  if (interaction.channel.type === `DM`) {
+  if (!interaction.channel) {
     replyHelper.interactionReply(interaction, {content: `That command has to be used in a server.`, ephemeral: true});
     return;
   }
@@ -411,7 +411,7 @@ async function changeWelcomeChannel(interaction) {
   const options = interaction.options;
   let result;
 
-  if (options.get(`channel`) && options.get(`channel`).channel.type !== `GUILD_TEXT`) {
+  if (options.get(`channel`) && (!interaction.options.get(`channel`).channel || options.get(`channel`).channel.type !== `GUILD_TEXT`)) {
     replyHelper.interactionReply(interaction, {content: `That's not a valid text channel.`, ephemeral: true});
     activeChanges.delete(interaction.guildId);
     return;
@@ -440,7 +440,7 @@ async function changeLogsChannel(interaction) {
   const options = interaction.options;
   let result;
 
-  if (options.get(`channel`) && options.get(`channel`).channel.type !== `GUILD_TEXT`) {
+  if (options.get(`channel`) && (!interaction.options.get(`channel`).channel || options.get(`channel`).channel.type !== `GUILD_TEXT`)) {
     replyHelper.interactionReply(interaction, {content: `That's not a valid text channel.`, ephemeral: true});
     activeChanges.delete(interaction.guildId);
     return;
@@ -469,7 +469,7 @@ async function changeStarboardChannel(interaction) {
   const options = interaction.options;
   let result;
 
-  if (options.get(`channel`) && options.get(`channel`).channel.type !== `GUILD_TEXT`) {
+  if (options.get(`channel`) && (!interaction.options.get(`channel`).channel || options.get(`channel`).channel.type !== `GUILD_TEXT`)) {
     replyHelper.interactionReply(interaction, {content: `That's not a valid text channel.`, ephemeral: true});
     activeChanges.delete(interaction.guildId);
     return;
@@ -538,7 +538,7 @@ async function changeRoleChannel(interaction, client) {
   const options = interaction.options;
   let result;
 
-  if (options.get(`channel`) && options.get(`channel`).channel.type !== `GUILD_TEXT`) {
+  if (options.get(`channel`) && (!interaction.options.get(`channel`).channel || options.get(`channel`).channel.type !== `GUILD_TEXT`)) {
     replyHelper.interactionReply(interaction, {content: `That's not a valid text channel.`, ephemeral: true});
     activeChanges.delete(interaction.guildId);
     return;
@@ -837,7 +837,7 @@ async function changeReportChannel(interaction) {
   const options = interaction.options;
   let result;
 
-  if (options.get(`channel`) && options.get(`channel`).channel.type !== `GUILD_TEXT`) {
+  if (options.get(`channel`) && (!interaction.options.get(`channel`).channel || options.get(`channel`).channel.type !== `GUILD_TEXT`)) {
     replyHelper.interactionReply(interaction, {content: `That's not a valid text channel.`, ephemeral: true});
     activeChanges.delete(interaction.guildId);
     return;

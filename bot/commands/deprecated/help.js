@@ -21,12 +21,12 @@ async function handle(client, interaction) {
   const embed = new Discord.MessageEmbed();
 
   embed.setColor(`#FF00CC`);
-  embed.setAuthor(client.user.username, client.user.displayAvatarURL());
-  embed.setFooter(settings.version);
+  embed.setAuthor({name: client.user.username, iconURL: client.user.displayAvatarURL()});
+  embed.setFooter({text: settings.version});
 
   const perms = [`user`];
 
-  if (interaction.channel.type === `DM`) {
+  if (!interaction.channel) {
     perms.push(`admin`);
   } else {
     const isAdmin = await permissions.checkAdmin(interaction.guild, interaction.user.id);

@@ -3,6 +3,7 @@ const ytdl = require(`ytdl-core`);
 const ytsearch = require(`youtube-search`);
 const voice = require(`@discordjs/voice`);
 const replyHelper = require(`./interaction-helper`);
+const htmlEntities = require(`html-entities`);
 
 // Exports
 module.exports = {checkUser, checkChannel, prepKey};
@@ -202,7 +203,7 @@ function searchYT(interaction, search) {
       } else {
         const newItem = {
           type: `youtube`,
-          title: results[0].title,
+          title: htmlEntities.decode(results[0].title),
           url: results[0].id,
         };
         addToQueue(interaction, newItem);

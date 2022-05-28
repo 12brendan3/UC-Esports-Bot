@@ -845,7 +845,7 @@ async function changeReportChannel(interaction) {
 
   if (options.get(`disable`) && options.get(`disable`).value) {
     result = await database.updateEntry(`Guilds`, {guildID: interaction.guildId}, {reportChannelID: null});
-  } else if (options.get(`role`)) {
+  } else if (options.get(`channel`)) {
     result = await database.updateEntry(`Guilds`, {guildID: interaction.guildId}, {reportChannelID: options.get(`channel`).channel.id});
   } else {
     replyHelper.interactionReply(interaction, {content: `Please provide a channel or set disable to true to disable the report channel.`, ephemeral: true});

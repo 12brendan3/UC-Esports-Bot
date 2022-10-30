@@ -7,7 +7,7 @@ const regexUserMention = new RegExp(`^<@!?[0-9]*>$`);
 const regexUserTag = new RegExp(`^.{1,}#[0-9]{4}$`);
 const regexObjectID = new RegExp(`^[0-9]*$`);
 const uniEmojiRegex = uniEmojiRegexReq();
-const discordEmojiRegex = RegExp(`^<a?:.+:[0-9]{18}>$`);
+const discordEmojiRegex = RegExp(`^<a?:.+:[0-9]{16,}>$`);
 
 // Exports
 module.exports = {resolveChannelID, resolveUserID, resolveRoleID, resolveEmojiID, resolveGuildID};

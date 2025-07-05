@@ -1,5 +1,7 @@
 const database = require(`./database-manager`);
 
+const Discord = require(`discord.js`);
+
 const roleData = {};
 
 // Exports
@@ -119,9 +121,9 @@ function generateMessage(client, guildID, categoryID) {
         const discordRole = client.guilds.cache.get(guildID).roles.cache.get(roleData[guildID][categoryID].roles[role]);
         if (discordRole) {
           buttons.push({
-            type: 2,
+            type: Discord.ComponentType.Button,
             label: discordRole.name,
-            style: 1,
+            style: Discord.ButtonStyle.Primary,
             custom_id: role,
             emoji: role,
           });
@@ -129,7 +131,7 @@ function generateMessage(client, guildID, categoryID) {
 
         if ((buttonCount % 5) === 0) {
           components.push({
-            type: 1,
+            type: Discord.ComponentType.ActionRow,
             components: buttons,
           });
           buttons = [];
@@ -142,7 +144,7 @@ function generateMessage(client, guildID, categoryID) {
 
   if (buttons.length > 0) {
     components.push({
-      type: 1,
+      type: Discord.ComponentType.ActionRow,
       components: buttons,
     });
   }

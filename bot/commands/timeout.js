@@ -1,3 +1,5 @@
+const Discord = require(`discord.js`);
+
 const timeouts = require(`../helpers/timeout-manager`);
 const resolvers = require(`../helpers/resolvers`);
 const database = require(`../helpers/database-manager`);
@@ -10,6 +12,7 @@ module.exports = {handle, getHelp};
 
 // Help command text
 const help = {
+  type: Discord.ApplicationCommandType.ChatInput,
   text: `Allows an admin to put a user in timeout.`,
   level: `admin`,
   allowDM: false,
@@ -17,13 +20,13 @@ const help = {
     {
       name: `user`,
       description: `The user to put in timeout.`,
-      type: `USER`,
+      type: Discord.ApplicationCommandOptionType.User,
       required: true,
     },
     {
       name: `time`,
       description: `The duration to put the user in timeout. (Format: 1d2h3m)`,
-      type: `STRING`,
+      type: Discord.ApplicationCommandOptionType.String,
       required: true,
     },
   ],

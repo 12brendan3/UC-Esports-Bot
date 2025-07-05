@@ -1,4 +1,6 @@
 // Imports
+const Discord = require(`discord.js`);
+
 const playerManager = require(`../helpers/player-manager`);
 
 // Exports
@@ -6,6 +8,7 @@ module.exports = {handle, getHelp};
 
 // Help command text
 const help = {
+  type: Discord.ApplicationCommandType.ChatInput,
   text: `Change the playing audio's volume.`,
   level: `user`,
   allowDM: false,
@@ -13,7 +16,7 @@ const help = {
     {
       name: `volume`,
       description: `The new volume, on a scale of 1-100.`,
-      type: `INTEGER`,
+      type: Discord.ApplicationCommandOptionType.Integer,
       required: true,
     },
   ],

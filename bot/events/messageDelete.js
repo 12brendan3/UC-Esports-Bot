@@ -21,27 +21,34 @@ async function logMessageDeletion(msg) {
 
   if (guildSettings && guildSettings.logsChannelID) {
     const logsChannel = msg.guild.channels.cache.get(guildSettings.logsChannelID);
-    const embed = new Discord.MessageEmbed();
+    const embed = new Discord.EmbedBuilder();
 
     embed.setColor(`#FF0000`);
+
     if (msg.member && msg.author) {
       embed.setAuthor({name: msg.member.displayName, iconURL: msg.author.displayAvatarURL()});
+
       embed.setDescription(`Message sent by ${msg.author} was deleted in ${msg.channel}.`);
+
       embed.setFooter({text: msg.author.tag});
     } else if (msg.author) {
       embed.setAuthor({name: msg.author.tag, iconURL: msg.author.displayAvatarURL()});
+
       embed.setDescription(`Message sent by ${msg.author} was deleted in ${msg.channel}.`);
+
       embed.setFooter({text: msg.author.id});
     } else {
       embed.setAuthor({name: `Unknown User`});
+
       embed.setDescription(`Message was deleted in ${msg.channel}.`);
+
       embed.setFooter({text: `Unknown User`});
     }
 
     if (msg.content) {
-      embed.addField(`Message`, msg.content.length > 1000 ? msg.content.substr(0, 1000) : msg.content);
+      embed.setFields({ name: `Message`, value: msg.content.length > 1000 ? msg.content.substr(0, 1000) : msg.content });
       if (msg.content.length > 1000) {
-        embed.addField(`*** ***`, msg.content.substr(1000, msg.content.length));
+        embed.addFields({ name: `*** ***`, value: msg.content.substr(1000, msg.content.length) });
       }
     }
 

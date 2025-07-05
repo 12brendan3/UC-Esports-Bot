@@ -12,19 +12,20 @@ module.exports = {handle, getHelp};
 
 // Help command text
 const help = {
+  type: Discord.ApplicationCommandType.ChatInput,
   text: `Submit a ticket for a specific server.`,
   level: `user`,
   allowDM: true,
   options: [
     {
       name: `message`,
-      type: `STRING`,
+      type: Discord.ApplicationCommandOptionType.String,
       description: `The message on the ticket.`,
       required: true,
     },
     {
       name: `anonymous`,
-      type: `BOOLEAN`,
+      type: Discord.ApplicationCommandOptionType.Boolean,
       description: `Whether or not the ticket is anonymous.`,
       required: true,
     },
@@ -105,19 +106,24 @@ async function handle(client, interaction) {
 }
 
 function generateReportEmbed(text, interaction, anonymous) {
-  const embed = new Discord.MessageEmbed();
+  const embed = new Discord.EmbedBuilder();
 
   embed.setDescription(`A ticket has been submitted.`);
+  
   embed.setColor(`#FFFB1F`);
+
   if (anonymous) {
     embed.setAuthor({name: `Anonymous`});
   } else {
     embed.setAuthor({name: interaction.user.username, iconURL: interaction.user.displayAvatarURL()});
   }
-  embed.addField(`Message`, text.length > 1000 ? text.substr(0, 1000) : text);
+
+  embed.setFields({ name: `Message`, value: text.length > 1000 ? text.substr(0, 1000) : text });
+
   if (text.length > 1000) {
-    embed.addField(`*** ***`, text.substr(1000, text.length));
+    embed.addFields({ name: `*** ***`, value: text.substr(1000, text.length) });
   }
+
   embed.setTimestamp();
 
   return embed;

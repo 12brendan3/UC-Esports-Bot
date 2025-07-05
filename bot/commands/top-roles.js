@@ -6,6 +6,7 @@ module.exports = {handle, getHelp};
 
 // Help command text
 const help = {
+  type: Discord.ApplicationCommandType.ChatInput,
   text: `Allows an admin to get a list of the server roles. Ordered by most users to the least.`,
   level: `admin`,
   allowDM: false,
@@ -21,10 +22,12 @@ async function handle(client, interaction) {
   try {
     await interaction.deferReply();
     await interaction.guild.members.fetch();
-    const embed = new Discord.MessageEmbed();
+    const embed = new Discord.EmbedBuilder();
 
     embed.setColor(`#00EDCD`);
+
     embed.setAuthor({name: interaction.guild.name, iconURL: interaction.guild.iconURL()});
+
     embed.setTimestamp();
 
     const roles = interaction.guild.roles.cache.sort((role1, role2) => role2.members.size - role1.members.size);
@@ -56,10 +59,10 @@ async function handle(client, interaction) {
 
     lists.push(listOld);
 
-    embed.addField(`Top Server Roles`, lists[0]);
+    embed.setFields({ name: `Top Server Roles`, value: lists[0] });
 
     for (let x = 1; x < lists.length; x++) {
-      embed.addField(`*** ***`, lists[x]);
+      embed.addFields({ name: `*** ***`, value: lists[x] });
     }
 
     replyHelper.interactionEdit(interaction, {embeds: [embed]});

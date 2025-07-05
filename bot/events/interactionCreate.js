@@ -8,7 +8,7 @@ module.exports = {handle};
 
 // Exported function
 function handle(client, interaction) {
-  if (interaction.isCommand() || interaction.isContextMenu()) {
+  if (interaction.isCommand() || interaction.isContextMenuCommand()) {
     handleCommand(client, interaction);
   } else if (interaction.isButton()) {
     handleButton(client, interaction);

@@ -108,29 +108,38 @@ function rollWinners(reply, reaction, entry, member) {
 }
 
 function generateWinnersEmbed(winnerString, entry, member) {
-  const embed = new Discord.MessageEmbed();
+  const embed = new Discord.EmbedBuilder();
 
   embed.setTitle(entry.title);
+
   embed.setDescription(`${entry.description ? entry.description + `\n\n` : ``}Winners:\n${winnerString === `` ? `No one entered the giveaway!` : winnerString}`);
+
   embed.setColor(`#FF00E6`);
+
   embed.setFooter({text: `Started by ${member.displayName}`, iconURL: member.user.displayAvatarURL()});
+
   embed.setAuthor({name: `Giveaway Winners`, iconURL: member.guild.iconURL});
 
   return embed;
 }
 
 function generateGiveawayEmbed(title, description, endTime, member, numWinners, winners) {
-  const embed = new Discord.MessageEmbed();
+  const embed = new Discord.EmbedBuilder();
 
   embed.setTitle(title);
+
   if (winners) {
-    embed.setAuthor({name: `Giveaway Ended`, iconURL: member.guild.iconURL});
+    embed.setAuthor({ name: `Giveaway Ended`, iconURL: member.guild.iconURL });
+
     embed.setDescription(`${description ? description + `\n\n` : ``}This giveaway has ended.`);
   } else {
-    embed.setAuthor({name: `New Giveaway`, iconURL: member.guild.iconURL});
+    embed.setAuthor({ name: `New Giveaway`, iconURL: member.guild.iconURL });
+
     embed.setDescription(`${description ? description + `\n\n` : ``}This giveaway ends <t:${Math.floor(endTime / 1000)}:R>.\n${numWinners} winners.\nReact with 🎉 to enter!`);
   }
+
   embed.setColor(`#FF00E6`);
+
   embed.setFooter({text: `Started by ${member.displayName}`, iconURL: member.user.displayAvatarURL()});
 
   return embed;

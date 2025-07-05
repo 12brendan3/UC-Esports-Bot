@@ -91,26 +91,33 @@ function detectFlagReaction(guildSettings, reaction, user) {
   if (guildSettings.reportRoleID) {
     repChannel.send(`<@&${guildSettings.reportRoleID}>`, newEmbed);
   } else {
-    repChannel.send({embeds: [newEmbed]});
+    repChannel.send({ embeds: [newEmbed] });
   }
 
   user.send(`Message has been flagged for review by admins.`);
 }
 
 function generateReportEmbed(msg, user) {
-  const embed = new Discord.MessageEmbed();
+  const embed = new Discord.EmbedBuilder();
 
   embed.setDescription(`A message has been flagged.`);
+
   embed.setColor(`#FF0000`);
-  embed.setAuthor({name: msg.author.tag, iconURL: msg.author.displayAvatarURL()});
+
+  embed.setAuthor({ name: msg.author.tag, iconURL: msg.author.displayAvatarURL() });
+
   if (msg.content) {
-    embed.addField(`Message`, msg.content.length > 1000 ? msg.content.substr(0, 1000) : msg.content);
+    embed.setFields({ name: `Message`, value: msg.content.length > 1000 ? msg.content.substr(0, 1000) : msg.content });
+
     if (msg.content.length > 1000) {
-      embed.addField(`*** ***`, msg.content.substr(1000, msg.content.length));
+      embed.addFields({ name: `*** ***`, value: msg.content.substr(1000, msg.content.length) });
     }
   }
-  embed.addField(`Message Link`, `[View Message](${msg.url})`);
-  embed.setFooter({text: user.tag, iconURL: user.displayAvatarURL()});
+
+  embed.addFields({ name: `Message Link`, value: `[View Message](${msg.url})` });
+  
+  embed.setFooter({ text: user.tag, iconURL: user.displayAvatarURL() });
+
   embed.setTimestamp();
 
   return embed;
@@ -167,7 +174,7 @@ async function updateMessage(reaction, entry, guildSettings) {
 }
 
 function buildEmbed(reaction) {
-  const embed = new Discord.MessageEmbed();
+  const embed = new Discord.EmbedBuilder();
 
   let description = ``;
   reaction.message.reactions.cache.each((rxn) => {
@@ -177,31 +184,36 @@ function buildEmbed(reaction) {
   });
 
   embed.setColor(`#FFEE00`);
+
   if (reaction.message.member) {
     embed.setAuthor({name: reaction.message.member.displayName, iconURL: reaction.message.author.displayAvatarURL()});
   } else {
     embed.setAuthor({name: reaction.message.author.username, iconURL: reaction.message.author.displayAvatarURL()});
   }
+
   embed.setDescription(description);
 
   if (reaction.message.attachments) {
     const images = [];
+
     reaction.message.attachments.each((attachment) => {
       if (attachment.size < 8000000 && regexImage.test(attachment.name)) {
         images.push(attachment.url);
       }
     });
+
     embed.setImage(images[0]);
   }
 
   if (reaction.message.content) {
-    embed.addField(`Message`, reaction.message.content.length > 1000 ? reaction.message.content.substr(0, 1000) : reaction.message.content);
+    embed.setFields({ name: `Message`, value: reaction.message.content.length > 1000 ? reaction.message.content.substr(0, 1000) : reaction.message.content });
+
     if (reaction.message.content.length > 1000) {
-      embed.addField(`*** ***`, reaction.message.content.substr(1000, reaction.message.content.length));
+      embed.addFields({ name: `*** ***`, value: reaction.message.content.substr(1000, reaction.message.content.length) });
     }
   }
 
-  embed.addField(`Message Link`, `[View Message](${reaction.message.url})`);
+  embed.addFields({ name: `Message Link`, value: `[View Message](${reaction.message.url})` });
 
   embed.setTimestamp(reaction.message.createdTimestamp);
 

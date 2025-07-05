@@ -1,4 +1,6 @@
 // Imports
+const Discord = require(`discord.js`);
+
 const giveawayManager = require(`../helpers/giveaway-manager`);
 const replyHelper = require(`../helpers/interaction-helper`);
 
@@ -7,31 +9,32 @@ module.exports = {handle, getHelp};
 
 // Help command text
 const help = {
+  type: Discord.ApplicationCommandType.ChatInput,
   text: `Runs a giveaway`,
   level: `admin`,
   allowDM: false,
   options: [
     {
       name: `name`,
-      type: `STRING`,
+      type: Discord.ApplicationCommandOptionType.String,
       description: `The name of the giveaway.`,
       required: true,
     },
     {
       name: `duration`,
-      type: `STRING`,
+      type: Discord.ApplicationCommandOptionType.String,
       description: `How long to run the giveaway. (Format: 1d2h3m4s)`,
       required: true,
     },
     {
       name: `description`,
-      type: `STRING`,
+      type: Discord.ApplicationCommandOptionType.String,
       description: `The description of the giveaway.`,
       required: false,
     },
     {
       name: `winners`,
-      type: `INTEGER`,
+      type: Discord.ApplicationCommandOptionType.Integer,
       description: `The number of winners for the giveaway. (Default 1)`,
       required: false,
     },

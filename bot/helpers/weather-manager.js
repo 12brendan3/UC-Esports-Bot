@@ -14,17 +14,21 @@ function getWeather() {
 }
 
 async function setBotStatus(client) {
-  if (settings.getAuth().weatherToken || settings.getAuth().weatherToken === `replace me`) {
+  let status;
+
+  if (settings.getAuth().weatherToken && settings.getAuth().weatherToken != `replace me`) {
     await getWeatherData();
-    const status = `the sky | ${getEmoji(currentData.weatherCode)} ${Math.round(currentData.temperature)}°F`;
-    client.user.setPresence({status: `ONLINE`, afk: false, activities: [{name: status, type: `WATCHING`}]});
+    status = `the sky | ${getEmoji(currentData.weatherCode)} ${Math.round(currentData.temperature)}°F`;
 
     setTimeout(() => {
       setBotStatus(client);
     }, 600000);
   } else {
     console.error(`No weather token found, please edit the "auth.json" file in the storage folder.\nYou can then type "restart" and then press enter.\nTo exit, type "exit" and then press enter.`);
+    status = `the sky`;
   }
+
+  client.user.setPresence({status: `ONLINE`, afk: false, activities: [{name: status, type: `WATCHING`}]});
 }
 
 // Private functions

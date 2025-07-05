@@ -1,3 +1,5 @@
+const Discord = require(`discord.js`);
+
 const database = require(`../helpers/database-manager`);
 const taskManager = require(`../helpers/task-manager`);
 const replyHelper = require(`../helpers/interaction-helper`);
@@ -7,13 +9,14 @@ module.exports = {handle, getHelp};
 
 // Help command text
 const help = {
+  type: Discord.ApplicationCommandType.ChatInput,
   text: `Allows an admin to remove server tasks.`,
   level: `admin`,
   allowDM: false,
   options: [
     {
       name: `taskid`,
-      type: `STRING`,
+      type: Discord.ApplicationCommandOptionType.String,
       description: `The ID of the task to remove.`,
       required: true,
     },

@@ -1,4 +1,6 @@
 // Imports
+const Discord = require(`discord.js`);
+
 const playerManager = require(`../helpers/player-manager`);
 
 // Exports
@@ -6,6 +8,7 @@ module.exports = {handle, getHelp};
 
 // Help command text
 const help = {
+  type: Discord.ApplicationCommandType.ChatInput,
   text: `Plays audio from YouTube.  Adds to queue or resumes paused audio.`,
   level: `user`,
   allowDM: false,
@@ -13,7 +16,7 @@ const help = {
     {
       name: `ytsearch`,
       description: `The URL or search term.  Only needed when adding to queue.`,
-      type: `STRING`,
+      type: Discord.ApplicationCommandOptionType.String,
       required: false,
     },
   ],

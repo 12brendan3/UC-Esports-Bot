@@ -1,3 +1,5 @@
+const Discord = require(`discord.js`);
+
 const collectors = require(`../helpers/collectors`);
 const taskManager = require(`../helpers/task-manager`);
 const axios = require(`axios`);
@@ -11,31 +13,32 @@ module.exports = {handle, getHelp};
 
 // Help command text
 const help = {
+  type: Discord.ApplicationCommandType.ChatInput,
   text: `Allows an admin to schedule a new task.`,
   level: `admin`,
   allowDM: false,
   options: [
     {
       name: `channel`,
-      type: `CHANNEL`,
+      type: Discord.ApplicationCommandOptionType.Channel,
       description: `The channel to send the message and/or image in.`,
       required: true,
     },
     {
       name: `cron`,
-      type: `STRING`,
+      type: Discord.ApplicationCommandOptionType.String,
       description: `The cron string for this task.`,
       required: true,
     },
     {
       name: `image`,
-      type: `BOOLEAN`,
+      type: Discord.ApplicationCommandOptionType.Boolean,
       description: `Whether or not to attach an image to this task.`,
       required: true,
     },
     {
       name: `message`,
-      type: `STRING`,
+      type: Discord.ApplicationCommandOptionType.String,
       description: `The message to send.`,
       required: false,
     },

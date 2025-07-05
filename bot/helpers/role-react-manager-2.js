@@ -79,7 +79,7 @@ async function removeRoleData(client, guildID, categoryID, emojiID) {
   if (emojiID) {
     delete roleData[guildID][categoryID].roles[emojiID];
 
-    if (roleData[guildID][categoryID].roles === {}) {
+    if (roleData[guildID][categoryID].roles == {}) {
       delete roleData[guildID][categoryID];
     }
 
@@ -88,7 +88,7 @@ async function removeRoleData(client, guildID, categoryID, emojiID) {
   } else {
     delete roleData[guildID][categoryID];
 
-    if (roleData[guildID] === {}) {
+    if (roleData[guildID] == {}) {
       delete roleData[guildID];
     }
 
@@ -119,9 +119,9 @@ function generateMessage(client, guildID, categoryID) {
         const discordRole = client.guilds.cache.get(guildID).roles.cache.get(roleData[guildID][categoryID].roles[role]);
         if (discordRole) {
           buttons.push({
-            type: `BUTTON`,
+            type: 2,
             label: discordRole.name,
-            style: `PRIMARY`,
+            style: 1,
             custom_id: role,
             emoji: role,
           });
@@ -129,7 +129,7 @@ function generateMessage(client, guildID, categoryID) {
 
         if ((buttonCount % 5) === 0) {
           components.push({
-            type: `ACTION_ROW`,
+            type: 1,
             components: buttons,
           });
           buttons = [];
@@ -142,7 +142,7 @@ function generateMessage(client, guildID, categoryID) {
 
   if (buttons.length > 0) {
     components.push({
-      type: `ACTION_ROW`,
+      type: 1,
       components: buttons,
     });
   }

@@ -18,10 +18,12 @@ const help = {
 // Exported functions
 async function handle(client, interaction) {
   const commands = commandManager.getAll();
-  const embed = new Discord.MessageEmbed();
+  const embed = new Discord.EmbedBuilder();
 
   embed.setColor(`#FF00CC`);
+
   embed.setAuthor({name: client.user.username, iconURL: client.user.displayAvatarURL()});
+
   embed.setFooter({text: settings.version});
 
   const perms = [`user`];
@@ -40,12 +42,16 @@ async function handle(client, interaction) {
     perms.push(`developer`);
   }
 
+  const embedFields = [];
+
   for (const command of commands.keys()) {
     const helpInfo = commands.get(command).getHelp();
     if (helpInfo && perms.includes(helpInfo.level)) {
-      embed.addField(`__${command}__`, helpInfo.text);
+      embedFields.push({ name: `__${command}__`, value: helpInfo.text });
     }
   }
+
+  embed.setFields(embedFields);
 
   replyHelper.interactionReply(interaction, {embeds: [embed], ephemeral: true});
 }

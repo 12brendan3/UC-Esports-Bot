@@ -9,13 +9,14 @@ module.exports = {handle, getHelp};
 
 // Help command text
 const help = {
+  type: Discord.ApplicationCommandType.ChatInput,
   text: `Allows a server admin to test bot settings.`,
   level: `admin`,
   allowDM: false,
   options: [
     {
       name: `test`,
-      type: `STRING`,
+      type: Discord.ApplicationCommandOptionType.String,
       description: `What setting to test.`,
       required: true,
       choices: [
@@ -98,17 +99,24 @@ async function testLogsChannel(interaction) {
 
   if (guildSettings && guildSettings.logsChannelID) {
     const logsChannel = interaction.guild.channels.cache.get(guildSettings.logsChannelID);
-    const embed = new Discord.MessageEmbed();
+    const embed = new Discord.EmbedBuilder();
 
     embed.setColor(`#00FF1A`);
+
     embed.setAuthor({name: interaction.user.username, iconURL: interaction.user.displayAvatarURL()});
+
     embed.setDescription(`Message was sent by ${interaction.user} in ${interaction.channel} to test the logs channel.`);
-    embed.addField(`Message Content`, `Example content.`);
-    embed.addField(`Message Link`, `${interaction.channel}`);
+    
+    embed.setFields({ name: `Message Content`, value: `Example content.` });
+
+    embed.addFields({ name: `Message Link`, value: `${interaction.channel}` });
+
     embed.setTimestamp();
+
     embed.setFooter({text: `${interaction.user.tag}`});
 
     logsChannel.send({embeds: [embed]});
+    
     replyHelper.interactionReply(interaction, {content: `Check the logs channel! (${logsChannel})`, ephemeral: true});
   } else {
     replyHelper.interactionReply(interaction, {content: `There is no logs channel set up for this guild!`, ephemeral: true});

@@ -29,7 +29,7 @@ async function sendFeedback(client, interaction) {
     const embeds = [];
 
     for (let i = 0; i < result.length; i++) {
-      const embed = new Discord.MessageEmbed();
+      const embed = new Discord.EmbedBuilder();
 
       let user = client.users.cache.get(result[i].userID);
       let displayURL = client.user.displayAvatarURL();
@@ -49,17 +49,20 @@ async function sendFeedback(client, interaction) {
       }
 
       embed.setColor(`#CC00FF`);
+
       embed.setAuthor({name: user, iconURL: displayURL});
+
       embed.setTimestamp(result[i].time);
 
-      embed.addField(`Entry ID`, result[i].ID);
+      embed.setFields({ name: `Entry ID`, value: result[i].ID });
       if (result[i].message) {
-        embed.addField(`Feedback`, result[i].message.length > 1000 ? result[i].message.substr(0, 1000) : result[i].message);
+        embed.addFields({ name: `Feedback`, value: result[i].message.length > 1000 ? result[i].message.substr(0, 1000) : result[i].message });
         if (result[i].message.length > 1000) {
-          embed.addField(`Feedback Continued`, result[i].message.substr(1000, result[i].message.length));
+          embed.addFields({ name: `Feedback Continued`, value: result[i].message.substr(1000, result[i].message.length) });
         }
       }
-      embed.addField(`Message Link`, link);
+
+      embed.addFields({ name: `Message Link`, value: link });
 
       embeds.push(embed);
     }

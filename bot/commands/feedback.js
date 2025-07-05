@@ -1,3 +1,5 @@
+const Discord = require(`discord.js`);
+
 const database = require(`../helpers/database-manager`);
 const replyHelper = require(`../helpers/interaction-helper`);
 
@@ -6,13 +8,14 @@ module.exports = {handle, getHelp};
 
 // Help command text
 const help = {
+  type: Discord.ApplicationCommandType.ChatInput,
   text: `Provide feedback directly to the bot developers.  Use this command for improvements, bugs, etc.`,
   level: `user`,
   allowDM: true,
   options: [
     {
       name: `feedback`,
-      type: `STRING`,
+      type: Discord.ApplicationCommandOptionType.String,
       description: `Your feedback to the developers.`,
       required: true,
     },

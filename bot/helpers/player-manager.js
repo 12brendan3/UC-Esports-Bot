@@ -1,9 +1,11 @@
 const settings = require(`../helpers/settings-manager`);
-const ytdl = require(`ytdl-core`);
+const YTDlpWrap = require('yt-dlp-wrap').default;
 const ytsearch = require(`youtube-search`);
 const voice = require(`@discordjs/voice`);
 const replyHelper = require(`./interaction-helper`);
 const htmlEntities = require(`html-entities`);
+
+const ytdlp = new YTDlpWrap();
 
 // Exports
 module.exports = {checkUser, checkChannel, prepKey};
@@ -89,11 +91,11 @@ async function checkYT(interaction) {
   const video = interaction.options.get(`ytsearch`).value;
   if (regexYT.test(video)) {
     try {
-      const videoInfo = await ytdl.getInfo(video);
+      const videoInfo = await ytdlp.getVideoInfo(video);
       const newItem = {
         type: `youtube`,
-        title: videoInfo.videoDetails.title,
-        url: videoInfo.videoDetails.video_url,
+        title: videoInfo.title,
+        url: `https://youtu.be/${videoInfo.id}`,
       };
       addToQueue(interaction, newItem);
     } catch {
@@ -156,7 +158,7 @@ function playNext(guildID) {
   player.queue.shift();
 
   if (player.queue.length > 0) {
-    const resource = voice.createAudioResource(ytdl(player.queue[0].url, {quality: `highestaudio`, highWaterMark: 1 << 25}), {
+    const resource = voice.createAudioResource(ytdlp.execStream([ player.queue[0].url, '-f', 'bestaudio' ]), {
       inputType: voice.StreamType.Arbitrary,
       inlineVolume: true,
     });

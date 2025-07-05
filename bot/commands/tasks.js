@@ -1,3 +1,5 @@
+const Discord = require(`discord.js`);
+
 const database = require(`../helpers/database-manager`);
 const replyHelper = require(`../helpers/interaction-helper`);
 
@@ -6,6 +8,7 @@ module.exports = {handle, getHelp};
 
 // Help command text
 const help = {
+  type: Discord.ApplicationCommandType.ChatInput,
   text: `Allows an admin to view server tasks.`,
   level: `admin`,
   allowDM: false,

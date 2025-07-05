@@ -1,4 +1,6 @@
 // Imports
+const Discord = require(`discord.js`);
+
 const database = require(`../helpers/database-manager`);
 const resolvers = require(`../helpers/resolvers`);
 const reactManager = require(`../helpers/role-react-manager-2`);
@@ -12,301 +14,302 @@ module.exports = {handle, getHelp};
 
 // Help command text
 const help = {
+  type: Discord.ApplicationCommandType.ChatInput,
   text: `Allows a server admin to change bot settings.`,
   level: `admin`,
   allowDM: false,
   options: [
     {
       name: `welcome-message`,
-      type: `SUB_COMMAND`,
+      type: Discord.ApplicationCommandOptionType.Subcommand,
       description: `Sets the server's welcome message.`,
       options: [
         {
           name: `message`,
           description: `The message to greet users with.  Use !!newuser!! to mention the new user.`,
-          type: `STRING`,
+          type: Discord.ApplicationCommandOptionType.String,
           required: true,
         },
       ],
     },
     {
       name: `welcome-channel`,
-      type: `SUB_COMMAND`,
+      type: Discord.ApplicationCommandOptionType.Subcommand,
       description: `Sets or disables the server's welcome channel.`,
       options: [
         {
           name: `channel`,
           description: `The channel to greet users in.`,
-          type: `CHANNEL`,
+          type: Discord.ApplicationCommandOptionType.Channel,
           required: false,
         },
         {
           name: `disable`,
           description: `Whether or not to disable the welcome channel.`,
-          type: `BOOLEAN`,
+          type: Discord.ApplicationCommandOptionType.Boolean,
           required: false,
         },
       ],
     },
     {
       name: `logs-channel`,
-      type: `SUB_COMMAND`,
+      type: Discord.ApplicationCommandOptionType.Subcommand,
       description: `Sets or disables the logs channel.`,
       options: [
         {
           name: `channel`,
           description: `The channel to send logs in.`,
-          type: `CHANNEL`,
+          type: Discord.ApplicationCommandOptionType.Channel,
           required: false,
         },
         {
           name: `disable`,
           description: `Whether or not to disable the logs channel.`,
-          type: `BOOLEAN`,
+          type: Discord.ApplicationCommandOptionType.Boolean,
           required: false,
         },
       ],
     },
     {
       name: `starboard-channel`,
-      type: `SUB_COMMAND`,
+      type: Discord.ApplicationCommandOptionType.Subcommand,
       description: `Sets or disables the starboard channel.`,
       options: [
         {
           name: `channel`,
           description: `The channel to send starred messages in.`,
-          type: `CHANNEL`,
+          type: Discord.ApplicationCommandOptionType.Channel,
           required: false,
         },
         {
           name: `disable`,
           description: `Whether or not to disable the starboard.`,
-          type: `BOOLEAN`,
+          type: Discord.ApplicationCommandOptionType.Boolean,
           required: false,
         },
       ],
     },
     {
       name: `starboard-threshold`,
-      type: `SUB_COMMAND`,
+      type: Discord.ApplicationCommandOptionType.Subcommand,
       description: `Sets the starboard channel threshold.`,
       options: [
         {
           name: `threshold`,
           description: `The number of star reactions needed to put the message on the starboard.`,
-          type: `INTEGER`,
+          type: Discord.ApplicationCommandOptionType.Integer,
           required: true,
         },
       ],
     },
     {
       name: `streaming-role`,
-      type: `SUB_COMMAND`,
+      type: Discord.ApplicationCommandOptionType.Subcommand,
       description: `Sets or disables the streaming role.`,
       options: [
         {
           name: `role`,
           description: `The role to give to users streaming.`,
-          type: `ROLE`,
+          type: Discord.ApplicationCommandOptionType.Role,
           required: false,
         },
         {
           name: `disable`,
           description: `Whether or not to disable the streaming role.`,
-          type: `BOOLEAN`,
+          type: Discord.ApplicationCommandOptionType.Boolean,
           required: false,
         },
       ],
     },
     {
       name: `react-channel`,
-      type: `SUB_COMMAND`,
+      type: Discord.ApplicationCommandOptionType.Subcommand,
       description: `Sets or disables the reaction role channel.`,
       options: [
         {
           name: `channel`,
           description: `The channel to use for reaction roles.`,
-          type: `CHANNEL`,
+          type: Discord.ApplicationCommandOptionType.Channel,
           required: false,
         },
         {
           name: `disable`,
           description: `Whether or not to disable the reaction role channel.`,
-          type: `BOOLEAN`,
+          type: Discord.ApplicationCommandOptionType.Boolean,
           required: false,
         },
       ],
     },
     {
       name: `react-add`,
-      type: `SUB_COMMAND`,
+      type: Discord.ApplicationCommandOptionType.Subcommand,
       description: `Adds a reaction role.`,
       options: [
         {
           name: `role`,
           description: `The role to use for the reaction role.`,
-          type: `ROLE`,
+          type: Discord.ApplicationCommandOptionType.Role,
           required: true,
         },
         {
           name: `emoji`,
           description: `The name of the emoji to use for the reaction role. (case sensitive)`,
-          type: `STRING`,
+          type: Discord.ApplicationCommandOptionType.String,
           required: true,
         },
         {
           name: `category`,
           description: `The name of the category to use for the reaction role. (case sensitive)`,
-          type: `STRING`,
+          type: Discord.ApplicationCommandOptionType.String,
           required: true,
         },
         {
           name: `description`,
           description: `The description for the category when making a new one.`,
-          type: `STRING`,
+          type: Discord.ApplicationCommandOptionType.String,
           required: false,
         },
       ],
     },
     {
       name: `react-remove`,
-      type: `SUB_COMMAND`,
+      type: Discord.ApplicationCommandOptionType.Subcommand,
       description: `Removes a reaction role.`,
       options: [
         {
           name: `category`,
           description: `The category to remove the role from.`,
-          type: `STRING`,
+          type: Discord.ApplicationCommandOptionType.String,
           required: true,
         },
         {
           name: `role`,
           description: `The role to remove from the category.`,
-          type: `ROLE`,
+          type: Discord.ApplicationCommandOptionType.Role,
           required: true,
         },
       ],
     },
     {
       name: `react-update`,
-      type: `SUB_COMMAND`,
+      type: Discord.ApplicationCommandOptionType.Subcommand,
       description: `Forces an update on all reaction roles.  Only needed if there's an error.`,
     },
     {
       name: `react-cat-name`,
-      type: `SUB_COMMAND`,
+      type: Discord.ApplicationCommandOptionType.Subcommand,
       description: `Updates the name of a reaction role category.`,
       options: [
         {
           name: `currentcategory`,
           description: `The current name of the category.`,
-          type: `STRING`,
+          type: Discord.ApplicationCommandOptionType.String,
           required: true,
         },
         {
           name: `newcategory`,
           description: `The new name for the category.`,
-          type: `STRING`,
+          type: Discord.ApplicationCommandOptionType.String,
           required: true,
         },
       ],
     },
     {
       name: `react-cat-info`,
-      type: `SUB_COMMAND`,
+      type: Discord.ApplicationCommandOptionType.Subcommand,
       description: `Updates the description of a reaction role category.`,
       options: [
         {
           name: `category`,
           description: `The name of the category.`,
-          type: `STRING`,
+          type: Discord.ApplicationCommandOptionType.String,
           required: true,
         },
         {
           name: `description`,
           description: `The new description for the category.`,
-          type: `STRING`,
+          type: Discord.ApplicationCommandOptionType.String,
           required: true,
         },
       ],
     },
     {
       name: `react-verify`,
-      type: `SUB_COMMAND`,
+      type: Discord.ApplicationCommandOptionType.Subcommand,
       description: `Verifies all reaction roles are valid and removes invalid ones.`,
     },
     {
       name: `verified-role`,
-      type: `SUB_COMMAND`,
+      type: Discord.ApplicationCommandOptionType.Subcommand,
       description: `Sets or disables the verified user role.`,
       options: [
         {
           name: `role`,
           description: `The role to give to verified users.`,
-          type: `ROLE`,
+          type: Discord.ApplicationCommandOptionType.Role,
           required: false,
         },
         {
           name: `disable`,
           description: `Whether or not to disable the verified role.`,
-          type: `BOOLEAN`,
+          type: Discord.ApplicationCommandOptionType.Boolean,
           required: false,
         },
       ],
     },
     {
       name: `report-channel`,
-      type: `SUB_COMMAND`,
+      type: Discord.ApplicationCommandOptionType.Subcommand,
       description: `Sets or disables the report channel.`,
       options: [
         {
           name: `channel`,
           description: `The channel to send flagged messages and tickets in.`,
-          type: `CHANNEL`,
+          type: Discord.ApplicationCommandOptionType.Channel,
           required: false,
         },
         {
           name: `disable`,
           description: `Whether or not to disable the report channel.`,
-          type: `BOOLEAN`,
+          type: Discord.ApplicationCommandOptionType.Boolean,
           required: false,
         },
       ],
     },
     {
       name: `report-role`,
-      type: `SUB_COMMAND`,
+      type: Discord.ApplicationCommandOptionType.Subcommand,
       description: `Sets or disables the report role.`,
       options: [
         {
           name: `role`,
           description: `The role to ping for flagged messages and tickets.`,
-          type: `ROLE`,
+          type: Discord.ApplicationCommandOptionType.Role,
           required: false,
         },
         {
           name: `disable`,
           description: `Whether or not to disable the report role.`,
-          type: `BOOLEAN`,
+          type: Discord.ApplicationCommandOptionType.Boolean,
           required: false,
         },
       ],
     },
     {
       name: `timeout-role`,
-      type: `SUB_COMMAND`,
+      type: Discord.ApplicationCommandOptionType.Subcommand,
       description: `Sets or disables the timeout role.`,
       options: [
         {
           name: `role`,
           description: `The role to give to put users in timeout.`,
-          type: `ROLE`,
+          type: Discord.ApplicationCommandOptionType.Role,
           required: false,
         },
         {
           name: `disable`,
           description: `Whether or not to disable the timeout role.`,
-          type: `BOOLEAN`,
+          type: Discord.ApplicationCommandOptionType.Boolean,
           required: false,
         },
       ],
@@ -411,7 +414,7 @@ async function changeWelcomeChannel(interaction) {
   const options = interaction.options;
   let result;
 
-  if (options.get(`channel`) && (!interaction.options.get(`channel`).channel || options.get(`channel`).channel.type !== `GUILD_TEXT`)) {
+  if (options.get(`channel`) && (!interaction.options.get(`channel`).channel || options.get(`channel`).channel.type !== Discord.ChannelType.GuildText)) {
     replyHelper.interactionReply(interaction, {content: `That's not a valid text channel.`, ephemeral: true});
     activeChanges.delete(interaction.guildId);
     return;
@@ -440,7 +443,7 @@ async function changeLogsChannel(interaction) {
   const options = interaction.options;
   let result;
 
-  if (options.get(`channel`) && (!interaction.options.get(`channel`).channel || options.get(`channel`).channel.type !== `GUILD_TEXT`)) {
+  if (options.get(`channel`) && (!interaction.options.get(`channel`).channel || options.get(`channel`).channel.type !== Discord.ChannelType.GuildText)) {
     replyHelper.interactionReply(interaction, {content: `That's not a valid text channel.`, ephemeral: true});
     activeChanges.delete(interaction.guildId);
     return;
@@ -469,7 +472,7 @@ async function changeStarboardChannel(interaction) {
   const options = interaction.options;
   let result;
 
-  if (options.get(`channel`) && (!interaction.options.get(`channel`).channel || options.get(`channel`).channel.type !== `GUILD_TEXT`)) {
+  if (options.get(`channel`) && (!interaction.options.get(`channel`).channel || options.get(`channel`).channel.type !== Discord.ChannelType.GuildText)) {
     replyHelper.interactionReply(interaction, {content: `That's not a valid text channel.`, ephemeral: true});
     activeChanges.delete(interaction.guildId);
     return;
@@ -538,7 +541,7 @@ async function changeRoleChannel(interaction, client) {
   const options = interaction.options;
   let result;
 
-  if (options.get(`channel`) && (!interaction.options.get(`channel`).channel || options.get(`channel`).channel.type !== `GUILD_TEXT`)) {
+  if (options.get(`channel`) && (!interaction.options.get(`channel`).channel || options.get(`channel`).channel.type !== Discord.ChannelType.GuildText)) {
     replyHelper.interactionReply(interaction, {content: `That's not a valid text channel.`, ephemeral: true});
     activeChanges.delete(interaction.guildId);
     return;
@@ -837,7 +840,7 @@ async function changeReportChannel(interaction) {
   const options = interaction.options;
   let result;
 
-  if (options.get(`channel`) && (!interaction.options.get(`channel`).channel || options.get(`channel`).channel.type !== `GUILD_TEXT`)) {
+  if (options.get(`channel`) && (!interaction.options.get(`channel`).channel || options.get(`channel`).channel.type !== Discord.ChannelType.GuildText)) {
     replyHelper.interactionReply(interaction, {content: `That's not a valid text channel.`, ephemeral: true});
     activeChanges.delete(interaction.guildId);
     return;

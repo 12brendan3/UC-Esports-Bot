@@ -9,6 +9,7 @@ module.exports = {handle, getHelp};
 
 // Help command text
 const help = {
+  type: Discord.ApplicationCommandType.ChatInput,
   text: `Sends the leaderboard of the top 20 users with the most XP.`,
   level: `user`,
   allowDM: true,
@@ -20,7 +21,7 @@ function handle(client, interaction) {
 }
 
 async function sendLeaderboard(client, interaction) {
-  const embed = new Discord.MessageEmbed();
+  const embed = new Discord.EmbedBuilder();
 
   embed.setColor(`#CC00FF`);
   embed.setAuthor({name: client.user.username, iconURL: client.user.displayAvatarURL()});
@@ -28,7 +29,7 @@ async function sendLeaderboard(client, interaction) {
 
   const list = await getUserList(client);
 
-  embed.addField(`Leaderboard - Top 20`, list);
+  embed.setFields({ name: `Leaderboard - Top 20`, value: list });
 
   replyHelper.interactionReply(interaction, {embeds: [embed]});
 }

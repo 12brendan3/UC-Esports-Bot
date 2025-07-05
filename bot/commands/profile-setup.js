@@ -1,4 +1,6 @@
 // const bearcatManager = require(`../helpers/bearcat-manager`);
+const Discord = require(`discord.js`);
+
 const replyHelper = require(`../helpers/interaction-helper`);
 
 // Exports

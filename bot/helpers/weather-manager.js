@@ -1,5 +1,6 @@
 const axios = require(`axios`);
 const settings = require(`./settings-manager`);
+const Discord = require(`discord.js`);
 
 let lastCheck = 0;
 
@@ -28,7 +29,7 @@ async function setBotStatus(client) {
     status = `the sky`;
   }
 
-  client.user.setPresence({status: `ONLINE`, afk: false, activities: [{name: status, type: `WATCHING`}]});
+  client.user.setPresence({status: 'online', afk: false, activities: [{ name: status, type: Discord.ActivityType.Watching }]});
 }
 
 // Private functions

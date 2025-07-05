@@ -17,34 +17,31 @@
     "discord.js",
     "bot"
   ],
-  "author": "Brendan Root, Baru Yogesh",
+  "author": "Brendan Root",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/12brendan3/UC-Esports-Bot/issues"
   },
   "homepage": "https://github.com/12brendan3/UC-Esports-Bot#readme",
   "dependencies": {
-    "@discordjs/opus": "^0.7.0",
-    "@discordjs/voice": "^0.9.0",
-    "axios": "^0.27.2",
-    "bad-words": "^3.0.4",
-    "bufferutil": "^4.0.6",
+    "@discordjs/opus": "^0.10.0",
+    "@discordjs/voice": "^0.18.0",
+    "axios": "^1.10.0",
+    "bufferutil": "^4.0.9",
     "cronosjs": "^1.7.1",
-    "discord.js": "^13.6.0",
-    "emoji-regex": "^10.1.0",
-    "html-entities": "^2.3.3",
-    "node-gyp": "^9.0.0",
-    "nodemailer": "^6.7.5",
-    "sequelize": "^6.19.0",
-    "sqlite3": "^5.0.7",
-    "tweetnacl": "^1.0.3",
-    "utf-8-validate": "^5.0.9",
+    "discord.js": "^14.21.0",
+    "emoji-regex": "^10.4.0",
+    "html-entities": "^2.6.0",
+    "node-gyp": "^11.2.0",
+    "nodemailer": "^7.0.4",
+    "sequelize": "^6.37.7",
+    "sqlite3": "^5.1.7",
     "youtube-search": "^1.1.6",
-    "ytdl-core": "^4.11.0",
-    "zlib-sync": "^0.1.7"
+    "yt-dlp-wrap": "^2.3.12",
+    "zlib-sync": "^0.1.10"
   },
   "devDependencies": {
-    "eslint": "^7.32.0"
+    "eslint": "^9.30.1"
   },
   "eslintConfig": {
     "extends": [

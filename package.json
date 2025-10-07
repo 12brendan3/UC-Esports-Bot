@@ -33,7 +33,7 @@
     "emoji-regex": "^10.4.0",
     "html-entities": "^2.6.0",
     "node-gyp": "^11.2.0",
-    "nodemailer": "^7.0.4",
+    "nodemailer": "^7.0.7",
     "sequelize": "^6.37.7",
     "sqlite3": "^5.1.7",
     "youtube-search": "^1.1.6",

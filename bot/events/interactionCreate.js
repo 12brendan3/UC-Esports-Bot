@@ -1,3 +1,5 @@
+const Discord = require(`discord.js`);
+
 const commandManager = require(`../helpers/command-manager`);
 const database = require(`../helpers/database-manager`);
 const reactManager = require(`../helpers/role-react-manager-2`);

@@ -1,3 +1,5 @@
+const Discord = require(`discord.js`);
+
 const replyHelper = require(`../../helpers/interaction-helper`);
 
 // Exports
@@ -12,10 +14,11 @@ const help = {
 // Exported functions
 function handle(client, interaction) {
   try {
-    interaction.channel.send({files: [{attachment: `https://cataas.com/c/gif`, name: `cat.gif`}]});
-    replyHelper.interactionReply(interaction, {content: `Sent!`, ephemeral: true});
+    const nonce = Discord.SnowflakeUtil.generate();
+    interaction.channel.send({ files: [{attachment: `https://cataas.com/c/gif`, name: `cat.gif` }], enforceNonce: true, nonce: nonce.toString() });
+    replyHelper.interactionReply(interaction, { content: `Sent!`, flags: Discord.MessageFlags.Ephemeral });
   } catch (err) {
-    replyHelper.interactionReply(interaction, {content: `There was an error running the command.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `There was an error running the command.`, flags: Discord.MessageFlags.Ephemeral });
     console.error(err);
   }
 }

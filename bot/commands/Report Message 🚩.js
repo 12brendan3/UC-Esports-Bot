@@ -22,7 +22,7 @@ async function handle(client, interaction) {
   const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
 
   if (!guildSettings || !guildSettings.reportChannelID || (!guildSettings.starboardChannelID && interaction.channelId === guildSettings.starboardChannelID) || (!guildSettings.rolesChannelID && interaction.channelId === guildSettings.rolesChannelID)) {
-    replyHelper.interactionReply(interaction, {content: `Failed to report message.  Is a report channel set up?`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `Failed to report message.  Is a report channel set up?`, flags: Discord.MessageFlags.Ephemeral });
     return;
   }
 
@@ -32,13 +32,14 @@ async function handle(client, interaction) {
 
   const repChannel = interaction.guild.channels.cache.get(guildSettings.reportChannelID);
 
+  const nonce = Discord.SnowflakeUtil.generate();
   if (guildSettings.reportRoleID) {
-    repChannel.send({content: `<@&${guildSettings.reportRoleID}>`, embeds: [newEmbed]});
+    repChannel.send({ content: `<@&${guildSettings.reportRoleID}>`, embeds: [newEmbed], enforceNonce: true, nonce: nonce.toString() });
   } else {
-    repChannel.send({embeds: [newEmbed]});
+    repChannel.send({ embeds: [newEmbed], enforceNonce: true, nonce: nonce.toString() });
   }
 
-  replyHelper.interactionReply(interaction, {content: `Message has been flagged for review by admins.`, ephemeral: true});
+  replyHelper.interactionReply(interaction, { content: `Message has been flagged for review by admins.`, flags: Discord.MessageFlags.Ephemeral });
 }
 
 function generateReportEmbed(msg, user) {

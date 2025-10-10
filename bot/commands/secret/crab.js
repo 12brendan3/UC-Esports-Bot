@@ -1,3 +1,5 @@
+const Discord = require(`discord.js`);
+
 const replyHelper = require(`../../helpers/interaction-helper`);
 
 // Exports
@@ -11,8 +13,9 @@ const help = {
 
 // Exported functions
 function handle(client, interaction) {
-  interaction.channel.send(`🦀`);
-  replyHelper.interactionReply(interaction, {content: `Sent!`, ephemeral: true});
+  const nonce = Discord.SnowflakeUtil.generate();
+  interaction.channel.send({ content: `🦀`, enforceNonce: true, nonce: nonce.toString() });
+  replyHelper.interactionReply(interaction, { content: `Sent!`, flags: Discord.MessageFlags.Ephemeral });
 }
 
 function getHelp() {

@@ -27,13 +27,13 @@ async function removeFeedback(interaction) {
   try {
     const result = await database.removeEntry(`Feedback`, {ID: interaction.options.get(`entryid`).value});
     if (result) {
-      replyHelper.interactionReply(interaction, {content: `The feedback entry was removed.`, ephemeral: true});
+      replyHelper.interactionReply(interaction, { content: `The feedback entry was removed.`, flags: Discord.MessageFlags.Ephemeral });
     } else {
-      replyHelper.interactionReply(interaction, {content: `No feedback with that ID was found.`, ephemeral: true});
+      replyHelper.interactionReply(interaction, { content: `No feedback with that ID was found.`, flags: Discord.MessageFlags.Ephemeral });
     }
   } catch (err) {
     console.error(err);
-    replyHelper.interactionReply(interaction, {content: `There was an error.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `There was an error.`, flags: Discord.MessageFlags.Ephemeral });
   }
 }
 

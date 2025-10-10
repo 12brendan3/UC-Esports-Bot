@@ -42,6 +42,7 @@ async function logMessageEdit(msgOld, msgNew) {
     embed.setTimestamp();
     embed.setFooter({text: msgNew.author.tag});
 
-    logsChannel.send({embeds: [embed]});
+    const nonce = Discord.SnowflakeUtil.generate();
+    logsChannel.send({ embeds: [embed], enforceNonce: true, nonce: nonce.toString() });
   }
 }

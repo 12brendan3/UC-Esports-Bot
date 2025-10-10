@@ -1,6 +1,7 @@
-const axios = require(`axios`);
-const settings = require(`./settings-manager`);
 const Discord = require(`discord.js`);
+const axios = require(`axios`);
+
+const settings = require(`./settings-manager`);
 
 let lastCheck = 0;
 

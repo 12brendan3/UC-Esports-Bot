@@ -35,7 +35,7 @@ async function handle(client, interaction) {
       replyHelper.interactionReply(interaction, `You don't have any XP.`);
     }
   } catch {
-    replyHelper.interactionReply(interaction, {content: `There was an error fetching your XP.  Tell the bot devs if the issue persists.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `There was an error fetching your XP.  Tell the bot devs if the issue persists.`, flags: Discord.MessageFlags.Ephemeral });
   }
 }
 

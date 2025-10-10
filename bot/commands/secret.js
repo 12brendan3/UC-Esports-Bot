@@ -37,7 +37,7 @@ function handle(client, interaction) {
   if (commands.has(commandName)) {
     commands.get(commandName).handle(client, interaction);
   } else {
-    replyHelper.interactionReply(interaction, {content: `Sorry, that's not a valid secret command.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `Sorry, that's not a valid secret command.`, flags: Discord.MessageFlags.Ephemeral });
   }
 }
 

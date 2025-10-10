@@ -1,3 +1,5 @@
+const Discord = require(`discord.js`);
+
 const database = require(`../helpers/database-manager`);
 
 // Exports
@@ -10,6 +12,7 @@ async function handle(client, member) {
   if (guildSettings && guildSettings.welcomeMessage && guildSettings.welcomeChannelID) {
     const welcomeMessage = guildSettings.welcomeMessage.replace(`!!newuser!!`, `${member}`);
     const welcomeChannel = member.guild.channels.cache.get(guildSettings.welcomeChannelID);
-    welcomeChannel.send(welcomeMessage);
+    const nonce = Discord.SnowflakeUtil.generate();
+    welcomeChannel.send({ content: welcomeMessage, enforceNonce: true, nonce: nonce.toString() });
   }
 }

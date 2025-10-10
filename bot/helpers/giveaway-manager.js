@@ -1,5 +1,6 @@
 const Discord = require(`discord.js`);
 const Sequelize = require(`sequelize`);
+
 const database = require(`./database-manager`);
 const replyHelper = require(`./interaction-helper`);
 
@@ -31,13 +32,13 @@ async function addOne(client, interaction) {
     result = await database.createEntry(`Giveaways`, {guildID: reply.guild.id, channelID: reply.channel.id, messageID: reply.id, userID: interaction.member.id, expireTime: endTime, numWinners, title, description});
   } catch {
     interaction.deleteReply();
-    interaction.followUp({content: `There was an internal error, please try again.\nLet the bot devs know if the issue persists.`, ephemeral: true});
+    interaction.followUp({ content: `There was an internal error, please try again.\nLet the bot devs know if the issue persists.`, flags: Discord.MessageFlags.Ephemeral });
     return;
   }
 
   if (!result) {
     interaction.deleteReply();
-    interaction.followUp({content: `There was an internal error, please try again.\nLet the bot devs know if the issue persists.`, ephemeral: true});
+    interaction.followUp({ content: `There was an internal error, please try again.\nLet the bot devs know if the issue persists.`, flags: Discord.MessageFlags.Ephemeral });
     return;
   }
 
@@ -55,12 +56,12 @@ async function endOne(client, interaction) {
   try {
     result = await database.getEntry(`Giveaways`, {guildID: interaction.guild.id, channelID: interaction.channel.id, title, expireTime: {[Sequelize.Op.ne]: 0}});
   } catch {
-    replyHelper.interactionReply(interaction, {content: `There was an internal error, please try again.\nLet the bot devs know if the issue persists.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `There was an internal error, please try again.\nLet the bot devs know if the issue persists.`, flags: Discord.MessageFlags.Ephemeral });
     return;
   }
 
   if (!result) {
-    replyHelper.interactionReply(interaction, {content: `There was no giveaway found by that name. (Are you using this command in the same channel as the giveaway and typing the exact name?)`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `There was no giveaway found by that name. (Are you using this command in the same channel as the giveaway and typing the exact name?)`, flags: Discord.MessageFlags.Ephemeral });
     return;
   }
 
@@ -71,7 +72,7 @@ async function endOne(client, interaction) {
 
   activeGiveaways.delete(result.ID);
 
-  await replyHelper.interactionReply(interaction, {content: `The giveaway has been ended.`, ephemeral: true});
+  await replyHelper.interactionReply(interaction, { content: `The giveaway has been ended.`, flags: Discord.MessageFlags.Ephemeral });
 }
 
 function registerGiveaway(client, reply, member, reaction, entry) {

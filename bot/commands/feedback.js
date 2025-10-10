@@ -30,12 +30,12 @@ async function handle(client, interaction) {
     const result = await database.createEntry(`Feedback`, {userID: interaction.user.id, messageURL, message: interaction.options.get(`feedback`).value, time: interaction.createdTimestamp});
 
     if (result) {
-      replyHelper.interactionReply(interaction, {content: `Your feedback has been recorded!`, ephemeral: true});
+      replyHelper.interactionReply(interaction, { content: `Your feedback has been recorded!`, flags: Discord.MessageFlags.Ephemeral });
     } else {
-      replyHelper.interactionReply(interaction, {content: `There was an error saving your feedback.  Tell the bot developers directly if the issue persists.`, ephemeral: true});
+      replyHelper.interactionReply(interaction, { content: `There was an error saving your feedback.  Tell the bot developers directly if the issue persists.`, flags: Discord.MessageFlags.Ephemeral });
     }
   } catch {
-    replyHelper.interactionReply(interaction, {content: `Command timed out, please try again.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `Command timed out, please try again.`, flags: Discord.MessageFlags.Ephemeral });
   }
 }
 

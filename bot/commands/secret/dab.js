@@ -1,3 +1,5 @@
+const Discord = require(`discord.js`);
+
 const replyHelper = require(`../../helpers/interaction-helper`);
 
 // Exports
@@ -23,10 +25,11 @@ function handle(client, interaction) {
   const dabEmoji = client.emojis.cache.find((emoji) => emoji.name === emojiName);
 
   if (dabEmoji) {
-    interaction.channel.send(`${dabEmoji}`);
-    replyHelper.interactionReply(interaction, {content: `Sent!`, ephemeral: true});
+    const nonce = Discord.SnowflakeUtil.generate();
+    interaction.channel.send({ content: `${dabEmoji}`, enforceNonce: true, nonce: nonce.toString() });
+    replyHelper.interactionReply(interaction, { content: `Sent!`, flags: Discord.MessageFlags.Ephemeral });
   } else {
-    replyHelper.interactionReply(interaction, {content: `There was an error running the command.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `There was an error running the command.`, flags: Discord.MessageFlags.Ephemeral });
   }
 }
 

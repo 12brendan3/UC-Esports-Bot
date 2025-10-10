@@ -64,6 +64,7 @@ async function logMessageDeletion(msg) {
 
     embed.setTimestamp();
 
-    logsChannel.send({embeds: [embed]});
+    const nonce = Discord.SnowflakeUtil.generate();
+    logsChannel.send({ embeds: [embed], enforceNonce: true, nonce: nonce.toString() });
   }
 }

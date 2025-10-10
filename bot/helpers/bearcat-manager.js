@@ -38,7 +38,7 @@ function prepEmail() {
 
 async function verifyUser(interaction) {
   if (!emailer) {
-    replyHelper.interactionReply(interaction, {content: `The email verification system isn't set up on this bot, bug the bot developers to set it up.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `The email verification system isn't set up on this bot, bug the bot developers to set it up.`, flags: Discord.MessageFlags.Ephemeral });
     return;
   }
 
@@ -58,9 +58,9 @@ async function verifyUser(interaction) {
         if (subCode.toLowerCase() !== userStatus.code.toLowerCase()) {
           userStatus.attempts--;
           if (userStatus.attempts > 0) {
-            replyHelper.interactionReply(interaction, {content: `That code is incorrect, please try again.\nYou have ${userStatus.attempts} more attempt(s).`, ephemeral: true});
+            replyHelper.interactionReply(interaction, { content: `That code is incorrect, please try again.\nYou have ${userStatus.attempts} more attempt(s).`, flags: Discord.MessageFlags.Ephemeral });
           } else {
-            replyHelper.interactionReply(interaction, {content: `That code is incorrect, you have no more attempts.\nPlease try again later.`, ephemeral: true});
+            replyHelper.interactionReply(interaction, { content: `That code is incorrect, you have no more attempts.\nPlease try again later.`, flags: Discord.MessageFlags.Ephemeral });
             userStatus.code = null;
             userStatus.status = `timeout`;
             userStatus.timer = Date.now();
@@ -75,7 +75,7 @@ async function verifyUser(interaction) {
 
         if (startedFromDM) {
           // \nIf you'd like to complete your user profile, run the "profile-setup" command.
-          replyHelper.interactionReply(interaction, {content: `Success!\nYour email has been saved.\nIn order to get a verified role, run \`/verify\` in a server you want the verified role in.  You won't be asked to verify your email again.`, ephemeral: true});
+          replyHelper.interactionReply(interaction, { content: `Success!\nYour email has been saved.\nIn order to get a verified role, run \`/verify\` in a server you want the verified role in.  You won't be asked to verify your email again.`, flags: Discord.MessageFlags.Ephemeral });
         } else {
           const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
           let role = false;
@@ -87,15 +87,15 @@ async function verifyUser(interaction) {
           if (role) {
             if (interaction.member.roles.cache.has(guildSettings.verifiedRoleID)) {
               // \nIf you'd like to complete your user profile, run the "profile-setup" command.
-              replyHelper.interactionReply(interaction, {content: `Success!\nYour email has been saved.`, ephemeral: true});
+              replyHelper.interactionReply(interaction, { content: `Success!\nYour email has been saved.`, flags: Discord.MessageFlags.Ephemeral });
             } else {
               await interaction.member.roles.add(guildSettings.verifiedRoleID, `User passed verification.`);
               // \nIf you'd like to complete your user profile, run the "profile-setup" command.
-              replyHelper.interactionReply(interaction, {content: `Success!\nYour email has been saved and you now have the ${role.name} role in ${interaction.guild.name}.`, ephemeral: true});
+              replyHelper.interactionReply(interaction, { content: `Success!\nYour email has been saved and you now have the ${role.name} role in ${interaction.guild.name}.`, flags: Discord.MessageFlags.Ephemeral });
             }
           } else {
             // \nIf you'd like to complete your user profile, run the "profile-setup" command.
-            replyHelper.interactionReply(interaction, {content: `Success!\nYour email has been saved.  The server you verified in doesn't have a verified role.\nIf one is added, you can re-run this command to get the role.  You will not be asked to verify your email again.`, ephemeral: true});
+            replyHelper.interactionReply(interaction, { content: `Success!\nYour email has been saved.  The server you verified in doesn't have a verified role.\nIf one is added, you can re-run this command to get the role.  You will not be asked to verify your email again.`, flags: Discord.MessageFlags.Ephemeral });
           }
         }
 
@@ -105,17 +105,17 @@ async function verifyUser(interaction) {
 
         userStatuses.delete(interaction.user.id);
       } else {
-        replyHelper.interactionReply(interaction, {content: `Please provide a verification code.`, ephemeral: true});
+        replyHelper.interactionReply(interaction, { content: `Please provide a verification code.`, flags: Discord.MessageFlags.Ephemeral });
         return;
       }
     } else {
       if (userStatus.status === `active`) {
-        replyHelper.interactionReply(interaction, {content: `You're already attempting verification right now.`, ephemeral: true});
+        replyHelper.interactionReply(interaction, { content: `You're already attempting verification right now.`, flags: Discord.MessageFlags.Ephemeral });
         return;
       }
 
       if (userStatus.status === `timeout` && (userStatus.timer + 300000) > Date.now()) {
-        replyHelper.interactionReply(interaction, {content: `You've already tried verification recently, try again later.`, ephemeral: true});
+        replyHelper.interactionReply(interaction, { content: `You've already tried verification recently, try again later.`, flags: Discord.MessageFlags.Ephemeral });
         return;
       }
     }
@@ -128,7 +128,7 @@ async function verifyUser(interaction) {
 
   if (prevVerified && prevVerified.email) {
     if (startedFromDM) {
-      replyHelper.interactionReply(interaction, {content: `You've already verified, please run this command from a server to get the verified user role.`, ephemeral: true});
+      replyHelper.interactionReply(interaction, { content: `You've already verified, please run this command from a server to get the verified user role.`, flags: Discord.MessageFlags.Ephemeral });
     } else {
       const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
       let role = false;
@@ -139,13 +139,13 @@ async function verifyUser(interaction) {
 
       if (role) {
         if (interaction.member.roles.cache.has(guildSettings.verifiedRoleID)) {
-          replyHelper.interactionReply(interaction, {content: `You already have the verified user role in ${interaction.guild.name}.`, ephemeral: true});
+          replyHelper.interactionReply(interaction, { content: `You already have the verified user role in ${interaction.guild.name}.`, flags: Discord.MessageFlags.Ephemeral });
         } else {
           await interaction.member.roles.add(guildSettings.verifiedRoleID, `User has previously passed verification.`);
-          replyHelper.interactionReply(interaction, {content: `You now have the ${role.name} role in ${interaction.guild.name}.`, ephemeral: true});
+          replyHelper.interactionReply(interaction, { content: `You now have the ${role.name} role in ${interaction.guild.name}.`, flags: Discord.MessageFlags.Ephemeral });
         }
       } else {
-        replyHelper.interactionReply(interaction, {content: `This server doesn't have a verified role.\nIf one is added, you can re-run this command to get the role.`, ephemeral: true});
+        replyHelper.interactionReply(interaction, { content: `This server doesn't have a verified role.\nIf one is added, you can re-run this command to get the role.`, flags: Discord.MessageFlags.Ephemeral });
       }
     }
 
@@ -154,7 +154,7 @@ async function verifyUser(interaction) {
   }
 
   if (!interaction.options.get(`email`)) {
-    replyHelper.interactionReply(interaction, {content: `Please run the command again with an email to verify you with.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `Please run the command again with an email to verify you with.`, flags: Discord.MessageFlags.Ephemeral });
     userStatuses.delete(interaction.user.id);
     return;
   }
@@ -164,18 +164,18 @@ async function verifyUser(interaction) {
     const existing = await database.getEntry(`Bearcats`, {email});
 
     if (existing) {
-      replyHelper.interactionReply(interaction, {content: `That email has already been used to verify another user.\nContact a bot developer if you believe this is an error.`, ephemeral: true});
+      replyHelper.interactionReply(interaction, { content: `That email has already been used to verify another user.\nContact a bot developer if you believe this is an error.`, flags: Discord.MessageFlags.Ephemeral });
       userStatus.status = `timeout`;
       userStatus.timer = Date.now();
       return;
     }
 
-    replyHelper.interactionReply(interaction, {content: `Attempting to email you...`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `Attempting to email you...`, flags: Discord.MessageFlags.Ephemeral });
 
     const verificationCode = await sendEmail(email);
 
     if (verificationCode) {
-      replyHelper.interactionEdit(interaction, {content: `An email has been sent with a verification code; please use \`/verify code:yourcode\`.\nYou have 5 minutes to verify your code.\nMake sure to check your junk mail!`, ephemeral: true});
+      replyHelper.interactionEdit(interaction, { content: `An email has been sent with a verification code; please use \`/verify code:yourcode\`.\nYou have 5 minutes to verify your code.\nMake sure to check your junk mail!`, flags: Discord.MessageFlags.Ephemeral });
       userStatus.email = email;
       userStatus.code = verificationCode;
       userStatus.timeout = setTimeout(() => {
@@ -184,12 +184,12 @@ async function verifyUser(interaction) {
         userStatus.timer = Date.now();
       }, 300000);
     } else {
-      replyHelper.interactionEdit(interaction, {content: `Failed to send a verification code.\nTry again later and let the bot devs know if the issue persists.`, ephemeral: true});
+      replyHelper.interactionEdit(interaction, { content: `Failed to send a verification code.\nTry again later and let the bot devs know if the issue persists.`, flags: Discord.MessageFlags.Ephemeral });
       userStatuses.delete(interaction.user.id);
     }
     return;
   } else {
-    replyHelper.interactionReply(interaction, {content: `That is not a valid UC email.  Please try again in 5 minutes.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `That is not a valid UC email.  Please try again in 5 minutes.`, flags: Discord.MessageFlags.Ephemeral });
     userStatus.status = `timeout`;
     userStatus.timer = Date.now();
   }

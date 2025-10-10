@@ -1,9 +1,9 @@
+const Discord = require(`discord.js`);
+
 const database = require(`../helpers/database-manager`);
 const collectors = require(`../helpers/collectors`);
 const resolvers = require(`../helpers/resolvers`);
 const replyHelper = require(`../helpers/interaction-helper`);
-
-const Discord = require(`discord.js`);
 
 const activeReports = new Set();
 
@@ -38,7 +38,7 @@ async function handle(client, interaction) {
   let guildID;
 
   if (activeReports.has(interaction.user.id)) {
-    replyHelper.interactionReply(interaction, {content: `You already have an active ticket in progress.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `You already have an active ticket in progress.`, flags: Discord.MessageFlags.Ephemeral });
     return;
   }
 
@@ -85,12 +85,13 @@ async function handle(client, interaction) {
     const reportGuild = client.guilds.cache.get(guildID);
     const reportChannel = reportGuild.channels.cache.get(guildSettings.reportChannelID);
 
-    reportChannel.send({embeds: [reportEmbed]});
+    const nonce = Discord.SnowflakeUtil.generate();
+    reportChannel.send({ embeds: [reportEmbed], enforceNonce: true, nonce: nonce.toString() });
 
     if (startedFromDM) {
       interaction.followUp(`The ticket has been sent.`);
     } else {
-      replyHelper.interactionReply(interaction, {content: `The ticket has been sent.`, ephemeral: true});
+      replyHelper.interactionReply(interaction, { content: `The ticket has been sent.`, flags: Discord.MessageFlags.Ephemeral });
     }
 
     activeReports.delete(interaction.user.id);
@@ -98,7 +99,7 @@ async function handle(client, interaction) {
     if (startedFromDM) {
       interaction.followUp(`The server doesn't have a ticket channel set up.  Ticket cancelled.`);
     } else {
-      replyHelper.interactionReply(interaction, {content: `The server doesn't have a ticket channel set up.  Ticket cancelled.`, ephemeral: true});
+      replyHelper.interactionReply(interaction, { content: `The server doesn't have a ticket channel set up.  Ticket cancelled.`, flags: Discord.MessageFlags.Ephemeral });
     }
 
     activeReports.delete(interaction.user.id);

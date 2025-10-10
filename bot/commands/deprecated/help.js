@@ -53,7 +53,7 @@ async function handle(client, interaction) {
 
   embed.setFields(embedFields);
 
-  replyHelper.interactionReply(interaction, {embeds: [embed], ephemeral: true});
+  replyHelper.interactionReply(interaction, {embeds: [embed], flags: Discord.MessageFlags.Ephemeral});
 }
 
 function getHelp() {

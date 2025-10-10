@@ -17,7 +17,7 @@ const help = {
 // Exported functions
 async function handle(client, interaction) {
   if (!interaction.channel) {
-    replyHelper.interactionReply(interaction, {content: `This command has to be used in a server.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `This command has to be used in a server.`, flags: Discord.MessageFlags.Ephemeral });
     return;
   }
 

@@ -48,7 +48,7 @@ async function transferXP(interaction) {
     if (resultFrom && resultFrom.XP) {
       newXP += resultFrom.XP;
     } else {
-      replyHelper.interactionReply(interaction, {content: `${interaction.options.get(`userfrom`).user} has no XP!`, ephemeral: true});
+      replyHelper.interactionReply(interaction, { content: `${interaction.options.get(`userfrom`).user} has no XP!`, flags: Discord.MessageFlags.Ephemeral });
       return;
     }
 
@@ -66,6 +66,6 @@ async function transferXP(interaction) {
     }
   } catch (err) {
     console.error(err);
-    replyHelper.interactionReply(interaction, {content: `Process canceled, there was an error.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `Process canceled, there was an error.`, flags: Discord.MessageFlags.Ephemeral });
   }
 }

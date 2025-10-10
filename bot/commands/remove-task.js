@@ -26,14 +26,14 @@ const help = {
 // Exported functions
 async function handle(client, interaction) {
   if (!interaction.channel) {
-    replyHelper.interactionReply(interaction, {content: `This command has to be used in a server.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `This command has to be used in a server.`, flags: Discord.MessageFlags.Ephemeral });
     return;
   }
 
   const existingTasks = await database.getAllEntries(`Tasks`, {guildID: interaction.guildId});
 
   if (existingTasks.length < 1) {
-    replyHelper.interactionReply(interaction, {content: `There are no tasks in this server.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `There are no tasks in this server.`, flags: Discord.MessageFlags.Ephemeral });
     return;
   }
 
@@ -42,16 +42,16 @@ async function handle(client, interaction) {
   const result = await database.getEntry(`Tasks`, {ID: taskID, guildID: interaction.guildId});
 
   if (!result) {
-    replyHelper.interactionReply(interaction, {content: `No task with that ID found, try again.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `No task with that ID found, try again.`, flags: Discord.MessageFlags.Ephemeral });
     return;
   }
 
   const resultRemoval = await taskManager.removeTask(taskID, result.taskFile);
 
   if (resultRemoval) {
-    replyHelper.interactionReply(interaction, {content: `Successfully removed the task.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `Successfully removed the task.`, flags: Discord.MessageFlags.Ephemeral });
   } else {
-    replyHelper.interactionReply(interaction, {content: `Failed to remove the task, let the bot devs know if the issue persists.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `Failed to remove the task, let the bot devs know if the issue persists.`, flags: Discord.MessageFlags.Ephemeral });
   }
 }
 

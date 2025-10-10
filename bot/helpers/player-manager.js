@@ -1,9 +1,11 @@
-const settings = require(`../helpers/settings-manager`);
-const YTDlpWrap = require('yt-dlp-wrap').default;
-const ytsearch = require(`youtube-search`);
+const Discord = require(`discord.js`);
 const voice = require(`@discordjs/voice`);
-const replyHelper = require(`./interaction-helper`);
+const YTDlpWrap = require(`yt-dlp-wrap`).default;
+const ytsearch = require(`youtube-search`);
 const htmlEntities = require(`html-entities`);
+
+const settings = require(`../helpers/settings-manager`);
+const replyHelper = require(`./interaction-helper`);
 
 const ytdlp = new YTDlpWrap();
 
@@ -34,24 +36,24 @@ function prepKey() {
 
 function checkUser(interaction, type) {
   if (interaction.guild === null) {
-    replyHelper.interactionReply(interaction, {content: `This command only works in a server.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `This command only works in a server.`, flags: Discord.MessageFlags.Ephemeral });
     return;
   }
 
   if (!interaction.member.voice.channel) {
-    replyHelper.interactionReply(interaction, {content: `You need to be connected to a voice channel.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `You need to be connected to a voice channel.`, flags: Discord.MessageFlags.Ephemeral });
     return;
   }
 
   if (!players.has(interaction.guildId) && (type !== `play` || !interaction.options.get(`ytsearch`))) {
-    replyHelper.interactionReply(interaction, {content: `There is no active queue.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `There is no active queue.`, flags: Discord.MessageFlags.Ephemeral });
     return;
   }
 
   const player = players.get(interaction.guildId);
 
   if (player && player.voiceChannel.id !== interaction.member.voice.channel.id) {
-    replyHelper.interactionReply(interaction, {content: `You need to be connected to the active voice channel.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `You need to be connected to the active voice channel.`, flags: Discord.MessageFlags.Ephemeral });
     return;
   }
 
@@ -70,7 +72,7 @@ function checkUser(interaction, type) {
       break;
     case `leave`:
       stopPlaying(interaction.guildId);
-      replyHelper.interactionReply(interaction, {content: `Disconnected and cleared the queue.`});
+      replyHelper.interactionReply(interaction, { content: `Disconnected and cleared the queue.` });
       break;
     default:
       console.error(`If you're seeing this, you incorrectly interacted with the music manager.`);
@@ -99,7 +101,7 @@ async function checkYT(interaction) {
       };
       addToQueue(interaction, newItem);
     } catch {
-      replyHelper.interactionEdit(interaction, {content: `Failed to fetch video information.  Please make sure the video URL/ID is valid and public.`});
+      replyHelper.interactionEdit(interaction, { content: `Failed to fetch video information.  Please make sure the video URL/ID is valid and public.` });
     }
   } else {
     searchYT(interaction, video);
@@ -110,9 +112,9 @@ function pause(interaction) {
   const player = players.get(interaction.guildId);
   if (player.audioPlayer.state.status !== `paused`) {
     player.audioPlayer.pause();
-    replyHelper.interactionReply(interaction, {content: `Audio has been paused.`});
+    replyHelper.interactionReply(interaction, { content: `Audio has been paused.` });
   } else {
-    replyHelper.interactionReply(interaction, {content: `Audio isn't currently playing.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `Audio isn't currently playing.`, flags: Discord.MessageFlags.Ephemeral });
   }
 }
 
@@ -120,16 +122,16 @@ function resume(interaction) {
   const player = players.get(interaction.guildId);
   if (player.audioPlayer.state.status === `paused`) {
     player.audioPlayer.unpause();
-    replyHelper.interactionReply(interaction, {content: `Audio has been resumed.`});
+    replyHelper.interactionReply(interaction, { content: `Audio has been resumed.` });
   } else {
-    replyHelper.interactionReply(interaction, {content: `Audio isn't currently paused.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `Audio isn't currently paused.`, flags: Discord.MessageFlags.Ephemeral });
   }
 }
 
 function skip(interaction) {
   const player = players.get(interaction.guildId);
   player.audioPlayer.stop();
-  replyHelper.interactionReply(interaction, {content: `Skipped!`});
+  replyHelper.interactionReply(interaction, { content: `Skipped!` });
 }
 
 function changeVolume(interaction) {
@@ -137,7 +139,7 @@ function changeVolume(interaction) {
   const player = players.get(interaction.guildId);
   player.volume = volume / 100;
   player.resource.volume.setVolumeLogarithmic(player.volume);
-  replyHelper.interactionReply(interaction, {content: `Changed the volume to ${volume}%.`});
+  replyHelper.interactionReply(interaction, { content: `Changed the volume to ${volume}%.` });
 }
 
 async function addToQueue(interaction, newItem) {
@@ -157,6 +159,7 @@ function playNext(guildID) {
   const player = players.get(guildID);
   player.queue.shift();
 
+  const nonce = Discord.SnowflakeUtil.generate();
   if (player.queue.length > 0) {
     const resource = voice.createAudioResource(ytdlp.execStream([ player.queue[0].url, '-f', 'bestaudio' ]), {
       inputType: voice.StreamType.Arbitrary,
@@ -165,13 +168,13 @@ function playNext(guildID) {
     resource.volume.setVolumeLogarithmic(player.volume);
     player.resource = resource;
     player.audioPlayer.play(resource);
-    player.textChannel.send(`Now playing ${player.queue[0].title}.`);
+    player.textChannel.send({ content: `Now playing ${player.queue[0].title}.`, enforceNonce: true, nonce: nonce.toString() });
   } else {
     if (player.killed) {
       return;
     }
 
-    player.textChannel.send(`End of queue, disconnecting.`);
+    player.textChannel.send({ content: `End of queue, disconnecting.`, enforceNonce: true, nonce: nonce.toString() });
     stopPlaying(guildID);
   }
 }
@@ -191,7 +194,8 @@ function stopPlaying(guildID) {
 function checkChannel(newState) {
   const player = players.get(newState.guild.id);
   if (player && player.voiceChannel.members.size < 2) {
-    player.textChannel.send(`Everyone left voice chat, disconnecting.`);
+    const nonce = Discord.SnowflakeUtil.generate();
+    player.textChannel.send({ content: `Everyone left voice chat, disconnecting.`, enforceNonce: true, nonce: nonce.toString() });
     stopPlaying(newState.guild.id);
   }
 }
@@ -200,7 +204,7 @@ function searchYT(interaction, search) {
   if (ytSearchOpts.key) {
     ytsearch(search, ytSearchOpts, (err, results) => {
       if (err) {
-        replyHelper.interactionReply(interaction, {content: `Failed to search YouTube.`});
+        replyHelper.interactionReply(interaction, { content: `Failed to search YouTube.` });
         console.error(err);
       } else {
         const newItem = {
@@ -212,7 +216,7 @@ function searchYT(interaction, search) {
       }
     });
   } else {
-    replyHelper.interactionReply(interaction, {content: `YouTube search is currently disabled.`});
+    replyHelper.interactionReply(interaction, { content: `YouTube search is currently disabled.` });
   }
 }
 

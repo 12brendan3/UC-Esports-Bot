@@ -1,7 +1,9 @@
-const database = require(`./database-manager`);
-const cronos = require(`cronosjs`);
 const Discord = require(`discord.js`);
+const cronos = require(`cronosjs`);
 const fs = require(`fs`);
+
+const database = require(`./database-manager`);
+
 const tasks = new Map();
 
 module.exports = {registerExisting, addTask, removeTask};
@@ -28,12 +30,13 @@ async function registerExisting(client) {
 
 function registerTask(taskID, channel, message, file, cronString) {
   const cronTask = cronos.scheduleTask(cronString, () => {
+  const nonce = Discord.SnowflakeUtil.generate();
     if (message && file) {
-      channel.send({content: message, files: [file]});
+      channel.send({ content: message, files: [file], enforceNonce: true, nonce: nonce.toString() });
     } else if (file) {
-      channel.send({files: [file]});
+      channel.send({ files: [file], enforceNonce: true, nonce: nonce.toString() });
     } else {
-      channel.send(message);
+      channel.send({ content: message, enforceNonce: true, nonce: nonce.toString() });
     }
   });
   tasks.set(taskID, cronTask);

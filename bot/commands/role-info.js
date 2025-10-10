@@ -1,4 +1,5 @@
 const Discord = require(`discord.js`);
+
 const replyHelper = require(`../helpers/interaction-helper`);
 
 // Exports
@@ -23,7 +24,7 @@ const help = {
 // Exported functions
 async function handle(client, interaction) {
   if (!interaction.channel) {
-    replyHelper.interactionReply(interaction, {content: `This command has to be used in a server.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `This command has to be used in a server.`, flags: Discord.MessageFlags.Ephemeral });
     return;
   }
 
@@ -50,7 +51,7 @@ async function handle(client, interaction) {
 
     replyHelper.interactionReply(interaction, {embeds: [embed]});
   } catch {
-    replyHelper.interactionReply(interaction, {content: `Command timed out, please try again.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `Command timed out, please try again.`, flags: Discord.MessageFlags.Ephemeral });
   }
 }
 

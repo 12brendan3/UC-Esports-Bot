@@ -1,8 +1,8 @@
+const Discord = require(`discord.js`);
+
 const database = require(`../helpers/database-manager`);
 const reactManager = require(`../helpers/role-react-manager-2`);
 const resolvers = require(`../helpers/resolvers`);
-
-const Discord = require(`discord.js`);
 
 // Starboard reactions to detect in order: ⭐🌟
 const detectedStarboardReactions = [`%E2%AD%90`, `%F0%9F%8C%9F`];
@@ -53,15 +53,17 @@ async function detectRoleReaction(client, guildSettings, reaction, user) {
         const role = reaction.message.guild.roles.cache.get(roleID);
 
         try {
+          const nonce = Discord.SnowflakeUtil.generate();
           if (member.roles.cache.get(roleID)) {
             await member.roles.remove(roleID, `User requested role removal.`);
-            user.send(`You no longer have the \`${role.name}\` role in \`${reaction.message.guild.name}\`.`);
+            user.send({ content: `You no longer have the \`${role.name}\` role in \`${reaction.message.guild.name}\`.`, enforceNonce: true, nonce: nonce.toString() });
           } else {
             await member.roles.add(roleID, `User requested role addition.`);
-            user.send(`You have been given the \`${role.name}\` role in \`${reaction.message.guild.name}\`.`);
+            user.send({ content: `You have been given the \`${role.name}\` role in \`${reaction.message.guild.name}\`.`, enforceNonce: true, nonce: nonce.toString() });
           }
         } catch {
-          const message = await reaction.message.channel.send(`${user}, there was an error giving you the \`${role.name}\` role.\nTell an admin if they don't notice.  There may be a permission issue.`);
+          const nonce = Discord.SnowflakeUtil.generate();
+          const message = await reaction.message.channel.send({ content: `${user}, there was an error giving you the \`${role.name}\` role.\nTell an admin if they don't notice.  There may be a permission issue.`, enforceNonce: true, nonce: nonce.toString() });
           setTimeout(() => message.delete(), 5000);
         }
 
@@ -88,13 +90,15 @@ function detectFlagReaction(guildSettings, reaction, user) {
 
   const repChannel = reaction.message.guild.channels.cache.get(guildSettings.reportChannelID);
 
+  let nonce = Discord.SnowflakeUtil.generate();
   if (guildSettings.reportRoleID) {
-    repChannel.send(`<@&${guildSettings.reportRoleID}>`, newEmbed);
+    repChannel.send({ content: `<@&${guildSettings.reportRoleID}>`, embeds: [newEmbed], enforceNonce: true, nonce: nonce.toString() });
   } else {
-    repChannel.send({ embeds: [newEmbed] });
+    repChannel.send({ embeds: [newEmbed], enforceNonce: true, nonce: nonce.toString() });
   }
 
-  user.send(`Message has been flagged for review by admins.`);
+  nonce = Discord.SnowflakeUtil.generate();
+  user.send({ content: `Message has been flagged for review by admins.`, enforceNonce: true, nonce: nonce.toString() });
 }
 
 function generateReportEmbed(msg, user) {
@@ -154,7 +158,8 @@ async function starMessage(reaction, guildSettings) {
   const embed = buildEmbed(reaction);
 
   const starboardChannel = reaction.message.guild.channels.cache.get(guildSettings.starboardChannelID);
-  const starboardMessage = await starboardChannel.send({embeds: [embed]});
+  const nonce = Discord.SnowflakeUtil.generate();
+  const starboardMessage = await starboardChannel.send({ embeds: [embed], enforceNonce: true, nonce: nonce.toString() });
 
   database.createEntry(`Starboard`, {guildID: reaction.message.guildId, channelID: reaction.message.channel.id, originalMessageID: reaction.message.id, starboardMessageID: starboardMessage.id});
 }
@@ -168,7 +173,8 @@ async function updateMessage(reaction, entry, guildSettings) {
 
     starboardMessage.edit({embeds: [embed]});
   } catch {
-    const starboardMessage = await starboardChannel.send({embeds: [embed]});
+    const nonce = Discord.SnowflakeUtil.generate();
+    const starboardMessage = await starboardChannel.send({ embeds: [embed], enforceNonce: true, nonce: nonce.toString() });
     database.updateEntry(`Starboard`, {guildID: reaction.message.guildId, channelID: reaction.message.channel.id, originalMessageID: reaction.message.id}, {starboardMessageID: starboardMessage.id});
   }
 }

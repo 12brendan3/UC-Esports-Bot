@@ -1,6 +1,6 @@
-const database = require(`./database-manager`);
-
 const Discord = require(`discord.js`);
+
+const database = require(`./database-manager`);
 
 const roleData = {};
 
@@ -149,9 +149,12 @@ function generateMessage(client, guildID, categoryID) {
     });
   }
 
+  const nonce = Discord.SnowflakeUtil.generate();
   const newMessage = {
     content: `**__${roleData[guildID][categoryID].name}__**\n${roleData[guildID][categoryID].description}`,
     components,
+    enforceNonce: true,
+    nonce: nonce.toString(),
   };
 
   return newMessage;

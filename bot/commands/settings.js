@@ -320,12 +320,12 @@ const help = {
 // Exported functions
 async function handle(client, interaction) {
   if (!interaction.channel) {
-    replyHelper.interactionReply(interaction, {content: `That command has to be used in a server.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `That command has to be used in a server.`, flags: Discord.MessageFlags.Ephemeral });
     return;
   }
 
   if (activeChanges.has(interaction.guildId)) {
-    replyHelper.interactionReply(interaction, {content: `Only one change can be made at a time.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `Only one change can be made at a time.`, flags: Discord.MessageFlags.Ephemeral });
   } else {
     activeChanges.add(interaction.guildId);
     changeSettings(interaction, client);
@@ -393,7 +393,7 @@ function changeSettings(interaction, client) {
     default:
       activeChanges.delete(interaction.guildId);
       console.error(`Somehow an invalid setting was passed, check the slash command settings or add the invalid command.\nInvalid setting: ${interaction.options.getSubcommand()}`);
-      replyHelper.interactionReply(interaction, {content: `There was an internal bot error.`, ephemeral: true});
+      replyHelper.interactionReply(interaction, { content: `There was an internal bot error.`, flags: Discord.MessageFlags.Ephemeral });
       break;
   }
 }
@@ -402,9 +402,9 @@ async function changeWelcomeMessage(interaction) {
   const result = await database.updateOrCreateEntry(`Guilds`, {guildID: interaction.guildId}, {welcomeMessage: interaction.options.get(`message`).value});
 
   if (result) {
-    replyHelper.interactionReply(interaction, {content: `Join message has been updated!\nUse \`/test Welcome Message\` to test it.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `Join message has been updated!\nUse \`/test Welcome Message\` to test it.`, flags: Discord.MessageFlags.Ephemeral });
   } else {
-    replyHelper.interactionReply(interaction, {content: `There was an error saving the new welcome message.\nTell the bot developers if the issue persists.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `There was an error saving the new welcome message.\nTell the bot developers if the issue persists.`, flags: Discord.MessageFlags.Ephemeral });
   }
 
   activeChanges.delete(interaction.guildId);
@@ -415,7 +415,7 @@ async function changeWelcomeChannel(interaction) {
   let result;
 
   if (options.get(`channel`) && (!interaction.options.get(`channel`).channel || options.get(`channel`).channel.type !== Discord.ChannelType.GuildText)) {
-    replyHelper.interactionReply(interaction, {content: `That's not a valid text channel.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `That's not a valid text channel.`, flags: Discord.MessageFlags.Ephemeral });
     activeChanges.delete(interaction.guildId);
     return;
   }
@@ -425,15 +425,15 @@ async function changeWelcomeChannel(interaction) {
   } else if (options.get(`channel`)) {
     result = await database.updateOrCreateEntry(`Guilds`, {guildID: interaction.guildId}, {welcomeChannelID: options.get(`channel`).channel.id});
   } else {
-    replyHelper.interactionReply(interaction, {content: `Please provide a channel or set disable to true to disable the welcome message.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `Please provide a channel or set disable to true to disable the welcome message.`, flags: Discord.MessageFlags.Ephemeral });
     activeChanges.delete(interaction.guildId);
     return;
   }
 
   if (result) {
-    replyHelper.interactionReply(interaction, {content: `Welcome message channel has been updated!\nUse \`/test Welcome Channel\` to test it.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `Welcome message channel has been updated!\nUse \`/test Welcome Channel\` to test it.`, flags: Discord.MessageFlags.Ephemeral });
   } else {
-    replyHelper.interactionReply(interaction, {content: `There was an error updating the welcome message channel.\nTell the bot developers if the issue persists.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `There was an error updating the welcome message channel.\nTell the bot developers if the issue persists.`, flags: Discord.MessageFlags.Ephemeral });
   }
 
   activeChanges.delete(interaction.guildId);
@@ -444,7 +444,7 @@ async function changeLogsChannel(interaction) {
   let result;
 
   if (options.get(`channel`) && (!interaction.options.get(`channel`).channel || options.get(`channel`).channel.type !== Discord.ChannelType.GuildText)) {
-    replyHelper.interactionReply(interaction, {content: `That's not a valid text channel.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `That's not a valid text channel.`, flags: Discord.MessageFlags.Ephemeral });
     activeChanges.delete(interaction.guildId);
     return;
   }
@@ -454,15 +454,15 @@ async function changeLogsChannel(interaction) {
   } else if (options.get(`channel`)) {
     result = await database.updateEntry(`Guilds`, {guildID: interaction.guildId}, {logsChannelID: options.get(`channel`).channel.id});
   } else {
-    replyHelper.interactionReply(interaction, {content: `Please provide a channel or set disable to true to disable logs.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `Please provide a channel or set disable to true to disable logs.`, flags: Discord.MessageFlags.Ephemeral });
     activeChanges.delete(interaction.guildId);
     return;
   }
 
   if (result) {
-    replyHelper.interactionReply(interaction, {content: `Logs channel has been updated!\nUse \`/test Logs Channel\` to test it.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `Logs channel has been updated!\nUse \`/test Logs Channel\` to test it.`, flags: Discord.MessageFlags.Ephemeral });
   } else {
-    replyHelper.interactionReply(interaction, {content: `There was an error updating the logs channel.\nTell the bot developers if the issue persists.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `There was an error updating the logs channel.\nTell the bot developers if the issue persists.`, flags: Discord.MessageFlags.Ephemeral });
   }
 
   activeChanges.delete(interaction.guildId);
@@ -473,7 +473,7 @@ async function changeStarboardChannel(interaction) {
   let result;
 
   if (options.get(`channel`) && (!interaction.options.get(`channel`).channel || options.get(`channel`).channel.type !== Discord.ChannelType.GuildText)) {
-    replyHelper.interactionReply(interaction, {content: `That's not a valid text channel.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `That's not a valid text channel.`, flags: Discord.MessageFlags.Ephemeral });
     activeChanges.delete(interaction.guildId);
     return;
   }
@@ -483,15 +483,15 @@ async function changeStarboardChannel(interaction) {
   } else if (options.get(`channel`)) {
     result = await database.updateEntry(`Guilds`, {guildID: interaction.guildId}, {starboardChannelID: options.get(`channel`).channel.id});
   } else {
-    replyHelper.interactionReply(interaction, {content: `Please provide a channel or set disable to true to disable the starboard.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `Please provide a channel or set disable to true to disable the starboard.`, flags: Discord.MessageFlags.Ephemeral });
     activeChanges.delete(interaction.guildId);
     return;
   }
 
   if (result) {
-    replyHelper.interactionReply(interaction, {content: `Starboard channel has been updated!\nAn admin can use a 🌟 reaction to test it.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `Starboard channel has been updated!\nAn admin can use a 🌟 reaction to test it.`, flags: Discord.MessageFlags.Ephemeral });
   } else {
-    replyHelper.interactionReply(interaction, {content: `There was an error updating the starboard channel.\nTell the bot developers if the issue persists.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `There was an error updating the starboard channel.\nTell the bot developers if the issue persists.`, flags: Discord.MessageFlags.Ephemeral });
   }
 
   activeChanges.delete(interaction.guildId);
@@ -500,14 +500,14 @@ async function changeStarboardChannel(interaction) {
 async function changeStarboardThreshold(interaction) {
   const newNum = interaction.options.get(`threshold`).value;
   if (newNum < 1 || newNum > 1000) {
-    replyHelper.interactionReply(interaction, {content: `That's an invalid number, please try again.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `That's an invalid number, please try again.`, flags: Discord.MessageFlags.Ephemeral });
   } else {
     const result = await database.updateOrCreateEntry(`Guilds`, {guildID: interaction.guildId}, {starboardThreshold: newNum});
 
     if (result) {
-      replyHelper.interactionReply(interaction, {content: `Starboard threshold has been updated!\nMake sure you have a starboard channel set!\nUse \`/settings starboard-channel\` to change it.`, ephemeral: true});
+      replyHelper.interactionReply(interaction, { content: `Starboard threshold has been updated!\nMake sure you have a starboard channel set!\nUse \`/settings starboard-channel\` to change it.`, flags: Discord.MessageFlags.Ephemeral });
     } else {
-      replyHelper.interactionReply(interaction, {content: `There was an error updating the starboard channel.\nTell the bot developers if the issue persists.`, ephemeral: true});
+      replyHelper.interactionReply(interaction, { content: `There was an error updating the starboard channel.\nTell the bot developers if the issue persists.`, flags: Discord.MessageFlags.Ephemeral });
     }
   }
 
@@ -523,15 +523,15 @@ async function changeStreamingRole(interaction) {
   } else if (options.get(`role`)) {
     result = await database.updateEntry(`Guilds`, {guildID: interaction.guildId}, {streamingRoleID: options.get(`role`).role.id});
   } else {
-    replyHelper.interactionReply(interaction, {content: `Please provide a role or set disable to true to disable the streaming role.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `Please provide a role or set disable to true to disable the streaming role.`, flags: Discord.MessageFlags.Ephemeral });
     activeChanges.delete(interaction.guildId);
     return;
   }
 
   if (result) {
-    replyHelper.interactionReply(interaction, {content: `Streaming role has been updated!`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `Streaming role has been updated!`, flags: Discord.MessageFlags.Ephemeral });
   } else {
-    replyHelper.interactionReply(interaction, {content: `There was an error updating the streaming role.\nTell the bot developers if the issue persists.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `There was an error updating the streaming role.\nTell the bot developers if the issue persists.`, flags: Discord.MessageFlags.Ephemeral });
   }
 
   activeChanges.delete(interaction.guildId);
@@ -542,7 +542,7 @@ async function changeRoleChannel(interaction, client) {
   let result;
 
   if (options.get(`channel`) && (!interaction.options.get(`channel`).channel || options.get(`channel`).channel.type !== Discord.ChannelType.GuildText)) {
-    replyHelper.interactionReply(interaction, {content: `That's not a valid text channel.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `That's not a valid text channel.`, flags: Discord.MessageFlags.Ephemeral });
     activeChanges.delete(interaction.guildId);
     return;
   }
@@ -552,7 +552,7 @@ async function changeRoleChannel(interaction, client) {
   } else if (options.get(`channel`)) {
     result = await database.updateOrCreateEntry(`Guilds`, {guildID: interaction.guildId}, {rolesChannelID: options.get(`channel`).channel.id});
   } else {
-    replyHelper.interactionReply(interaction, {content: `Please provide a channel or set disable to true to disable the reaction role channel.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `Please provide a channel or set disable to true to disable the reaction role channel.`, flags: Discord.MessageFlags.Ephemeral });
     activeChanges.delete(interaction.guildId);
     return;
   }
@@ -560,9 +560,9 @@ async function changeRoleChannel(interaction, client) {
   if (result) {
     await interaction.deferReply();
     await reactManager.updateGuildMessages(client, interaction.guildId);
-    replyHelper.interactionEdit(interaction, {content: `Reaction role channel has been updated!`, ephemeral: true});
+    replyHelper.interactionEdit(interaction, { content: `Reaction role channel has been updated!`, flags: Discord.MessageFlags.Ephemeral });
   } else {
-    replyHelper.interactionReply(interaction, {content: `There was an error updating the reaction role channel.\nTell the bot developers if the issue persists.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `There was an error updating the reaction role channel.\nTell the bot developers if the issue persists.`, flags: Discord.MessageFlags.Ephemeral });
   }
 
   activeChanges.delete(interaction.guildId);
@@ -574,7 +574,7 @@ async function addRoleReaction(interaction, client) {
     const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
 
     if (!guildSettings || !guildSettings.rolesChannelID) {
-      replyHelper.interactionEdit(interaction, {content: `There isn't a reaction role channel set.\nPlease set one up with \`/settings react-channel\``, ephemeral: true});
+      replyHelper.interactionEdit(interaction, { content: `There isn't a reaction role channel set.\nPlease set one up with \`/settings react-channel\``, flags: Discord.MessageFlags.Ephemeral });
       activeChanges.delete(interaction.guildId);
       return;
     }
@@ -584,7 +584,7 @@ async function addRoleReaction(interaction, client) {
     const emojiID = resolvers.resolveEmojiID(client, options.get(`emoji`).value);
 
     if (!emojiID) {
-      replyHelper.interactionEdit(interaction, {content: `No emoji found by that name.  Please try again.`, ephemeral: true});
+      replyHelper.interactionEdit(interaction, { content: `No emoji found by that name.  Please try again.`, flags: Discord.MessageFlags.Ephemeral });
       activeChanges.delete(interaction.guildId);
       return;
     }
@@ -595,7 +595,7 @@ async function addRoleReaction(interaction, client) {
       const matchingRole = await database.getEntry(`Roles`, {roleCategory: roleCategory.ID, emojiID});
 
       if (matchingRole) {
-        replyHelper.interactionEdit(interaction, {content: `A role in that category is already using that emoji, please try again.`, ephemeral: true});
+        replyHelper.interactionEdit(interaction, { content: `A role in that category is already using that emoji, please try again.`, flags: Discord.MessageFlags.Ephemeral });
         activeChanges.delete(interaction.guildId);
         return;
       }
@@ -603,7 +603,7 @@ async function addRoleReaction(interaction, client) {
       const totalRoles = await database.getAllEntries(`Roles`, {guildID: interaction.guildId, roleCategory: roleCategory.ID});
 
       if (totalRoles.length > 24) {
-        replyHelper.interactionEdit(interaction, {content: `That category has the maximum amount of roles already, please try again.`, ephemeral: true});
+        replyHelper.interactionEdit(interaction, { content: `That category has the maximum amount of roles already, please try again.`, flags: Discord.MessageFlags.Ephemeral });
         activeChanges.delete(interaction.guildId);
         return;
       }
@@ -613,13 +613,13 @@ async function addRoleReaction(interaction, client) {
       await reactManager.addRoleData(client, interaction.guildId, roleCategory.ID, emojiID, options.get(`role`).role.id);
 
       if (result) {
-        replyHelper.interactionEdit(interaction, {content: `The reaction role has been added!`, ephemeral: true});
+        replyHelper.interactionEdit(interaction, { content: `The reaction role has been added!`, flags: Discord.MessageFlags.Ephemeral });
       } else {
-        replyHelper.interactionEdit(interaction, {content: `There was an error adding the reaction role.\nTell the bot developers if the issue persists.`, ephemeral: true});
+        replyHelper.interactionEdit(interaction, { content: `There was an error adding the reaction role.\nTell the bot developers if the issue persists.`, flags: Discord.MessageFlags.Ephemeral });
       }
     } else {
       if (!options.get(`description`)) {
-        replyHelper.interactionEdit(interaction, {content: `No category description was provided for the new category, try again with one.`, ephemeral: true});
+        replyHelper.interactionEdit(interaction, { content: `No category description was provided for the new category, try again with one.`, flags: Discord.MessageFlags.Ephemeral });
         activeChanges.delete(interaction.guildId);
         return;
       }
@@ -631,14 +631,14 @@ async function addRoleReaction(interaction, client) {
       await reactManager.addRoleData(client, interaction.guildId, newRoleCategory.ID, emojiID, options.get(`role`).role.id, options.get(`description`).value, options.get(`category`).value);
 
       if (result) {
-        replyHelper.interactionEdit(interaction, {content: `The reaction role has been added!`, ephemeral: true});
+        replyHelper.interactionEdit(interaction, { content: `The reaction role has been added!`, flags: Discord.MessageFlags.Ephemeral });
       } else {
-        replyHelper.interactionEdit(interaction, {content: `There was an error adding the reaction role.\nTell the bot developers if the issue persists.`, ephemeral: true});
+        replyHelper.interactionEdit(interaction, { content: `There was an error adding the reaction role.\nTell the bot developers if the issue persists.`, flags: Discord.MessageFlags.Ephemeral });
       }
     }
   } catch (err) {
     console.error(err);
-    replyHelper.interactionEdit(interaction, {content: `There was an internal error, please try again.`, ephemeral: true});
+    replyHelper.interactionEdit(interaction, { content: `There was an internal error, please try again.`, flags: Discord.MessageFlags.Ephemeral });
   }
 
   activeChanges.delete(interaction.guildId);
@@ -650,7 +650,7 @@ async function removeRoleReaction(interaction, client) {
     const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
 
     if (!guildSettings || !guildSettings.rolesChannelID) {
-      replyHelper.interactionEdit(interaction, {content: `This guild has no reaction role channel, please set one up with \`/settings react-channel\`."`, ephemeral: true});
+      replyHelper.interactionEdit(interaction, { content: `This guild has no reaction role channel, please set one up with \`/settings react-channel\`."`, flags: Discord.MessageFlags.Ephemeral });
       activeChanges.delete(interaction.guildId);
       return;
     }
@@ -658,7 +658,7 @@ async function removeRoleReaction(interaction, client) {
     const roleCategories = await database.getAllEntries(`RoleCategories`, {guildID: interaction.guildId});
 
     if (!roleCategories || roleCategories.length < 1) {
-      replyHelper.interactionEdit(interaction, {content: `There are no reaction roles!`, ephemeral: true});
+      replyHelper.interactionEdit(interaction, { content: `There are no reaction roles!`, flags: Discord.MessageFlags.Ephemeral });
       activeChanges.delete(interaction.guildId);
       return;
     }
@@ -668,7 +668,7 @@ async function removeRoleReaction(interaction, client) {
     const roleCategory = await database.getEntry(`RoleCategories`, {guildID: interaction.guildId, categoryName: options.get(`category`).value});
 
     if (!roleCategory) {
-      replyHelper.interactionEdit(interaction, {content: `No role category was found, please try again.`, ephemeral: true});
+      replyHelper.interactionEdit(interaction, { content: `No role category was found, please try again.`, flags: Discord.MessageFlags.Ephemeral });
       activeChanges.delete(interaction.guildId);
       return;
     }
@@ -686,12 +686,12 @@ async function removeRoleReaction(interaction, client) {
         await reactManager.removeRoleData(client, interaction.guildId, roleCategory.ID, oldRole.emojiID);
       }
 
-      replyHelper.interactionEdit(interaction, {content: `The role has been removed.`, ephemeral: true});
+      replyHelper.interactionEdit(interaction, { content: `The role has been removed.`, flags: Discord.MessageFlags.Ephemeral });
     } else {
-      replyHelper.interactionEdit(interaction, {content: `No reaction role was found, please try again.`, ephemeral: true});
+      replyHelper.interactionEdit(interaction, { content: `No reaction role was found, please try again.`, flags: Discord.MessageFlags.Ephemeral });
     }
   } catch {
-    replyHelper.interactionEdit(interaction, {content: `There was an internal error, please try again.`, ephemeral: true});
+    replyHelper.interactionEdit(interaction, { content: `There was an internal error, please try again.`, flags: Discord.MessageFlags.Ephemeral });
   }
 
   activeChanges.delete(interaction.guildId);
@@ -704,9 +704,9 @@ async function updateRoleReactions(interaction, client) {
   if (guildSettings && guildSettings.rolesChannelID) {
     await reactManager.updateGuildMessages(client, interaction.guildId);
 
-    replyHelper.interactionEdit(interaction, {content: `The role reactions have been updated.`, ephemeral: true});
+    replyHelper.interactionEdit(interaction, { content: `The role reactions have been updated.`, flags: Discord.MessageFlags.Ephemeral });
   } else {
-    replyHelper.interactionEdit(interaction, {content: `This guild has no reaction role channel, please set one up with \`/settings react-channel\`."`, ephemeral: true});
+    replyHelper.interactionEdit(interaction, { content: `This guild has no reaction role channel, please set one up with \`/settings react-channel\`."`, flags: Discord.MessageFlags.Ephemeral });
   }
 
   activeChanges.delete(interaction.guildId);
@@ -718,7 +718,7 @@ async function updateCategoryName(interaction, client) {
     const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
 
     if (!guildSettings || !guildSettings.rolesChannelID) {
-      replyHelper.interactionEdit(interaction, {content: `This guild has no reaction role channel, please set one up with \`/settings react-channel\`."`, ephemeral: true});
+      replyHelper.interactionEdit(interaction, { content: `This guild has no reaction role channel, please set one up with \`/settings react-channel\`."`, flags: Discord.MessageFlags.Ephemeral });
       activeChanges.delete(interaction.guildId);
       return;
     }
@@ -730,12 +730,12 @@ async function updateCategoryName(interaction, client) {
 
     if (result && newResult) {
       await reactManager.updateCategoryData(client, newResult.guildID, newResult.ID, newResult.categoryName);
-      replyHelper.interactionEdit(interaction, {content: `The category name was updated.`, ephemeral: true});
+      replyHelper.interactionEdit(interaction, { content: `The category name was updated.`, flags: Discord.MessageFlags.Ephemeral });
     } else {
-      replyHelper.interactionEdit(interaction, {content: `Failed to update that category, please try again.`, ephemeral: true});
+      replyHelper.interactionEdit(interaction, { content: `Failed to update that category, please try again.`, flags: Discord.MessageFlags.Ephemeral });
     }
   } catch {
-    replyHelper.interactionEdit(interaction, {content: `There was an internal error, please try again.`, ephemeral: true});
+    replyHelper.interactionEdit(interaction, { content: `There was an internal error, please try again.`, flags: Discord.MessageFlags.Ephemeral });
   }
 
   activeChanges.delete(interaction.guildId);
@@ -747,7 +747,7 @@ async function updateCategoryInfo(interaction, client) {
     const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
 
     if (!guildSettings || !guildSettings.rolesChannelID) {
-      replyHelper.interactionEdit(interaction, {content: `This guild has no reaction role channel, please set one up with \`/settings react-channel\`.`, ephemeral: true});
+      replyHelper.interactionEdit(interaction, { content: `This guild has no reaction role channel, please set one up with \`/settings react-channel\`.`, flags: Discord.MessageFlags.Ephemeral });
       activeChanges.delete(interaction.guildId);
       return;
     }
@@ -759,12 +759,12 @@ async function updateCategoryInfo(interaction, client) {
 
     if (result && newResult) {
       await reactManager.updateCategoryData(client, newResult.guildID, newResult.ID, null, newResult.categoryDescription);
-      replyHelper.interactionEdit(interaction, {content: `The category description was updated.`, ephemeral: true});
+      replyHelper.interactionEdit(interaction, { content: `The category description was updated.`, flags: Discord.MessageFlags.Ephemeral });
     } else {
-      replyHelper.interactionEdit(interaction, {content: `Failed to update that category, please try again.`, ephemeral: true});
+      replyHelper.interactionEdit(interaction, { content: `Failed to update that category, please try again.`, flags: Discord.MessageFlags.Ephemeral });
     }
   } catch {
-    replyHelper.interactionEdit(interaction, {content: `There was an internal error, please try again.`, ephemeral: true});
+    replyHelper.interactionEdit(interaction, { content: `There was an internal error, please try again.`, flags: Discord.MessageFlags.Ephemeral });
   }
 
   activeChanges.delete(interaction.guildId);
@@ -777,17 +777,17 @@ async function verifyReactRoles(interaction, client) {
     const guildSettings = await database.getEntry(`Guilds`, {guildID: interaction.guildId});
 
     if (!guildSettings || !guildSettings.rolesChannelID) {
-      replyHelper.interactionEdit(interaction, {content: `This server doesn't have reaction roles set up.`, ephemeral: true});
+      replyHelper.interactionEdit(interaction, { content: `This server doesn't have reaction roles set up.`, flags: Discord.MessageFlags.Ephemeral });
       activeChanges.delete(interaction.guildId);
       return;
     }
 
     const reactionCategories = await database.getAllEntries(`RoleCategories`, {guildID: interaction.guildId});
     if (!reactionCategories) {
-      replyHelper.interactionEdit(interaction, {content: `This server doesn't have reaction roles set up.`, ephemeral: true});
+      replyHelper.interactionEdit(interaction, { content: `This server doesn't have reaction roles set up.`, flags: Discord.MessageFlags.Ephemeral });
     }
 
-    replyHelper.interactionEdit(interaction, {content: `Verifying reaction roles...`, ephemeral: true});
+    replyHelper.interactionEdit(interaction, { content: `Verifying reaction roles...`, flags: Discord.MessageFlags.Ephemeral });
     reactionCategories.forEach(async (category) => {
       const catRoles = await database.getAllEntries(`Roles`, {guildID: interaction.guildId, roleCategory: category.ID});
       catRoles.forEach(async (role) => {
@@ -805,9 +805,9 @@ async function verifyReactRoles(interaction, client) {
         await reactManager.removeRoleData(client, interaction.guildId, category.ID);
       }
     });
-    replyHelper.interactionEdit(interaction, {content: `Reaction roles have been verified.  Any missing roles have been removed.`, ephemeral: true});
+    replyHelper.interactionEdit(interaction, { content: `Reaction roles have been verified.  Any missing roles have been removed.`, flags: Discord.MessageFlags.Ephemeral });
   } catch {
-    replyHelper.interactionEdit(interaction, {content: `There was an internal error verifying the reaction roles.`, ephemeral: true});
+    replyHelper.interactionEdit(interaction, { content: `There was an internal error verifying the reaction roles.`, flags: Discord.MessageFlags.Ephemeral });
   }
 
   activeChanges.delete(interaction.guildId);
@@ -822,15 +822,15 @@ async function changeVerifiedRole(interaction) {
   } else if (options.get(`role`)) {
     result = await database.updateEntry(`Guilds`, {guildID: interaction.guildId}, {verifiedRoleID: options.get(`role`).role.id});
   } else {
-    replyHelper.interactionReply(interaction, {content: `Please provide a role or set disable to true to disable the verified role.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `Please provide a role or set disable to true to disable the verified role.`, flags: Discord.MessageFlags.Ephemeral });
     activeChanges.delete(interaction.guildId);
     return;
   }
 
   if (result) {
-    replyHelper.interactionReply(interaction, {content: `Verified role has been updated!`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `Verified role has been updated!`, flags: Discord.MessageFlags.Ephemeral });
   } else {
-    replyHelper.interactionReply(interaction, {content: `There was an error updating the verified role.\nTell the bot developers if the issue persists.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `There was an error updating the verified role.\nTell the bot developers if the issue persists.`, flags: Discord.MessageFlags.Ephemeral });
   }
 
   activeChanges.delete(interaction.guildId);
@@ -841,7 +841,7 @@ async function changeReportChannel(interaction) {
   let result;
 
   if (options.get(`channel`) && (!interaction.options.get(`channel`).channel || options.get(`channel`).channel.type !== Discord.ChannelType.GuildText)) {
-    replyHelper.interactionReply(interaction, {content: `That's not a valid text channel.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `That's not a valid text channel.`, flags: Discord.MessageFlags.Ephemeral });
     activeChanges.delete(interaction.guildId);
     return;
   }
@@ -851,15 +851,15 @@ async function changeReportChannel(interaction) {
   } else if (options.get(`channel`)) {
     result = await database.updateEntry(`Guilds`, {guildID: interaction.guildId}, {reportChannelID: options.get(`channel`).channel.id});
   } else {
-    replyHelper.interactionReply(interaction, {content: `Please provide a channel or set disable to true to disable the report channel.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `Please provide a channel or set disable to true to disable the report channel.`, flags: Discord.MessageFlags.Ephemeral });
     activeChanges.delete(interaction.guildId);
     return;
   }
 
   if (result) {
-    replyHelper.interactionReply(interaction, {content: `Report channel has been updated!`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `Report channel has been updated!`, flags: Discord.MessageFlags.Ephemeral });
   } else {
-    replyHelper.interactionReply(interaction, {content: `There was an error updating the report channel.\nTell the bot developers if the issue persists.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `There was an error updating the report channel.\nTell the bot developers if the issue persists.`, flags: Discord.MessageFlags.Ephemeral });
   }
 
   activeChanges.delete(interaction.guildId);
@@ -874,15 +874,15 @@ async function changeReportRole(interaction) {
   } else if (options.get(`role`)) {
     result = await database.updateEntry(`Guilds`, {guildID: interaction.guildId}, {reportRoleID: options.get(`role`).role.id});
   } else {
-    replyHelper.interactionReply(interaction, {content: `Please provide a role or set disable to true to disable the report role.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `Please provide a role or set disable to true to disable the report role.`, flags: Discord.MessageFlags.Ephemeral });
     activeChanges.delete(interaction.guildId);
     return;
   }
 
   if (result) {
-    replyHelper.interactionReply(interaction, {content: `Report role has been updated!`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `Report role has been updated!`, flags: Discord.MessageFlags.Ephemeral });
   } else {
-    replyHelper.interactionReply(interaction, {content: `There was an error updating the report role.\nTell the bot developers if the issue persists.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `There was an error updating the report role.\nTell the bot developers if the issue persists.`, flags: Discord.MessageFlags.Ephemeral });
   }
 
   activeChanges.delete(interaction.guildId);
@@ -897,15 +897,15 @@ async function changeTimeoutRole(interaction) {
   } else if (options.get(`role`)) {
     result = await database.updateEntry(`Guilds`, {guildID: interaction.guildId}, {timeoutRoleID: options.get(`role`).role.id});
   } else {
-    replyHelper.interactionReply(interaction, {content: `Please provide a role or set disable to true to disable the timeout role.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `Please provide a role or set disable to true to disable the timeout role.`, flags: Discord.MessageFlags.Ephemeral });
     activeChanges.delete(interaction.guildId);
     return;
   }
 
   if (result) {
-    replyHelper.interactionReply(interaction, {content: `Timeout role has been updated!`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `Timeout role has been updated!`, flags: Discord.MessageFlags.Ephemeral });
   } else {
-    replyHelper.interactionReply(interaction, {content: `There was an error updating the timeout role.\nTell the bot developers if the issue persists.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `There was an error updating the timeout role.\nTell the bot developers if the issue persists.`, flags: Discord.MessageFlags.Ephemeral });
   }
 
   activeChanges.delete(interaction.guildId);

@@ -1,8 +1,8 @@
 // Imports
+const Discord = require(`discord.js`);
+
 const database = require(`../helpers/database-manager`);
 const replyHelper = require(`../helpers/interaction-helper`);
-
-const Discord = require(`discord.js`);
 
 // Exports
 module.exports = {handle, getHelp};
@@ -40,7 +40,7 @@ const help = {
 // Exported functions
 function handle(client, interaction) {
   if (!interaction.channel) {
-    replyHelper.interactionReply(interaction, {content: `This command has to be used in a server.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `This command has to be used in a server.`, flags: Discord.MessageFlags.Ephemeral });
   } else {
     testSettings(interaction, interaction.options.get(`test`).value);
   }
@@ -73,9 +73,9 @@ async function testWelcomeMessage(interaction) {
 
   if (guildSettings && guildSettings.welcomeMessage) {
     const welcomeMessage = guildSettings.welcomeMessage.replace(`!!newuser!!`, `${interaction.user}`);
-    replyHelper.interactionReply(interaction, {content: welcomeMessage, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: welcomeMessage, flags: Discord.MessageFlags.Ephemeral });
   } else {
-    replyHelper.interactionReply(interaction, {content: `There is no welcome message set up for this guild!`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `There is no welcome message set up for this guild!`, flags: Discord.MessageFlags.Ephemeral });
   }
 }
 
@@ -85,12 +85,13 @@ async function testWelcomeChannel(interaction) {
   if (guildSettings && guildSettings.welcomeMessage && guildSettings.welcomeChannelID) {
     const welcomeMessage = guildSettings.welcomeMessage.replace(`!!newuser!!`, `${interaction.user}`);
     const welcomeChannel = interaction.guild.channels.cache.get(guildSettings.welcomeChannelID);
-    welcomeChannel.send(welcomeMessage);
-    replyHelper.interactionReply(interaction, {content: `Check the welcome channel! (${welcomeChannel})`, ephemeral: true});
+    const nonce = Discord.SnowflakeUtil.generate();
+    welcomeChannel.send({ content: welcomeMessage, enforceNonce: true, nonce: nonce.toString() });
+    replyHelper.interactionReply(interaction, { content: `Check the welcome channel! (${welcomeChannel})`, flags: Discord.MessageFlags.Ephemeral });
   } else if (guildSettings && guildSettings.welcomeChannelID) {
-    replyHelper.interactionReply(interaction, {content: `There is no welcome message set up for this guild!`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `There is no welcome message set up for this guild!`, flags: Discord.MessageFlags.Ephemeral });
   } else {
-    replyHelper.interactionReply(interaction, {content: `There is no welcome channel set up for this guild!`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `There is no welcome channel set up for this guild!`, flags: Discord.MessageFlags.Ephemeral });
   }
 }
 
@@ -115,10 +116,11 @@ async function testLogsChannel(interaction) {
 
     embed.setFooter({text: `${interaction.user.tag}`});
 
-    logsChannel.send({embeds: [embed]});
+    const nonce = Discord.SnowflakeUtil.generate();
+    logsChannel.send({ embeds: [embed], enforceNonce: true, nonce: nonce.toString() });
     
-    replyHelper.interactionReply(interaction, {content: `Check the logs channel! (${logsChannel})`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `Check the logs channel! (${logsChannel})`, flags: Discord.MessageFlags.Ephemeral });
   } else {
-    replyHelper.interactionReply(interaction, {content: `There is no logs channel set up for this guild!`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `There is no logs channel set up for this guild!`, flags: Discord.MessageFlags.Ephemeral });
   }
 }

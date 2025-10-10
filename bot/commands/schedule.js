@@ -1,11 +1,11 @@
 const Discord = require(`discord.js`);
-
-const collectors = require(`../helpers/collectors`);
-const taskManager = require(`../helpers/task-manager`);
 const axios = require(`axios`);
 const path = require(`path`);
 const cronos = require(`cronosjs`);
 const fs = require(`fs`);
+
+const collectors = require(`../helpers/collectors`);
+const taskManager = require(`../helpers/task-manager`);
 const replyHelper = require(`../helpers/interaction-helper`);
 
 // Exports
@@ -48,19 +48,19 @@ const help = {
 // Exported functions
 async function handle(client, interaction) {
   if (!interaction.channel) {
-    replyHelper.interactionReply(interaction, {content: `This command has to be used in a server.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `This command has to be used in a server.`, flags: Discord.MessageFlags.Ephemeral });
     return;
   }
 
   if (!interaction.options.get(`channel`).channel || interaction.options.get(`channel`).channel.type !== `GUILD_TEXT`) {
-    replyHelper.interactionReply(interaction, {content: `That's not a valid text channel.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `That's not a valid text channel.`, flags: Discord.MessageFlags.Ephemeral });
     return;
   }
 
   const cronString = interaction.options.get(`cron`).value;
   const cronSplit = cronString.split(` `);
   if (!cronos.validate(cronString) || (cronSplit.length > 5 && isNaN(cronSplit[0]))) {
-    replyHelper.interactionReply(interaction, {content: `That isn't a valid cron string, please try again.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `That isn't a valid cron string, please try again.`, flags: Discord.MessageFlags.Ephemeral });
     return;
   }
 
@@ -68,21 +68,21 @@ async function handle(client, interaction) {
   let task;
   if (interaction.options.get(`image`).value) {
     try {
-      replyHelper.interactionReply(interaction, {content: `Please send an image for the task now.`, ephemeral: true});
+      replyHelper.interactionReply(interaction, { content: `Please send an image for the task now.`, flags: Discord.MessageFlags.Ephemeral });
       taskImg = await collectors.oneMessageFromUser(interaction.channel, interaction.user.id, 600000);
     } catch {
-      interaction.followUp({content: `Command timed out, please try again.`, ephemeral: true});
+      interaction.followUp({ content: `Command timed out, please try again.`, flags: Discord.MessageFlags.Ephemeral });
       return;
     }
 
     task = taskImg.first();
 
     if (task.attachments.size > 0 && verifyImage(task) !== `valid`) {
-      interaction.followUp({content: `That isn't a valid image, please try again.`, ephemeral: true});
+      interaction.followUp({ content: `That isn't a valid image, please try again.`, flags: Discord.MessageFlags.Ephemeral });
       return;
     }
   } else if (!interaction.options.has(`message`)) {
-    replyHelper.interactionReply(interaction, {content: `The task needs to at least send something, please try again.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `The task needs to at least send something, please try again.`, flags: Discord.MessageFlags.Ephemeral });
     return;
   }
 
@@ -98,19 +98,19 @@ async function handle(client, interaction) {
       if (task.deletable) {
         task.delete();
       }
-      interaction.followUp({content: `Task added!`, ephemeral: true});
+      interaction.followUp({ content: `Task added!`, flags: Discord.MessageFlags.Ephemeral });
       return;
     }
-    replyHelper.interactionReply(interaction, {content: `Task added!`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `Task added!`, flags: Discord.MessageFlags.Ephemeral });
   } else {
     if (interaction.options.get(`image`).value) {
       if (task.deletable) {
         task.delete();
       }
-      interaction.followUp({content: `Failed to add task, let the bot devs know if the issue persists.`, ephemeral: true});
+      interaction.followUp({ content: `Failed to add task, let the bot devs know if the issue persists.`, flags: Discord.MessageFlags.Ephemeral });
       return;
     }
-    replyHelper.interactionReply(interaction, {content: `Failed to add task, let the bot devs know if the issue persists.`, ephemeral: true});
+    replyHelper.interactionReply(interaction, { content: `Failed to add task, let the bot devs know if the issue persists.`, flags: Discord.MessageFlags.Ephemeral });
   }
 }
 

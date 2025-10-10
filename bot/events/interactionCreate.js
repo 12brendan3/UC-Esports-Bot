@@ -55,13 +55,13 @@ async function handleButton(client, interaction) {
         try {
           if (member.roles.cache.get(roleID)) {
             await member.roles.remove(roleID, `User requested role removal.`);
-            replyHelper.interactionReply(interaction, {content: `You no longer have the \`${role.name}\` role.`, ephemeral: true});
+            replyHelper.interactionReply(interaction, { content: `You no longer have the \`${role.name}\` role.`, flags: Discord.MessageFlags.Ephemeral });
           } else {
             await member.roles.add(roleID, `User requested role addition.`);
-            replyHelper.interactionReply(interaction, {content: `You have been given the \`${role.name}\` role.`, ephemeral: true});
+            replyHelper.interactionReply(interaction, { content: `You have been given the \`${role.name}\` role.`, flags: Discord.MessageFlags.Ephemeral });
           }
         } catch {
-          const message = await replyHelper.interactionReply(interaction, {content: `${member}, there was an error giving you the \`${role.name}\` role.\nTell an admin if they don't notice.  There may be a permission issue.`, ephemeral: false});
+          const message = await replyHelper.interactionReply(interaction, { content: `${member}, there was an error giving you the \`${role.name}\` role.\nTell an admin if they don't notice.  There may be a permission issue.`, ephemeral: false });
           setTimeout(() => message.delete(), 10000);
         }
         break;

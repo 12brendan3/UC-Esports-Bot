@@ -11,7 +11,7 @@ const help = {
 
 // Exported functions
 function handle(client, interaction) {
-  replyHelper.interactionReply(interaction, {content: `Here's the link to invite the bot to a server:\nhttps://discord.com/api/oauth2/authorize?client_id=${client.user.id}&permissions=8&scope=bot%20applications.commands`, ephemeral: true});
+  replyHelper.interactionReply(interaction, { content: `Here's the link to invite the bot to a server:\nhttps://discord.com/api/oauth2/authorize?client_id=${client.user.id}&permissions=8&scope=bot%20applications.commands`, flags: Discord.MessageFlags.Ephemeral });
 }
 
 function getHelp() {

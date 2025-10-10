@@ -94,5 +94,10 @@ function reloadSomething(split) {
   }
 }
 
+// Handle and log all unhandled rejections to help prevent crashes
+process.on('unhandledRejection', (err) => {
+    console.error('Unhandled promise rejection:', err);
+});
+
 // Kick it all off
 startUp();

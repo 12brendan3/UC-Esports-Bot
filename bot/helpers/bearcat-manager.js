@@ -1,3 +1,5 @@
+const Discord = require(`discord.js`);
+
 const settings = require(`./settings-manager`);
 const database = require(`./database-manager`);
 const replyHelper = require(`./interaction-helper`);
@@ -28,12 +30,15 @@ function prepEmail() {
   emailer = nodemailer.createTransport({
     service: `gmail`,
     auth: {
+      type: "OAuth2",
       user: settings.getAuth().gmailUN,
-      pass: settings.getAuth().gmailPW,
+      clientId: settings.getAuth().gmailId,
+      clientSecret: settings.getAuth().gmailSecret,
+      refreshToken: settings.getAuth().gmailToken,
     },
   });
 
-  console.info(`Email username and password set.`);
+  console.info(`Email setup complete.`);
 }
 
 async function verifyUser(interaction) {

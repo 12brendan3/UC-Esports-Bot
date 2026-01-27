@@ -35,7 +35,7 @@ function handle(client, interaction) {
 
   embed.setFields(embedFields);
 
-  embed.setFooter({text: settings.version});
+  embed.setFooter({text: settings.getVersion()});
 
   replyHelper.interactionReply(interaction, {embeds: [embed]});
 }

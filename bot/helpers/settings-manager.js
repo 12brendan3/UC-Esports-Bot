@@ -1,19 +1,20 @@
 const fs = require(`fs`);
 
-const authTemplate = {botToken: `replace me`, weatherToken: `replace me`, ytKey: `replace me`, gmailUN: `replace me`, gmailPW: `replace me`};
+const authTemplate = {botToken: `replace me`, weatherToken: `replace me`, ytKey: `replace me`, gmailUN: `replace me`, gmailId: `replace me`, gmailSecret: `replace me`, gmailToken: `replace me`};
 const settingsTemplate = {prefix: `bc!`, weatherLatitude: 39.132920, weatherLongitude: -84.514952};
-const version = `v1.2.0`;
 
+let version = '';
 let auth = {};
 let settings = {};
 
 // Exports
-module.exports = {loadAll, loadAuth, loadSettings, getAuth, getSettings, clearAll, version};
+module.exports = {loadAll, loadAuth, loadSettings, getAuth, getSettings, clearAll, getVersion};
 
 // Exported functions
 function loadAll() {
   loadAuth();
   loadSettings();
+  readVersion();
 }
 
 function loadAuth() {
@@ -58,6 +59,12 @@ function loadSettings() {
   }
 }
 
+function readVersion() {
+  const packageInfo = JSON.parse(fs.readFileSync(`./package.json`));
+  version = `v${packageInfo.version}`;
+  console.info(`Version read.`);
+}
+
 function getSettings() {
   return settings;
 }
@@ -66,7 +73,12 @@ function getAuth() {
   return auth;
 }
 
+function getVersion() {
+  return version;
+}
+
 function clearAll() {
   auth = {};
   settings = {};
+  version = '';
 }
